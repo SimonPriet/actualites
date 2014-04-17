@@ -1,0 +1,10 @@
+<article class="cell eight height-six">
+	<label>Titre :</label>
+	<input ng-model="currentInfo.title" type="text"/>
+
+	<label>Contenu :</label>
+	<rich-text-editor ng-model="currentInfo.content">
+	</rich-text-editor>
+
+	<button ng-click="saveInfo()">Sauvegarder</button>
+</article>
