@@ -1,13 +1,32 @@
-# Application Actualité (ENT Core)
+# Notes d'utilisation
 
-Actualités est une application de test développé avec ATOS
+## Construction
 
-## Fonctionnalités
+<pre>
+		gradle copyMod
+</pre>
 
-- Chaque utilisateur peut créer un fil d'actualité paratgeable
-- Les utilisateurs habilités peuvent modérer la publication d'actualité
-- les actualités peuvent être rendu public
+## Déploier dans ent-core
 
-## Modèle
 
-- décrire le modèle JS de donnée ici
+## Configuration
+
+Dans le fichier `/infra/src/main/resources/mod.json` :
+
+
+Déclarer l'application dans `"one-modules"`:
+<pre>
+	{
+		"name": "fr.wseduc~scrap-book~0.1-SNAPSHOT"
+	}
+</pre>
+
+
+Associer une route d'entée à la configuration du module proxy intégré (`"name": "com.wse~http-proxy~1.0.0"`) :
+<pre>
+	{
+		"location": "/scrapbook",
+		"proxy_pass": "http://localhost:8020"
+	}
+</pre>
+
