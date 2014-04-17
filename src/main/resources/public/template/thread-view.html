@@ -1,0 +1,7 @@
+<article>
+	<div ng-repeat="info in currentThread.infos.all">
+		<h2>[[info.title]]</h2>
+		<div class="row" bind-html="info.content">
+		</div>
+	</div>
+</article>

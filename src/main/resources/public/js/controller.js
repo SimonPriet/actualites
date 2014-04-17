@@ -76,6 +76,11 @@ function ActualitesController($scope, template, route){
     	thread.open();
     }
 
+    $scope.showThread = function(thread){
+        $scope.selectThread(thread);
+        template.open('thread', 'thread-view');
+    }
+
     $scope.removeInfo = function(info){
     	$scope.currentThread.infos.remove(info);
     	$scope.currentThread.save();
