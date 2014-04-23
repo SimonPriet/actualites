@@ -13,14 +13,18 @@
 	<h1>Application actualites</h1>
 	<p>Les actualites de l'ent-core.</p>
 
-	<div class="row">
-		<div class="cell three" ng-repeat="thread in threads.all">
-			<h2>[[thread.title]]</h2>
-			<div ng-include="template.containers.info">
-			</div>
+	<div class="row" ng-repeat="thread in threads.all">
+		<h2>[[thread.title]]</h2>
 
-			<button ng-if="currentThread !== thread" ng-click="showThread(thread)">Voir</button>
-		</div>
+		<button ng-if="! thread.loaded" ng-click="loadThread(thread)">Voir</button>
+
+		<article class="cell three" ng-repeat="info in thread.infos.all">
+			<h3>[[info.title]]</h3>
+			<div class="row" bind-html="info.content">
+			</div>
+		</article>
+
+		<button ng-if="currentThread !== thread" ng-click="showThread(thread)">Plus</button>
 	</div>
 
 	<div class="row" ng-include="template.containers.thread">

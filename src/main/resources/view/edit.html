@@ -14,6 +14,7 @@
 	<p>Les actualites de l'ent-core.</p>
 
 	<div class="row">
+		<!-- Thread Navigation -->
 		<nav class="vertical cell three">
 		    <ul>
 			  <li ng-repeat="thread in threads.all">
@@ -23,39 +24,64 @@
 			  </li>
 			</ul>
 		</nav>
+
 		<div class="cell eight">
+
+			<!-- Thread actions -->
 			<div class="row height-one">
-				<article class="absolute">
+				<div class="absolute">
 					<button ng-click="createThread()">Nouveau fil d'actualites</button>
 					<button ng-click="createInfo()" ng-if="hasCurrentThread()">Nouvelle actualite</button>
 					<behaviour name="edit" resource="currentThread" class="cell">
 						<button ng-click="template.open('edition', 'thread-edit-form')">Editer le fil d'actualites</button>
 					</behaviour>
 					<button ng-click="display.showPanel = true" ng-if="hasCurrentThread()">Partager le fil</button>
-				</article>
+				</div>
 			</div>
-			<div ng-include="template.containers.edition">
 
+			<!-- Thread edition -->
+			<div ng-include="template.containers.edition">
 			</div>
+
+			<!-- Infos -->
 			<div class="row">
-				<div ng-repeat="info in currentThread.infos.all">
-					<h2>[[info.title]]</h2>
-					<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
-					<div class="row" bind-html="info.content">
+				<article ng-repeat="info in currentThread.infos.all">
+
+					<!-- Info display -->
+					<div ng-if="(! hasCurrentInfo()) || (info !== currentInfo)">
+						<div class="row">
+							<h2>[[info.title]]</h2>
+							<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
+						</div>
+
+						<div class="row">
+							<span ng-if="info.hasPublicationDate === true">Date de publication: [[info.publicationDate]]</span>
+							<span ng-if="info.hasExpirationDate === true">Date d'expiration': [[info.expirationDate]]</span>
+						</div>
+
+						<div class="row" bind-html="info.content">
+						</div>
+
+						<div class="row">
+							<behaviour name="edit" resource="currentThread">
+								<button ng-click="editInfo(info)">Editer</button>
+							</behaviour>
+							<button workflow="actualites.publish">Publier</button>
+						</div>
 					</div>
-					<behaviour name="edit" resource="currentThread">
-						<button ng-click="editInfo(info)">Editer</button>
-					</behaviour>
-					<button workflow="actualites.publish">Publier</button>
+
+					<!-- Info edition -->
 					<div ng-if="info === currentInfo" ng-include="template.containers.editinfo">
 					</div>
-				</div>
+
+				</article>
 			</div>
 		</div>
 	</div>
 
 </portal>
 
+<!-- Lightbox : Thread share -->
 <div ng-if="hasCurrentThread()">
 	<behaviour name="share" resource="currentThread">
 		<lightbox show="display.showPanel" on-close="display.showPanel = false">

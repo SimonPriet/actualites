@@ -1,10 +1,28 @@
-<article class="cell eight height-six">
-	<label>Titre :</label>
-	<input ng-model="currentInfo.title" type="text"/>
+<article class="cell eight">
+	<div class="row">
+		<label>Titre :</label>
+		<input ng-model="currentInfo.title" type="text"/>
+	</div>
 
-	<label>Contenu :</label>
-	<rich-text-editor ng-model="currentInfo.content">
-	</rich-text-editor>
+	<div class="row">
+		<input ng-model="currentInfo.hasPublicationDate" type="checkbox"/>
+		<label>Date de publication :</label>
+		<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
+	</div>
 
-	<button ng-click="saveInfo()">Sauvegarder</button>
+	<div class="row">
+		<input ng-model="currentInfo.hasExpirationDate" type="checkbox"/>
+		<label>Date d'expiration' :</label>
+		<date-picker ng-model="currentInfo.expirationDate" ng-change="showDate = true"></date-picker>
+	</div>
+
+	<div class="row">
+		<label>Contenu :</label>
+		<rich-text-editor ng-model="currentInfo.content">
+		</rich-text-editor>
+	</div>
+
+	<div class="row">
+		<button ng-click="saveInfo()">Sauvegarder</button>
+	</div>
 </article>
