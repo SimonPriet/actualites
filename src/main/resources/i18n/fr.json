@@ -1,4 +1,10 @@
 {
 	"actualites.title": "Actualités",
+	"actualites.title.latest": "Dernières actualités",
+	"actualites.title.mine": "Mes actualités",
+	"actualites.title.edition": "Gestion des actualités",
+	"actualites.display.latest": "Dernières actualités",
+	"actualites.display.mine": "Mes actualités",
+	"actualites.display.edition": "Gérer les actualités",
 	"actualites.thread.default.title": "Entrez un titre pour le fil"
 }

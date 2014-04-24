@@ -18,6 +18,27 @@ Thread.prototype.addInfo = function(info){
 	
 	var newInfo = new Info(info);
 	this.infos.push(newInfo);
+	this.infos.load(this.infos.sortBy(function(info){ return moment() - moment(info.modificationDate); }));
+	this.save();
+
+}
+
+
+function PrivateThread(){
+	this.collection(Info);
+}
+
+PrivateThread.prototype.create = function(data){
+
+	this.updateData(data);
+	this.save();
+
+}
+
+PrivateThread.prototype.addInfo = function(info){
+	
+	var newInfo = new Info(info);
+	this.infos.push(newInfo);
 	this.save();
 
 }
@@ -26,6 +47,7 @@ Thread.prototype.addInfo = function(info){
 model.build = function(){
 	model.me.workflow.load(['actualites']);
 
-	this.makeModels([Thread, Info]);
+	this.makeModels([Thread, PrivateThread, Info]);
 	this.makePermanent(Thread);
+	this.makePermanent(PrivateThread);
 };

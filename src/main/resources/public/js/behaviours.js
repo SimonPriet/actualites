@@ -1,5 +1,6 @@
 var actualitesBehaviours = {
 	workflow: {
+		edit: 'fr.wseduc.actualites.controllers.ActualitesController|viewEdit',
 		publish: 'fr.wseduc.actualites.controllers.ActualitesController|publish'
 	}
 };

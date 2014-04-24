@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{#i18n}}actualites.title{{/i18n}}</title>
+	<title>{{#i18n}}actualites.title.edition{{/i18n}}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
+	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
-<body ng-controller="ActualitesController">
+<body ng-controller="ActualitesEditionController">
 <portal>
-	<h1 translate content="actualites.title"></h1>
+	<h1 translate content="actualites.title.edition"></h1>
 	<p>Les actualites de l'ent-core.</p>
 
 	<div class="row">
@@ -40,41 +41,14 @@
 			</div>
 
 			<!-- Thread edition -->
-			<div ng-include="template.containers.edition">
+			<div ng-include="template.containers.thread_edition">
 			</div>
 
 			<!-- Infos -->
 			<div class="row">
-				<article ng-repeat="info in currentThread.infos.all">
-
-					<!-- Info display -->
-					<div ng-if="(! hasCurrentInfo()) || (info !== currentInfo)">
-						<div class="row">
-							<h2>[[info.title]]</h2>
-							<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
-						</div>
-
-						<div class="row">
-							<span ng-if="info.hasPublicationDate === true">Date de publication: [[info.publicationDate]]</span>
-							<span ng-if="info.hasExpirationDate === true">Date d'expiration': [[info.expirationDate]]</span>
-						</div>
-
-						<div class="row" bind-html="info.content">
-						</div>
-
-						<div class="row">
-							<behaviour name="edit" resource="currentThread">
-								<button ng-click="editInfo(info)">Editer</button>
-							</behaviour>
-							<button workflow="actualites.publish">Publier</button>
-						</div>
-					</div>
-
-					<!-- Info edition -->
-					<div ng-if="info === currentInfo" ng-include="template.containers.editinfo">
-					</div>
-
-				</article>
+				<!-- Infos display / info edition -->
+				<div ng-include="template.containers.infos_edition">
+				</div>
 			</div>
 		</div>
 	</div>

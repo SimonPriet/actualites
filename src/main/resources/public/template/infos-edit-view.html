@@ -1,0 +1,27 @@
+<div ng-repeat="info in currentThread.infos.all">
+
+	<!-- Info display -->
+	<article class="cell twelve info-full" ng-if="(! hasCurrentInfo()) || (info !== currentInfo)">
+		<div class="row">
+			<h2 class="cell">[[info.title]]</h2>
+			<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
+		</div>
+
+		<div class="row">
+			<span ng-if="info.hasPublicationDate === true">Date de publication: [[info.publicationDate]]</span>
+			<span ng-if="info.hasExpirationDate === true">Date d'expiration': [[info.expirationDate]]</span>
+		</div>
+
+		<div class="row" bind-html="info.content">
+		</div>
+
+		<div class="row">
+			<behaviour class="cell" name="edit" resource="currentThread">
+				<button class="cell" ng-click="editInfo(info)">Editer</button>
+			</behaviour>
+			<button class="cell" workflow="actualites.publish">Publier</button>
+		</div>
+	</article>
+
+	<hr class="row"/>
+</div>
