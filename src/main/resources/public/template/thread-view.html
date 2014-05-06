@@ -2,7 +2,7 @@
 
 <h2>[[currentThread.title]]</h2>
 
-<article class="row info-full" ng-repeat="info in currentThread.infos.all">
+<article class="row info-full" ng-repeat="info in currentThread.infos.all | filter:isInfoVisible">
 	<h3>[[info.title]]</h3>
 	<div class="row" bind-html="info.content">
 	</div>

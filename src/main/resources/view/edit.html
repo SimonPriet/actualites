@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
-	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
+	<script src="/actualites/public/js/controller-edition.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
 	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
@@ -26,44 +26,12 @@
 			</ul>
 		</nav>
 
-		<div class="cell eight">
-
-			<!-- Thread actions -->
-			<div class="row height-one">
-				<div class="absolute">
-					<button ng-click="createThread()">Nouveau fil d'actualites</button>
-					<button ng-click="createInfo()" ng-if="hasCurrentThread()">Nouvelle actualite</button>
-					<behaviour name="edit" resource="currentThread" class="cell">
-						<button ng-click="template.open('edition', 'thread-edit-form')">Editer le fil d'actualites</button>
-					</behaviour>
-					<button ng-click="display.showPanel = true" ng-if="hasCurrentThread()">Partager le fil</button>
-				</div>
-			</div>
-
-			<!-- Thread edition -->
-			<div ng-include="template.containers.thread_edition">
-			</div>
-
-			<!-- Infos -->
-			<div class="row">
-				<!-- Infos display / info edition -->
-				<div ng-include="template.containers.infos_edition">
-				</div>
-			</div>
+		<!-- Thread edition -->
+		<div ng-include="template.containers.threads_edition">
 		</div>
 	</div>
 
 </portal>
-
-<!-- Lightbox : Thread share -->
-<div ng-if="hasCurrentThread()">
-	<behaviour name="share" resource="currentThread">
-		<lightbox show="display.showPanel" on-close="display.showPanel = false">
-			<share-panel resources="currentThread">
-			</share-panel>
-		</lightbox>
-	</behaviour>
-</div>
 
 </body>
 </html>

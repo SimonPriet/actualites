@@ -4,7 +4,7 @@
 		<button class="right-magnet" ng-click="showThread(thread)">Tout voir</button>
 	</div>
 
-	<article class="cell five height-three info-preview" ng-repeat="info in thread.infos.all | limitTo: infoLoadSize">
+	<article class="cell five height-three info-preview" ng-repeat="info in thread.infos.all | limitTo: infoLoadSize | filter:isInfoVisible">
 		<h3>[[info.title]]</h3>
 		<div class="row" bind-html="info.content">
 		</div>

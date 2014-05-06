@@ -5,6 +5,7 @@
 		<div class="row">
 			<h2 class="cell">[[info.title]]</h2>
 			<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
+			<p>[[info.status]]</p>
 		</div>
 
 		<div class="row">
@@ -19,7 +20,12 @@
 			<behaviour class="cell" name="edit" resource="currentThread">
 				<button class="cell" ng-click="editInfo(info)">Editer</button>
 			</behaviour>
-			<button class="cell" workflow="actualites.publish">Publier</button>
+			<behaviour class="cell" name="edit" resource="currentPublicationThread">
+				<button class="cell" ng-click="publishInfo(info)" workflow="actualites.publish" ng-if="info.status !== infoStatus.PUBLISHED">Publier</button>
+			</behaviour>
+			<behaviour class="cell" name="edit" resource="currentPublicationThread">
+				<button class="cell" ng-click="unpublishInfo(info)" workflow="actualites.publish" ng-if="info.status === infoStatus.PUBLISHED">Dé-Publier</button>
+			</behaviour>
 		</div>
 	</article>
 

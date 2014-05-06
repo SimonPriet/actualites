@@ -5,6 +5,10 @@
 	</div>
 
 	<div class="row">
+		<label>Status: </label>[[currentInfo.status]]
+	</div>
+
+	<div class="row">
 		<input ng-model="currentInfo.hasPublicationDate" type="checkbox"/>
 		<label>Date de publication :</label>
 		<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>

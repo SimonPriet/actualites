@@ -65,7 +65,7 @@ function ActualitesController($scope, template, route){
             if (i++ === $scope.loadTotal) {
                 return;
             }
-            thread.open()
+            thread.open();
             thread.on('change', function(){
                 $scope.$apply("threads");
             });
@@ -90,109 +90,14 @@ function ActualitesController($scope, template, route){
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     }
-}
 
-
-function ActualitesEditionController($scope, template, route){
-
-	route({
-		viewThread: function(param){
-			$scope.selectThread(new Thread({_id: param.threadId}));
-		}
-	});
-
-	$scope.template = template;
-	$scope.threads = model.threads.mixed;
-	$scope.newThread = {};
-	$scope.newInfo = {};
-	$scope.currentThread = {};
-    $scope.currentPrivateThread = {};
-	$scope.currentInfo = {};
-	$scope.display = {showPanel: false};
-
-	model.threads.on("mixed.change", function(){
-    	$scope.$apply("threads");
-    	$scope.$apply("currentThread");
-    });
-
-    /* Thread display */
-    $scope.selectThread = function(thread){
-    	$scope.currentThread = thread;
-        /*
-        $scope.currentPrivateThread = model.privateThreads.find(function(item){
-            return item._id = thread._id;
-        });
-        */
-        thread.open();
-        template.open('infos_edition', 'infos-edit-view')
-    }
-
-    $scope.hasCurrentThread = function(){
-        return ($scope.currentThread instanceof Thread);
-    }
-
-    $scope.hasCurrentInfo = function(){
-        return ($scope.currentInfo instanceof Info);
-    }
-
-
-    /* Thread and Info edition */
-    $scope.createThread = function(){
-        $scope.currentThread = new Thread;
-        /*
-        $scope.currentPrivateThread = new PrivateThread;
-        $scope.currentThread.privateId = $scope.currentPrivateThread._id;
-        */
-        template.open('thread_edition', 'thread-edit-form');
-    }
-
-    $scope.createInfo = function(){
-        $scope.currentInfo = new Info;
-        template.open('infos_edition', 'info-edit-form')
-    }
-
-    $scope.editInfo = function(info){
-        $scope.currentInfo = info;
-        template.open('infos_edition', 'info-edit-form')
-    }
-
-    $scope.saveThread = function(){
-        if ($scope.currentThread._id !== undefined) {
-            //model.threads.mixed.load(model.threads.sortBy(function(thread){ return moment() - thread.modified}));
-            $scope.currentThread.save();
+    $scope.isInfoVisible = function(info) {
+        if (info.hasPublicationDate) {
+            return (moment().unix() > moment(info.publicationDate).unix());
         }
-        else {
-            var newThread = new Thread;
-            newThread.create($scope.currentThread);
-            $scope.currentThread = {};
+        if (info.hasExpirationDate) {
+            return (moment().unix() < moment(info.expirationDate).unix());
         }
-        template.close('thread_edition');
-    }
-
-    $scope.saveInfo = function(){
-        $scope.currentInfo.modificationDate = moment();
-
-        if ($scope.currentInfo.hasPublicationDate === undefined || $scope.currentInfo.hasPublicationDate === false) {
-            $scope.currentInfo.publicationDate = undefined;
-        }
-
-        if ($scope.currentInfo.hasExpirationDate === undefined || $scope.currentInfo.hasExpirationDate === false) {
-            $scope.currentInfo.expirationDate = undefined;
-        }
-
-        if ($scope.currentThread.infos.all.indexOf($scope.currentInfo) !== -1) {
-            $scope.currentThread.infos.load($scope.currentThread.infos.sortBy(function(info){ return moment() - moment(info.modificationDate); }));
-            $scope.currentThread.save();
-        }
-        else {
-            $scope.currentThread.addInfo($scope.currentInfo);
-        }
-        $scope.currentInfo = {};
-        template.close('infos_edition');
-    }
-
-    $scope.removeInfo = function(info){
-    	$scope.currentThread.infos.remove(info);
-    	$scope.currentThread.save();
+        return true;
     }
 }
