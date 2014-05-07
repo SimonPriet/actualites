@@ -1,35 +1,15 @@
-<div class="cell eight">
-
-	<!-- Thread actions -->
-	<div class="row height-one">
-		<div class="absolute">
-			<button ng-click="createThread()">Nouveau fil d'actualites</button>
-			<button ng-click="createInfo()" ng-if="hasCurrentThread()">Nouvelle actualite</button>
-			<behaviour name="edit" resource="currentThread" class="cell">
-				<button ng-click="editThread()">Editer le fil d'actualites</button>
-			</behaviour>
-			<button ng-click="display.showPanel = true" ng-if="hasCurrentThread()">Partager le fil</button>
-		</div>
-	</div>
-
-	<!-- Thread edition -->
-	<div ng-include="template.containers.thread_edition">
-	</div>
-
-	<!-- Infos -->
+<div class="row info-full" ng-repeat="info in infos">
 	<div class="row">
-		<!-- Infos display / info edition -->
-		<div ng-include="template.containers.infos_edition">
-		</div>
+		<h3>[[info.title]]</h3>
 	</div>
-</div>
 
-<!-- Lightbox : Thread share -->
-<div ng-if="hasCurrentThread()">
-	<behaviour name="share" resource="currentThread">
-		<lightbox show="display.showPanel" on-close="display.showPanel = false">
-			<share-panel resources="currentPublicationThread">
-			</share-panel>
-		</lightbox>
-	</behaviour>
+	<article class="row" bind-html="info.content">
+	</article>
+
+	<div class="row">
+		<button ng-click="createInfo()" translate content="actualites.edition.infos.edit"></button>
+		<button ng-click="publishInfo()" translate content="actualites.edition.infos.publish"></button>
+		<button ng-click="unpublishInfo()" translate content="actualites.edition.infos.unpublish"></button>
+		<button ng-click="deleteInfo()" translate content="actualites.edition.infos.delete"></button>
+	</div>
 </div>

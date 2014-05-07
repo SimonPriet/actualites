@@ -1,11 +1,8 @@
-<button ng-click="backToThreads()">Retour à la liste des fils</button>
-
-<h2>[[currentThread.title]]</h2>
-
-<article class="row info-full" ng-repeat="info in currentThread.infos.all | filter:isInfoVisible">
-	<h3>[[info.title]]</h3>
-	<div class="row" bind-html="info.content">
+<div class="row info-full" ng-repeat="info in infos | filter:isInfoVisible">
+	<div class="row">
+		<h3>[[info.title]]</h3>
 	</div>
-</article>
 
-<button ng-click="backToThreads()">Retour à la liste des fils</button>
+	<article class="row" bind-html="info.content">
+	</article>
+</div>

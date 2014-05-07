@@ -11,16 +11,36 @@
 </head>
 <body ng-controller="ActualitesController">
 <portal>
-	<h1 ng-if="displayMode === 'latest'" translate content="actualites.title.latest"></h1>
-	<h1 ng-if="displayMode === 'mine'" translate content="actualites.title.mine"></h1>
 
 	<div class="row">
-		<button ng-click="showLatestThreads()" translate content="actualites.display.latest"></button>
-		<button ng-click="showMyThreadsFirst()" translate content="actualites.display.mine"></button>
-		<a class="button" href="/actualites/edit" workflow="actualites.edit" translate content="actualites.display.edition"></a>
+		<div class="cell eight">
+			<h1 translate content="actualites.threads.title"></h1>
+		</div>
+		<div class="cell four">
+			<a href="/actualites/edit" translate content="actualites.links.edition"></a>
+		</div>
 	</div>
 
-	<div class="row" ng-include="template.containers.main">
+	<div class="row">
+		<!-- Thread Navigation -->
+		<nav class="vertical cell three">
+			<ul>
+				<li>
+		     		<a ng-class="{selected: latestThread === currentThread}" ng-click="showThread(latestThread)" translate content="actualites.threads.latest"></a>
+		     	</li>
+			</ul>
+		    <ul>
+			 	<li ng-repeat="thread in threads.all">
+			    	<a ng-class="{selected: thread === currentThread}" ng-click="showThread(thread)">[[thread.title]]</a>
+			  	</li>
+			</ul>
+		</nav>
+
+		<div class="cell eight">
+			<!-- Thread edition -->
+			<div ng-include="template.containers.thread">
+			</div>
+		</div>
 	</div>
 
 </portal>

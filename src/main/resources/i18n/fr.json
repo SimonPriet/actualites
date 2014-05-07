@@ -1,10 +1,20 @@
 {
 	"actualites.title": "Actualités",
-	"actualites.title.latest": "Dernières actualités",
-	"actualites.title.mine": "Mes actualités",
-	"actualites.title.edition": "Gestion des actualités",
-	"actualites.display.latest": "Dernières actualités",
-	"actualites.display.mine": "Mes actualités",
-	"actualites.display.edition": "Gérer les actualités",
+	"actualites.threads.title": "Fils d'actualités",
+	"actualites.threads.latest": "Dernières actualités",
+
+	"actualites.links.latest": "Dernières actualités",
+	"actualites.links.mine": "Mes actualités",
+	"actualites.links.edition": "Gérer les actualités",
+	"actualites.links.back": "<< Retour",
+
+	"actualites.edition.title": "Gestion des actualités",
+	"actualites.edition.thread.share": "Partager le fil",
+	"actualites.edition.infos.create": "Nouvelle actualité",
+	"actualites.edition.infos.edit": "Editer",
+	"actualites.edition.infos.publish": "Publier",
+	"actualites.edition.infos.unpublish": "Dé-Publier",
+	"actualites.edition.infos.delete": "Supprimer",
+
 	"actualites.thread.default.title": "Entrez un titre pour le fil"
 }

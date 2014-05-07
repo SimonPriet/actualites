@@ -15,73 +15,40 @@ function ActualitesController($scope, template, route){
         }
     });
 
-    // Dependancies
+    // Dependencies
     $scope.template = template;
 
     // Configuration
     $scope.loadSize = 4;
-    $scope.infoLoadSize = 4;
     $scope.displayMode = 'latest';
 
     // Variables
+    $scope.latestThread = model.latestThread;
+    $scope.threads = model.threads.mixed;
+    $scope.infos = {};
     $scope.loadTotal = 0;
-    $scope.newThread = {};
     $scope.newInfo = {};
     $scope.currentThread = {};
     $scope.currentInfo = {};
     $scope.display = {showPanel: false};
 
-    // Default view
-    template.open('main', 'threads-view');
-
-    model.threads.on('mixed.sync', function(){
-        $scope.showLatestThreads();
-        $scope.loadMoreThreads();
-    });
-
-    model.threads.on("mixed.change", function(){
-        $scope.$apply("threads");
-        $scope.$apply("currentThread");
-    });
-
-    /* Page presentations */
-    $scope.showLatestThreads = function(){
-        $scope.displayMode = 'latest';
-        // Sort by latest modified
-        $scope.threads = model.threads.mixed.sortBy(function(thread){ return moment() - thread.modified; });
-    }
-
-    $scope.showMyThreadsFirst = function(){
-        $scope.displayMode = 'mine';
-        // Filter by owner is me
-        $scope.threads = model.threads.mine;
-    }
-
-    $scope.loadMoreThreads = function(){
-        $scope.loadTotal = $scope.loadTotal + $scope.loadSize;
-        // Open 'loadTotal' threads only
-        var i = 0;
-        $scope.threads.forEach(function(thread){
-            if (i++ === $scope.loadTotal) {
-                return;
-            }
-            thread.open();
-            thread.on('change', function(){
-                $scope.$apply("threads");
-            });
-        });
-    }
-
-    $scope.backToThreads = function(){
-        $scope.currentThread = {};
-        template.open('main', 'threads-view');
-    }
 
     /* Thread display */
     $scope.showThread = function(thread){
         $scope.currentThread = thread;
-        template.open('main', 'thread-view');
+        template.open('thread', 'thread-view');
+
+        // Display modes
+        $scope.showLatestInfos();
     }
+
+    $scope.showThreadEdit = function(thread){
+        $scope.currentThread = thread;
+        template.open('thread', 'threads-edit-view');
+
+        // Display mode
+        $scope.showLatestInfos();
+    }    
 
     $scope.hasCurrentThread = function(){
         return ($scope.currentThread instanceof Thread);
@@ -100,4 +67,43 @@ function ActualitesController($scope, template, route){
         }
         return true;
     }
+
+    $scope.showLatestInfos = function(){
+        $scope.displayMode = 'latest';
+        $scope.loadTotal = 0;
+        
+        $scope.currentThread.loadInfos();
+        $scope.currentThread.on('loadInfos', function(){
+            // Sort by latest modified
+            $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
+                return moment() - info.modified; });
+            //$scope.$apply("infos");
+            $scope.loadMoreInfos();
+        });
+    }
+
+    $scope.loadMoreInfos = function(){
+        $scope.loadTotal = $scope.loadTotal + $scope.loadSize;
+        // Open 'loadTotal' threads only
+        var i = 0;
+        $scope.infos.forEach(function(info){
+            if (i++ === $scope.loadTotal) {
+                return;
+            }
+            info.load();
+            info.on('change', function(){
+                $scope.$apply("infos");
+            });
+        });
+    }
+
+    // Info detailled display
+    $scope.backToThreads = function(){
+        $scope.currentInfo = {};
+        template.open('thread', 'threads-view');
+    }
+
+
+    // Default view
+    $scope.showThread(model.latestThread);
 }
