@@ -26,7 +26,7 @@
 		<nav class="vertical cell three">
 		    <ul>
 			 	<li ng-repeat="thread in threads.all">
-			    	<a ng-class="{selected: thread === currentThread}" ng-click="showThreadEdit(thread)">[[thread.title]]</a>
+			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThreadEdit(thread)">[[thread.title]]</a>
 			  	</li>
 			</ul>
 		</nav>

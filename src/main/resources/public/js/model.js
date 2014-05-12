@@ -6,9 +6,15 @@ var ACTUALITES_CONFIGURATION = {
 	threadTypes: {
 		latest: 0,
 		mine: 1,
-		trash: 2
+		trash: 2,
+		pending: 3
 	},
-	trashFolderTag: 'Trash'
+	trashFolderTag: 'Trash',
+	infoStatus: {
+		DRAFT: 0,
+		PENDING: 1,
+		PUBLISHED: 2
+	}
 };
 
 
@@ -89,6 +95,15 @@ Info.prototype.save = function(){
 	var form = new FormData();
 	form.append('blob', blob, info.title + '.json');
 	http().putFile('/workspace/document/' + this._id, form);
+}
+
+Info.prototype.remove = function(thread){
+	if(thread.type === ACTUALITES_CONFIGURATION.threadTypes.trash){
+		http().delete('/workspace/document/' + this._id);
+	}
+	else{
+		http().put('/workspace/document/trash/' + this._id);
+	}
 }
 
 Info.prototype.getApplicationInfosCollectionTag = function(){
@@ -186,6 +201,7 @@ model.build = function(){
 	model.me.workflow.load(['actualites']);
 	this.makeModels([Info, Thread]);
 	this.makePermanent(Thread);
+	// Info is not using the Permanent System
 
 	this.latestThread = new Thread();
 	this.latestThread.build({

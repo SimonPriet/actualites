@@ -17,7 +17,7 @@
 			<h1 translate content="actualites.threads.title"></h1>
 		</div>
 		<div class="cell four">
-			<a href="/actualites/edit" translate content="actualites.links.edition"></a>
+			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition"></a>
 		</div>
 	</div>
 
@@ -26,12 +26,13 @@
 		<nav class="vertical cell three">
 			<ul>
 				<li>
-		     		<a ng-class="{selected: latestThread === currentThread}" ng-click="showThread(latestThread)" translate content="actualites.threads.latest"></a>
+		     		<a ng-class="{selected: latestThread === currentThread}" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
 		     	</li>
 			</ul>
+			<hr />
 		    <ul>
 			 	<li ng-repeat="thread in threads.all">
-			    	<a ng-class="{selected: thread === currentThread}" ng-click="showThread(thread)">[[thread.title]]</a>
+			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
 			  	</li>
 			</ul>
 		</nav>

@@ -1,5 +1,7 @@
 {
 	"actualites.title": "Actualités",
+	"actualites.title.edition": "Gestion des actualités",
+
 	"actualites.threads.title": "Fils d'actualités",
 	"actualites.threads.latest": "Dernières actualités",
 
@@ -12,9 +14,11 @@
 	"actualites.edition.thread.share": "Partager le fil",
 	"actualites.edition.infos.create": "Nouvelle actualité",
 	"actualites.edition.infos.edit": "Editer",
+	"actualites.edition.infos.save": "Enregistrer",
 	"actualites.edition.infos.publish": "Publier",
 	"actualites.edition.infos.unpublish": "Dé-Publier",
 	"actualites.edition.infos.delete": "Supprimer",
+	"actualites.edition.infos.cancel": "Annuler",
 
 	"actualites.thread.default.title": "Entrez un titre pour le fil"
 }

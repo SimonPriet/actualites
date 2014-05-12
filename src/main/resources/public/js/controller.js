@@ -10,7 +10,7 @@ function ActualitesController($scope, template, route){
 
     route({
         viewThread: function(param){
-            $scope.showThread(new Thread({_id: param.threadId}));
+            $scope.selectThread(new Thread({_id: param.threadId}));
             $scope.currentThread.open();
         }
     });
@@ -27,14 +27,13 @@ function ActualitesController($scope, template, route){
     $scope.threads = model.threads.mixed;
     $scope.infos = {};
     $scope.loadTotal = 0;
-    $scope.newInfo = {};
     $scope.currentThread = {};
     $scope.currentInfo = {};
     $scope.display = {showPanel: false};
 
 
     /* Thread display */
-    $scope.showThread = function(thread){
+    $scope.selectThread = function(thread){
         $scope.currentThread = thread;
         template.open('thread', 'thread-view');
 
@@ -42,7 +41,7 @@ function ActualitesController($scope, template, route){
         $scope.showLatestInfos();
     }
 
-    $scope.showThreadEdit = function(thread){
+    $scope.selectThreadEdit = function(thread){
         $scope.currentThread = thread;
         template.open('thread', 'threads-edit-view');
 
@@ -52,20 +51,6 @@ function ActualitesController($scope, template, route){
 
     $scope.hasCurrentThread = function(){
         return ($scope.currentThread instanceof Thread);
-    }
-
-    $scope.hasCurrentInfo = function(){
-        return ($scope.currentInfo instanceof Info);
-    }
-
-    $scope.isInfoVisible = function(info) {
-        if (info.hasPublicationDate) {
-            return (moment().unix() > moment(info.publicationDate).unix());
-        }
-        if (info.hasExpirationDate) {
-            return (moment().unix() < moment(info.expirationDate).unix());
-        }
-        return true;
     }
 
     $scope.showLatestInfos = function(){
@@ -97,13 +82,103 @@ function ActualitesController($scope, template, route){
         });
     }
 
+
     // Info detailled display
-    $scope.backToThreads = function(){
-        $scope.currentInfo = {};
-        template.open('thread', 'threads-view');
+    $scope.selectInfo = function(info){
+        $scope.currentInfo = info;
+    }
+
+    $scope.hasCurrentInfo = function(){
+        return ($scope.currentInfo instanceof Info);
+    }
+
+    $scope.isInfoPublished = function(info) {
+        return info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+    }
+
+    $scope.isInfoPublishable = function(info) {
+        return (info._id !== undefined) && (info.status !== ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED);
+    }
+
+    $scope.isInfoVisible = function(info) {
+        if (info.hasPublicationDate) {
+            return (moment().unix() > moment(info.publicationDate).unix());
+        }
+        if (info.hasExpirationDate) {
+            return (moment().unix() < moment(info.expirationDate).unix());
+        }
+        return $scope.isInfoPublished(info);
+    }
+
+    $scope.infoExists = function(info) {
+        return (info._id !== undefined);
     }
 
 
-    // Default view
-    $scope.showThread(model.latestThread);
+    // Info Edition
+    $scope.createInfo = function(info){
+        if (info === undefined) {
+            // Info creation
+            $scope.currentInfo = new Info();
+            $scope.currentInfo.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+        }
+        else {
+            // Info edition
+            $scope.currentInfo = info;
+        }
+        template.open('thread', 'info-edit-form');
+    }
+
+    $scope.saveInfo = function(info){
+        if (info._id === undefined) {
+            // Info creation
+            var newInfo = new Info();
+            newInfo.create($scope.currentThread, info);
+        }
+        else {
+            // Info edition
+            info.save();
+        }
+
+        $scope.reloadInfos();
+        $scope.cancelEditInfo();
+    }
+
+    $scope.publishInfo = function(info){
+        info.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+        info.save();
+        $scope.reloadInfos();
+    }
+
+    $scope.unpublishInfo = function(info){
+        info.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+        info.save();
+        $scope.reloadInfos();
+    }
+
+    $scope.deleteInfo = function(info){
+        info.remove($scope.currentThread);
+        $scope.reloadInfos();
+        $scope.cancelEditInfo();
+    }
+
+    $scope.cancelEditInfo = function(){
+        $scope.currentInfo = {};
+        template.open('thread', 'threads-edit-view');
+    }
+
+    $scope.reloadInfos = function(){
+        var reloadFlag = true;
+        $scope.currentThread.infos.on('sync', function(){
+            if (reloadFlag === true) {
+                $scope.infos = $scope.currentThread.infos;
+                $scope.apply("infos");
+                reloadFlag = false;
+            }
+        });
+    }
+
+
+    // Default display
+    $scope.selectThread(model.latestThread);
 }

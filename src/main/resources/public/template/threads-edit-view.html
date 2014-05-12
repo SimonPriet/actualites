@@ -3,13 +3,13 @@
 		<h3>[[info.title]]</h3>
 	</div>
 
-	<article class="row" bind-html="info.content">
+	<article class="row info-content" bind-html="info.content">
 	</article>
 
 	<div class="row">
-		<button ng-click="createInfo()" translate content="actualites.edition.infos.edit"></button>
-		<button ng-click="publishInfo()" translate content="actualites.edition.infos.publish"></button>
-		<button ng-click="unpublishInfo()" translate content="actualites.edition.infos.unpublish"></button>
-		<button ng-click="deleteInfo()" translate content="actualites.edition.infos.delete"></button>
+		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit"></button>
+		<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
+		<button ng-click="unpublishInfo(info)" ng-if="isInfoPublished(info)" translate content="actualites.edition.infos.unpublish"></button>
+		<button ng-click="deleteInfo(info)" translate content="actualites.edition.infos.delete"></button>
 	</div>
 </div>

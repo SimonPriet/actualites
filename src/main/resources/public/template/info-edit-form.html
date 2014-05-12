@@ -1,4 +1,4 @@
-<article class="cell eight">
+<div class="row info-full">
 	<div class="row">
 		<label>Titre :</label>
 		<input ng-model="currentInfo.title" type="text"/>
@@ -22,11 +22,17 @@
 
 	<div class="row">
 		<label>Contenu :</label>
-		<rich-text-editor ng-model="currentInfo.content">
-		</rich-text-editor>
+		<article>
+			<rich-text-editor ng-model="currentInfo.content">
+			</rich-text-editor>
+		</article>
 	</div>
 
 	<div class="row">
-		<button ng-click="saveInfo()">Sauvegarder</button>
+		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save"></button>
+		<button ng-click="publishInfo(currentInfo)" ng-if="isInfoPublishable(currentInfo)" translate content="actualites.edition.infos.publish"></button>
+		<button ng-click="unpublishInfo(currentInfo)" ng-if="isInfoPublished(currentInfo)" translate content="actualites.edition.infos.unpublish"></button>
+		<button ng-click="deleteInfo(currentInfo)" translate content="actualites.edition.infos.delete"></button>
+		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="cancel"></button>
 	</div>
-</article>
+</div>

@@ -1,9 +1,5 @@
-.info-preview {
-	overflow: hidden;
-	margin-right: 20px;
-	margin-bottom: 20px;
-	padding-left: 10px;
-	padding-right: 10px;
+.info-content {
+	padding: 10px;
 }
 
 .info-full {
