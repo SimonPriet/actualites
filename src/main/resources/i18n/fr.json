@@ -1,9 +1,12 @@
 {
 	"actualites.title": "Actualités",
 	"actualites.title.edition": "Gestion des actualités",
+	"actualites.title.admin": "Administration des actualités",
 
 	"actualites.threads.title": "Fils d'actualités",
 	"actualites.threads.latest": "Dernières actualités",
+	"actualites.threads.pending": "En attente d'approbation",
+	"actualites.threads.trash": "Corbeille",
 
 	"actualites.links.latest": "Dernières actualités",
 	"actualites.links.mine": "Mes actualités",
@@ -11,7 +14,11 @@
 	"actualites.links.back": "<< Retour",
 
 	"actualites.edition.title": "Gestion des actualités",
+
+	"actualites.edition.thread.create": "Créer un nouveau fil",
+	"actualites.edition.thread.edit": "Editer le fil",
 	"actualites.edition.thread.share": "Partager le fil",
+
 	"actualites.edition.infos.create": "Nouvelle actualité",
 	"actualites.edition.infos.edit": "Editer",
 	"actualites.edition.infos.save": "Enregistrer",

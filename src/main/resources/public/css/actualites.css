@@ -1,5 +1,25 @@
+
+hr.solid {
+	border-style: inset;
+	border-width: 1px;
+	margin: 10px 0;
+}
+
+hr.nav {
+	margin: 10px 60px 10px 0;
+}
+
+hr {
+	margin: 5px 0;
+}
+
+a.link-back {
+	margin: 20px 10px;
+}
+
 .info-content {
 	padding: 10px;
+	margin-bottom: 10px;
 }
 
 .info-full {

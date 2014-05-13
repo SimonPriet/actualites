@@ -12,35 +12,37 @@
 <body ng-controller="ActualitesController">
 <portal>
 
-	<div class="row">
-		<div class="cell eight">
+	<div class="cell four">
+		<!-- Thread Navigation -->
+		<div class="row">
 			<h1 translate content="actualites.threads.title"></h1>
 		</div>
-		<div class="cell four">
-			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition"></a>
-		</div>
-	</div>
-
-	<div class="row">
-		<!-- Thread Navigation -->
-		<nav class="vertical cell three">
+		<hr />
+		<nav class="vertical">
+			<!-- Latest thread -->
 			<ul>
 				<li>
 		     		<a ng-class="{selected: latestThread === currentThread}" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
 		     	</li>
 			</ul>
 			<hr />
+			<!-- Real threads -->
 		    <ul>
 			 	<li ng-repeat="thread in threads.all">
 			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
 			  	</li>
 			</ul>
 		</nav>
+		<hr />
+		<div class="row">
+			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition"></a>
+		</div>
+	</div>
 
-		<div class="cell eight">
-			<!-- Thread edition -->
-			<div ng-include="template.containers.thread">
-			</div>
+	<!-- Thread panel -->
+	<div class="cell eight">
+		<!-- Thread infos -->
+		<div ng-include="template.containers.thread">
 		</div>
 	</div>
 
