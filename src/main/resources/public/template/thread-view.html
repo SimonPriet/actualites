@@ -1,4 +1,4 @@
-<div class="row info-full" ng-repeat="info in infos | filter:isInfoVisible">
+<div class="row info-full" ng-repeat="info in infos | filter:isInfoVisible | limitTo: loadTotal">
 	<div class="row">
 		<h3>[[info.title]]</h3>
 	</div>

@@ -4,6 +4,7 @@
 	"actualites.title.admin": "Administration des actualités",
 
 	"actualites.threads.title": "Fils d'actualités",
+	"actualites.threads.title.admin": "Gestion des Fils d'actualités",
 	"actualites.threads.latest": "Dernières actualités",
 	"actualites.threads.pending": "En attente d'approbation",
 	"actualites.threads.trash": "Corbeille",
@@ -11,13 +12,20 @@
 	"actualites.links.latest": "Dernières actualités",
 	"actualites.links.mine": "Mes actualités",
 	"actualites.links.edition": "Gérer les actualités",
+	"actualites.links.admin.edition": "Accéder à l'application",
 	"actualites.links.back": "<< Retour",
 
 	"actualites.edition.title": "Gestion des actualités",
 
 	"actualites.edition.thread.create": "Créer un nouveau fil",
-	"actualites.edition.thread.edit": "Editer le fil",
+	"actualites.edition.thread.edit": "Editer",
+	"actualites.edition.thread.save": "Enregistrer",
+	"actualites.edition.thread.cancel": "Annuler",
+	"actualites.edition.thread.delete": "Supprimer",
 	"actualites.edition.thread.share": "Partager le fil",
+	"actualites.edition.thread.manage": "Gestionnaires",
+	"actualites.edition.thread.field.title.label": "Titre :",
+	"actualites.edition.thread.field.title.placeholder": "Entrez un titre pour le fil",
 
 	"actualites.edition.infos.create": "Nouvelle actualité",
 	"actualites.edition.infos.edit": "Editer",
@@ -25,7 +33,5 @@
 	"actualites.edition.infos.publish": "Publier",
 	"actualites.edition.infos.unpublish": "Dé-Publier",
 	"actualites.edition.infos.delete": "Supprimer",
-	"actualites.edition.infos.cancel": "Annuler",
-
-	"actualites.thread.default.title": "Entrez un titre pour le fil"
+	"actualites.edition.infos.cancel": "Annuler"
 }

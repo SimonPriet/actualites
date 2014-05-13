@@ -6,58 +6,34 @@
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
+	<script src="/actualites/public/js/controller-admin.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
 	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
-<body ng-controller="ActualitesController">
+<body ng-controller="ActualitesAdminController">
 <admin-portal>
 
-	<div class="cell twelve">
-		<h1 translate content="actualites.title.admin"></h1>
-	</div>
-
-	<div class="cell three">
-		<!-- Thread Navigation -->
-		<div class="row">
-			<h2 translate content="actualites.threads.title"></h2>
+	<div class="row">
+		<div class="cell eight">
+			<h1 translate content="actualites.threads.title.admin"></h1>
 		</div>
-		<hr />
-		<nav class="vertical">
-		    <ul>
-			 	<li ng-repeat="thread in threads.all">
-			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThreadEdit(thread)">[[thread.title]]</a>
-			  	</li>
-			</ul>
-		</nav>
-		<hr />
-
-		<!-- Threads actions -->
-		<div class="row">
-			<button ng-click="createThread()" translate content="actualites.edition.thread.create"></button>
+		<div class="cell four">
+			<h1>
+				<a href="/actualites/edit" translate content="actualites.links.admin.edition"></a>
+			</h1>
 		</div>
 	</div>
 
-	<!-- Thread panel -->
-	<div class="cell nine">
-
-		<!-- Thread actions -->
-		<div class="row">
-			<button ng-click="createThread(currentThread)" ng-if="hasCurrentThread()" translate content="actualites.edition.thread.edit"></button>
-			<button ng-click="createInfo()" ng-if="hasCurrentThread()" translate content="actualites.edition.infos.create"></button>
-			<button ng-click="display.showPanel = true" ng-if="hasCurrentThread()" translate content="actualites.edition.thread.share"></button>
-		</div>
-		<hr class="solid"/>
-
-		<!-- Thread infos -->
-		<div ng-include="template.containers.thread">
-		</div>
+	<div ng-include="template.containers.threads">
 	</div>
+
+	
 
 	<!-- Lightbox : Thread share -->
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
 			<lightbox show="display.showPanel" on-close="display.showPanel = false">
-				<share-panel resources="currentPublicationThread">
+				<share-panel resources="currentThread">
 				</share-panel>
 			</lightbox>
 		</behaviour>

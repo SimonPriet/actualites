@@ -1,16 +1,31 @@
-<div class="row" ng-repeat="thread in threads | limitTo: loadTotal">
+<div class="cell twelve list-view">
+	<!-- Threads table -->
+	<table class="cell twelve">
+		<thead>
+			<tr>
+				<th class="one">Ordre</th>
+				<th class="six">Libelle</th>
+				<th class="one">Couleur</th>
+				<th class="four">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="thread in threads.all">
+				<td>[[thread.order]]</td>
+				<td>[[thread.title]]</td>
+				<td>[[thread.color]]</td>
+				<td>
+					<button ng-click="createThread(thread)" translate content="actualites.edition.thread.edit"></button>
+					<button ng-click="manageThread(thread)" translate content="actualites.edition.thread.manage"></button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<hr />
+	
+	<!-- Threads actions -->
 	<div class="row">
-		<h2 class="cell ten">[[thread.title]]</h2> 
-		<button class="right-magnet" ng-click="showThread(thread)">Tout voir</button>
+		<button ng-click="createThread()" translate content="actualites.edition.thread.create"></button>
 	</div>
-
-	<article class="cell five height-three info-preview" ng-repeat="info in thread.infos.all | limitTo: infoLoadSize | filter:isInfoVisible">
-		<h3>[[info.title]]</h3>
-		<div class="row" bind-html="info.content">
-		</div>
-	</article>
-
-	<hr class="row"/>
 </div>
-
-<button class="row" ng-if="loadTotal < threads.length" ng-click="loadMoreThreads()">Charger plus de fils</button>

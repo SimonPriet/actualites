@@ -1,48 +1,56 @@
- routes.define(function($routeProvider){
-    $routeProvider
-        .when('/thread/:threadId', {
-            action: 'viewThread'
-        })
-  });
+/* Admin Controller */
+function ActualitesAdminController($injector, $scope, template, route){
 
+    this.initialize = function(){
 
- function ActualitesAdminController($scope, template, route){
+        // Dependencies
+        $scope.template = template;
 
-    route({
-        viewThread: function(param){
-            $scope.selectThread(new Thread({_id: param.threadId}));
-        }
-    });
+        // Variables
+        $scope.threads = model.threads.mixed;
+        $scope.currentThread = {};
+        $scope.display = {showPanel: false};
 
-    $scope.template = template;
-    $scope.threads = model.privateThreads.mixed;
-    $scope.newThread = {};
-    $scope.newInfo = {};
-    $scope.currentThread = {};
-    $scope.currentInfo = {};
-    $scope.display = {showPanel: false};
-
-    model.threads.on("mixed.change", function(){
-        $scope.$apply("threads");
-        $scope.$apply("currentThread");
-    });
-
-    template.open('threads_edition', 'threads-edit-view');
-
-    /* Thread display */
-    $scope.selectThread = function(thread){
-        $scope.currentThread = thread;
-        /*
-        $scope.currentPrivateThread = model.privateThreads.find(function(item){
-            return item._id = thread._id;
+        // Default display
+        model.threads.on('mixed.sync', function(){
+            $scope.threads.forEach(function(thread){
+                thread.open();
+                thread.on('change', function(){
+                    $scope.$apply("threads");
+                });
+            });
+            $scope.showThreads();
         });
-        */
-        thread.open();
-        template.open('infos_edition', 'infos-edit-view')
     }
 
-    $scope.hasCurrentThread = function(){
-        return ($scope.currentThread instanceof PrivateThread);
+    $scope.showThreads = function(){
+        template.open('threads', 'threads-view');
     }
-    
+
+    $scope.createThread = function(thread){
+        if (thread === undefined) {
+            $scope.currentThread = new Thread();
+        }
+        else {
+            $scope.currentThread = thread;
+        }
+        template.open('threads', 'thread-edit-form');
+    }
+
+    $scope.saveThread = function(){
+
+    }
+
+    $scope.cancelEditThread = function(){
+        $scope.currentThread = {};
+        $scope.showThreads();
+    }
+
+    $injector.invoke(ActualitesAbstractController, this, {
+        $scope: $scope,
+        template: template,
+        route: route
+    });
+
+    this.initialize();
 }

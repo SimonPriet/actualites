@@ -1,213 +1,133 @@
- routes.define(function($routeProvider){
+routes.define(function($routeProvider){
     $routeProvider
         .when('/thread/:threadId', {
             action: 'viewThread'
         })
-  });
+});
 
+/* Edition Controller */
+function ActualitesEditionController($injector, $scope, template, route){
 
- function ActualitesEditionController($scope, template, route){
+    this.initialize = function(){
 
-	route({
-		viewThread: function(param){
-			$scope.selectThread(new Thread({_id: param.threadId}));
-		}
-	});
-
-	/* Status constants */
-	$scope.infoStatus = {
-		DRAFT: 0,
-		PENDING: 1,
-		PUBLISHED: 2
-	};
-
-    $scope.pendingPrivateThread = undefined;
-    $scope.pendingPublicationThread = undefined;
-    $scope.pendingInfo = undefined;
-
-	$scope.template = template;
-	$scope.threads = model.privateThreads.mixed;
-	$scope.newThread = {};
-	$scope.newInfo = {};
-	$scope.currentThread = {};
-    $scope.currentPublicationThread = {};
-	$scope.currentInfo = {};
-	$scope.display = {showPanel: false};
-
-    /* Events */
-	model.privateThreads.on("mixed.change", function(){
-    	$scope.$apply("threads");
-    	$scope.$apply("currentThread");
-    });
-
-    model.privateThreads.on("mine.change", function(){
-        if ($scope.pendingPrivateThread !== undefined) {
-            $scope.currentThread = model.privateThreads.mine.last();
-
-            // Creation du Thread de publication
-            var newPublicationThread = new Thread;
-            newPublicationThread.createFromPrivateThread($scope.currentThread);
-            $scope.pendingPublicationThread = newPublicationThread;
-
-            $scope.pendingPrivateThread = undefined;
-        }
-    });
-
-    model.threads.on("mine.change", function(){
-        if ($scope.pendingPublicationThread !== undefined) {
-
-            $scope.currentPublicationThread = model.threads.mine.last();
-
-            // Liaison PrivateThread - PublicationThread
-            if ($scope.currentThread.publicationThreadId === undefined) {
-                $scope.currentThread.publicationThreadId = $scope.currentPublicationThread._id;
+        route({
+            viewThread: function(param){
+                $scope.selectThread(new Thread({_id: param.threadId}));
+                $scope.currentThread.open();
             }
-            $scope.currentThread.save();
-
-            $scope.pendingPublicationThread = undefined;
-        }
-    });
-
-    template.open('threads_edition', 'threads-edit-view');
-
-    /* Thread display */
-    $scope.selectThread = function(thread){
-    	$scope.currentThread = thread;
-        thread.open();
-
-        thread.on('change', function(){
-            $scope.currentPublicationThread = model.threads.mixed.find(function(publicationThread){ 
-                return publicationThread._id === thread.publicationThreadId; 
-            });
-            $scope.currentPublicationThread.open();
         });
 
-        template.open('infos_edition', 'infos-edit-view');
+        // Dependencies
+        $scope.template = template;
+
+        // Variables
+        $scope.threads = model.threads.mixed;
+        $scope.infos = {};
+        $scope.currentThread = {};
+        $scope.currentInfo = {};
+        $scope.display = {showPanel: false};
+
+        // Default display : first thread
+        model.threads.on('mixed.sync', function(){
+            $scope.selectThread(model.threads.mixed.first());
+        });
     }
 
-    $scope.hasCurrentThread = function(){
-        return ($scope.currentThread instanceof PrivateThread);
+    // Thread display
+    $scope.selectThread = function(thread){
+        $scope.currentThread = thread;
+        template.open('thread', 'threads-edit-view');
+
+        // Display mode
+        $scope.showInfos();
     }
 
-    $scope.hasCurrentPublicationThread = function(){
-        return ($scope.currentPublicationThread instanceof Thread);
-    }    
+    $scope.showInfos = function(){
+        $scope.currentThread.loadInfos();
+        $scope.currentThread.on('loadInfos', function(){
+            // Sort by latest modified
+            $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
+                return moment() - info.modified; });
+            //$scope.$apply("infos");
+            $scope.infos.forEach(function(info){
+                info.load();
+                info.on('change', function(){
+                    $scope.$apply("infos");
+                });
+            });
+        });
+    }
+
+    // Info display
+    $scope.selectInfo = function(info){
+        $scope.currentInfo = info;
+    }
 
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     }
 
-
-    /* Thread Edition */
-    $scope.createThread = function(){
-        $scope.currentThread = new PrivateThread;
-        template.open('thread_edition', 'thread-edit-form');
+    // Info Edition
+    $scope.infoExists = function(info) {
+        return (info._id !== undefined);
     }
 
-    $scope.editThread = function(){
-        template.open('thread_edition', 'thread-edit-form');
-    }
-
-    $scope.saveThread = function(){
-        if ($scope.currentThread._id !== undefined) {
-            // Modification du PrivateThread
-            $scope.currentThread.save();
-
-            // Modification du PublicationThread
-            $scope.currentPublicationThread.updateFromPrivateThread($scope.currentThread);
+    $scope.createInfo = function(info){
+        if (info === undefined) {
+            // Info creation
+            $scope.currentInfo = new Info();
+            $scope.currentInfo.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
         }
         else {
-        	// Creation du PrivateThread
-            var newThread = new PrivateThread;
-            newThread.create($scope.currentThread);
-            $scope.pendingPrivateThread = newThread;
-            $scope.currentThread = {};
+            // Info edition
+            $scope.currentInfo = info;
         }
-        template.close('thread_edition');
+        template.open('thread', 'info-edit-form');
     }
 
-    $scope.deleteThread = function(){
-        $scope.currentThread.remove();
-        $scope.currentPublicationThread.remove();
-    }
-
-
-    /* Info Edition */
-    $scope.createInfo = function(){
-        $scope.currentInfo = new Info;
-        $scope.currentInfo.status = $scope.infoStatus.DRAFT;
-        template.open('infos_edition', 'info-edit-form')
-    }
-
-    $scope.editInfo = function(info){
-        $scope.currentInfo = info;
-        template.open('infos_edition', 'info-edit-form')
-    }
-
-    $scope.saveInfo = function(){
-        $scope.currentInfo.modificationDate = moment();
-
-        // Remove publication date if disabled
-        if ($scope.currentInfo.hasPublicationDate === undefined || $scope.currentInfo.hasPublicationDate === false) {
-            $scope.currentInfo.publicationDate = undefined;
-        }
-
-        // Remove expiration date if disabled
-        if ($scope.currentInfo.hasExpirationDate === undefined || $scope.currentInfo.hasExpirationDate === false) {
-            $scope.currentInfo.expirationDate = undefined;
-        }
-
-        if ($scope.currentThread.infos.all.indexOf($scope.currentInfo) !== -1) {
-            // Sort the collection by modificationDate and save
-            $scope.currentThread.infos.load($scope.currentThread.infos.sortBy(function(info){ return moment() - moment(info.modificationDate); }));
-            $scope.currentThread.save();
+    $scope.saveInfo = function(info){
+        if (info._id === undefined) {
+            // Info creation
+            var newInfo = new Info();
+            newInfo.create($scope.currentThread, info);
         }
         else {
-            // Add the new info to the collection (and sort by modificationDate)
-            $scope.currentThread.addInfo($scope.currentInfo);
+            // Info edition
+            info.save();
         }
-        $scope.currentInfo = {};
-        template.close('infos_edition');
+
+        $scope.reloadInfos();
+        $scope.cancelEditInfo();
     }
 
     $scope.publishInfo = function(info){
-        
-        // Lookup the Info in the PublicationThread
-        if ($scope.currentPublicationThread.infos.find(function(publishedInfo){
-            return publishedInfo.$$hashKey === info.$$hashKey;
-        }) !== undefined) {
-            // Update the PublicationThread and sort by modificationThread
-            $scope.currentPublicationThread.infos.load($scope.currentPublicationThread.infos.sortBy(function(info){ return moment() - moment(info.modificationDate); }));
-            $scope.currentPublicationThread.save();
-        }
-        else {
-            // Add the Info the the PublicationThread
-            $scope.currentPublicationThread.addInfo(info);
-        }
-        // Switch the status
-        info.status = $scope.infoStatus.PUBLISHED;
-        $scope.currentThread.save();
+        info.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+        info.save();
+        $scope.reloadInfos();
     }
 
     $scope.unpublishInfo = function(info){
-        // Lookup the Info in the PublicationThread
-        var publishedInfo = $scope.currentPublicationThread.infos.find(function(publishedInfo){
-            return publishedInfo.$$hashKey === info.$$hashKey;
-        });
-
-        if (publishedInfo !== undefined) {
-            // Remove the info from the PublicationThread
-            $scope.currentPublicationThread.infos.remove(publishedInfo);
-            $scope.currentPublicationThread.save();
-        }
-
-        // Swicth the status
-        info.status = $scope.infoStatus.DRAFT;
-        $scope.currentThread.save();
+        info.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+        info.save();
+        $scope.reloadInfos();
     }
 
-    $scope.removeInfo = function(info){
-    	$scope.currentThread.infos.remove(info);
-    	$scope.currentThread.save();
+    $scope.deleteInfo = function(info){
+        info.remove($scope.currentThread);
+        $scope.reloadInfos();
+        $scope.cancelEditInfo();
     }
+
+    $scope.cancelEditInfo = function(){
+        $scope.currentInfo = {};
+        template.open('thread', 'threads-edit-view');
+    }
+
+    $injector.invoke(ActualitesAbstractController, this, {
+        $scope: $scope,
+        template: template,
+        route: route
+    });
+
+    this.initialize();
 }

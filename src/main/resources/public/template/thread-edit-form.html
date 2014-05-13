@@ -1,6 +1,13 @@
-<article class="cell eight height-six">
-	<label>Titre :</label>
-	<input translate attr="placeholder" placeholder="actualites.thread.default.title" ng-model="currentThread.title" type="text"/>
+<div class="cell twelve">
+	<div class="row">
+		<label translate content="actualites.edition.thread.field.title.label"></label>
+		<input class="six" translate attr="placeholder" placeholder="actualites.edition.field.title.placeholder" ng-model="currentThread.title" type="text"/>
+	</div>
 
-	<button ng-click="saveThread()">Sauvegarder</button>
-</article>
+	<hr />
+
+	<div class="row">
+		<button ng-click="saveThread()" translate content="actualites.edition.thread.save"></button>
+		<button ng-click="cancelEditThread()" translate content="actualites.edition.thread.cancel" class="cancel"></button>
+	</div>
+</div>
