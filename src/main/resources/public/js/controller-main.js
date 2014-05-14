@@ -31,7 +31,7 @@ function ActualitesMainController($injector, $scope, template, route){
 	    $scope.loadTotal = 0;
 	    $scope.currentThread = {};
 	    $scope.currentInfo = {};
-	    $scope.display = {showPanel: false};
+	    $scope.display = {showPanel: false, emptyThread: false};
 
 	    // Default display
 		$scope.selectThread(model.latestThread);
@@ -55,7 +55,15 @@ function ActualitesMainController($injector, $scope, template, route){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
                 return moment() - info.modified; });
-            //$scope.$apply("infos");
+
+            if ($scope.currentThread.infos.empty()) {
+                $scope.display.emptyThread = true;
+                $scope.$apply("infos");
+            }
+            else {
+                $scope.display.emptyThread = false;
+            }
+
             $scope.loadMoreInfos();
         });
     }

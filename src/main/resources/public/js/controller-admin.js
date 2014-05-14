@@ -38,12 +38,35 @@ function ActualitesAdminController($injector, $scope, template, route){
     }
 
     $scope.saveThread = function(){
+        if ($scope.currentThread._id === undefined) {
+            var newThread = new Thread();
+            newThread.create($scope.currentThread);
+        }
+        else {
+            $scope.currentThread.save();
+        }
 
+        $scope.$scope.cancelEditThread();
     }
 
     $scope.cancelEditThread = function(){
         $scope.currentThread = {};
         $scope.showThreads();
+    }
+
+    $scope.shareThread = function(thread){
+        $scope.currentThread = thread;
+        $scope.display.showPanel = true;
+    }
+
+    $scope.saveShareThread = function(){
+        $scope.currentThread.save();
+        $scope.cancelShareThread();
+    }
+
+    $scope.cancelShareThread = function(){
+        $scope.currentThread = {};
+        $scope.display.showPanel = false;
     }
 
     $injector.invoke(ActualitesAbstractController, this, {

@@ -42,7 +42,9 @@
 		<!-- Thread actions -->
 		<div class="row">
 			<button ng-click="createInfo()" ng-if="hasCurrentThread()" translate content="actualites.edition.infos.create"></button>
-			<button ng-click="display.showPanel = true" ng-if="hasCurrentThread()" translate content="actualites.edition.thread.share"></button>
+			<behaviour name="share" resource="currentThread" class="right-magnet">
+				<button ng-click="shareThread()" ng-if="hasCurrentThread()" translate content="actualites.edition.thread.share"></button>
+			</behaviour>
 		</div>
 		<hr class="solid"/>
 
@@ -54,9 +56,11 @@
 	<!-- Lightbox : Thread share -->
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
-			<lightbox show="display.showPanel" on-close="display.showPanel = false">
+			<lightbox show="display.showPanel" on-close="cancelShareThread()">
 				<share-panel resources="currentThread">
 				</share-panel>
+				<button ng-click="saveShareThread()" translate content="actualites.edition.thread.save"></button>
+				<button ng-click="cancelShareThread()" translate content="actualites.edition.thread.cancel"></button>
 			</lightbox>
 		</behaviour>
 	</div>

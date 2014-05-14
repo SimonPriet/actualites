@@ -16,7 +16,9 @@
 				<td>[[thread.color]]</td>
 				<td>
 					<button ng-click="createThread(thread)" translate content="actualites.edition.thread.edit"></button>
-					<button ng-click="manageThread(thread)" translate content="actualites.edition.thread.manage"></button>
+					<behaviour name="share" resource="thread" class="right-magnet">
+						<button ng-click="shareThread(thread)" translate content="actualites.edition.thread.manage"></button>
+					</behaviour>
 				</td>
 			</tr>
 		</tbody>

@@ -9,6 +9,8 @@
 	"actualites.threads.pending": "En attente d'approbation",
 	"actualites.threads.trash": "Corbeille",
 
+	"actualites.thread.empty": "Aucune actualité",
+
 	"actualites.links.latest": "Dernières actualités",
 	"actualites.links.mine": "Mes actualités",
 	"actualites.links.edition": "Gérer les actualités",
@@ -23,7 +25,9 @@
 	"actualites.edition.thread.cancel": "Annuler",
 	"actualites.edition.thread.delete": "Supprimer",
 	"actualites.edition.thread.share": "Partager le fil",
-	"actualites.edition.thread.manage": "Gestionnaires",
+	"actualites.edition.thread.manage": "Partager",
+
+	"actualites.edition.thread.form.title": "Création d'un nouveau fil d'actualités",
 	"actualites.edition.thread.field.title.label": "Titre :",
 	"actualites.edition.thread.field.title.placeholder": "Entrez un titre pour le fil",
 

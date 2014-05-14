@@ -32,9 +32,11 @@
 	<!-- Lightbox : Thread share -->
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
-			<lightbox show="display.showPanel" on-close="display.showPanel = false">
+			<lightbox show="display.showPanel" on-close="cancelShareThread()">
 				<share-panel resources="currentThread">
 				</share-panel>
+				<button ng-click="saveShareThread()" translate content="actualites.edition.thread.save"></button>
+				<button ng-click="cancelShareThread()" translate content="actualites.edition.thread.cancel"></button>
 			</lightbox>
 		</behaviour>
 	</div>

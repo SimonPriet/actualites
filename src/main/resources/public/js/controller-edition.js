@@ -25,7 +25,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.infos = {};
         $scope.currentThread = {};
         $scope.currentInfo = {};
-        $scope.display = {showPanel: false};
+        $scope.display = {showPanel: false, emptyThread: false};
 
         // Default display : first thread
         model.threads.on('mixed.sync', function(){
@@ -48,7 +48,15 @@ function ActualitesEditionController($injector, $scope, template, route){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
                 return moment() - info.modified; });
-            //$scope.$apply("infos");
+
+            if ($scope.currentThread.infos.empty()) {
+                $scope.display.emptyThread = true;
+                $scope.$apply("infos");
+            }
+            else {
+                $scope.display.emptyThread = false;
+            }
+
             $scope.infos.forEach(function(info){
                 info.load();
                 info.on('change', function(){
@@ -58,6 +66,22 @@ function ActualitesEditionController($injector, $scope, template, route){
         });
     }
 
+
+    // Thread Share
+    $scope.shareThread = function(){
+        $scope.display.showPanel = true;
+    }
+
+    $scope.saveShareThread = function(){
+        $scope.currentThread.save();
+        $scope.cancelShareThread();
+    }
+
+    $scope.cancelShareThread = function(){
+        $scope.display.showPanel = false;
+    }
+
+
     // Info display
     $scope.selectInfo = function(info){
         $scope.currentInfo = info;
@@ -66,6 +90,7 @@ function ActualitesEditionController($injector, $scope, template, route){
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     }
+    
 
     // Info Edition
     $scope.infoExists = function(info) {
