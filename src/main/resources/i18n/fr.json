@@ -4,7 +4,7 @@
 	"actualites.title.admin": "Administration des actualités",
 
 	"actualites.threads.title": "Fils d'actualités",
-	"actualites.threads.title.admin": "Gestion des Fils d'actualités",
+	"actualites.threads.title.admin": "Gestion des fils d'actualités",
 	"actualites.threads.latest": "Dernières actualités",
 	"actualites.threads.pending": "En attente d'approbation",
 	"actualites.threads.trash": "Corbeille",
@@ -28,14 +28,19 @@
 	"actualites.edition.thread.manage": "Partager",
 
 	"actualites.edition.thread.form.title": "Création d'un nouveau fil d'actualités",
-	"actualites.edition.thread.field.title.label": "Titre :",
+	"actualites.edition.thread.field.title.label": "Titre",
 	"actualites.edition.thread.field.title.placeholder": "Entrez un titre pour le fil",
 
 	"actualites.edition.infos.create": "Nouvelle actualité",
 	"actualites.edition.infos.edit": "Editer",
 	"actualites.edition.infos.save": "Enregistrer",
 	"actualites.edition.infos.publish": "Publier",
-	"actualites.edition.infos.unpublish": "Dé-Publier",
+	"actualites.edition.infos.unpublish": "Dépublier",
 	"actualites.edition.infos.delete": "Supprimer",
-	"actualites.edition.infos.cancel": "Annuler"
+	"actualites.edition.infos.cancel": "Annuler",
+	"actualites.edition.status.0": "Privée",
+	"actualites.edition.status.2": "Publiée",
+	"workspace.read": "Lire",
+	"workspace.contrib": "Contribuer",
+	"workspace.comment": "Commenter"
 }

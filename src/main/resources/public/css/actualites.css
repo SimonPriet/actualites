@@ -1,8 +1,20 @@
 
 hr.solid {
-	border-style: inset;
+	border-style: dotted;
 	border-width: 1px;
 	margin: 10px 0;
+	border-bottom: 0;
+	padding-bottom: 15px;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.admin-edit-link{
+	display: block;
+	margin-top: -8px;
+	font-family: Lato;
+	font-size: 17px;
+	padding-bottom: 28px;
 }
 
 hr.nav {
@@ -17,11 +29,71 @@ a.link-back {
 	margin: 20px 10px;
 }
 
-.info-content {
-	padding: 10px;
-	margin-bottom: 10px;
+.info-full {
+	padding-bottom: 85px;
 }
 
-.info-full {
-	margin-bottom: 20px;
+label{
+	line-height: 32px;
+}
+
+.toggle{
+	position: relative;
+	width: 120px;
+	height: 26px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	color: #666;
+	background: #ddd;
+	font-family: Lato;
+	width: 66px;
+	padding: 2px;
+}
+
+.toggle button{
+	display: block;
+	height: 25px;
+}
+
+.toggle span{
+	display: block;
+	height: 25px;
+	line-height: 30px;
+
+}
+
+.toggle.on button{
+	position: absolute;
+	left: 44px;
+	transition: left 250ms ease;
+	background-color: #87D544;
+}
+
+.toggle.on span{
+	position: absolute;
+	left: 2px;
+}
+
+.toggle.off button{
+	position: absolute;
+	transition: left 250ms ease;
+	left: 0;
+	background-color: #D54444;
+}
+
+.toggle.off span{
+	position: absolute;
+	right: 2px;
+}
+
+.toggle button:hover{
+	border-color: transparent;
+}
+
+.toggle.on:hover button{
+	background-color: #8EF337;
+}
+
+.toggle.off:hover button{
+	background-color: #F70000;
 }

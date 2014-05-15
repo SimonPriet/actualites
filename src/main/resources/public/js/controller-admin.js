@@ -46,7 +46,7 @@ function ActualitesAdminController($injector, $scope, template, route){
             $scope.currentThread.save();
         }
 
-        $scope.$scope.cancelEditThread();
+        $scope.cancelEditThread();
     }
 
     $scope.cancelEditThread = function(){
@@ -57,17 +57,11 @@ function ActualitesAdminController($injector, $scope, template, route){
     $scope.shareThread = function(thread){
         $scope.currentThread = thread;
         $scope.display.showPanel = true;
-    }
+    };
 
-    $scope.saveShareThread = function(){
-        $scope.currentThread.save();
-        $scope.cancelShareThread();
-    }
-
-    $scope.cancelShareThread = function(){
-        $scope.currentThread = {};
-        $scope.display.showPanel = false;
-    }
+	$scope.editThread = function(thread){
+		$scope.currentThread = thread;
+	}
 
     $injector.invoke(ActualitesAbstractController, this, {
         $scope: $scope,
