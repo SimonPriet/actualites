@@ -77,3 +77,39 @@ function ActualitesAdminController($injector, $scope, template, route){
 
     this.initialize();
 }
+/*
+module.directive('sharePanelPlus', function($compile){
+    return {
+        scope: {
+            resources: '=',
+            appPrefix: '='
+        },
+        restrict: 'E',
+        templateUrl: '/' + ACTUALITES_CONFIGURATION.applicationName + '/public/template/share-panel-plus.html',
+        link: function($scope, $element, $attributes){
+
+        }
+    }
+});
+
+function ShareActualites($injector, $rootScope, $scope, ui, _, lang){
+
+    this.initialize = function(){
+        var actionsConfiguration = {};
+
+        http().get('/' + infraPrefix + '/public/json/sharing-rights.json').done(function(config){
+            actionsConfiguration = config;
+        });
+    }
+
+    $injector.invoke(Share, this, {
+        $rootScope: $rootScope,
+        $scope: $scope,
+        ui: ui,
+        _: _,
+        lang: lang
+    });
+
+    this.initialize();
+}
+*/

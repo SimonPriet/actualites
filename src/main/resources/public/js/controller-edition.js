@@ -90,7 +90,7 @@ function ActualitesEditionController($injector, $scope, template, route){
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     }
-    
+
 
     // Info Edition
     $scope.infoExists = function(info) {
@@ -126,17 +126,41 @@ function ActualitesEditionController($injector, $scope, template, route){
     }
 
     $scope.publishInfo = function(info){
+        // Update status
         info.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-        info.save();
-        $scope.reloadInfos();
+
+        // 1- Clean permissions
+        info.on('clearPermissions', function(){
+            // 2- Update permissions
+            info.on('updatePermissions', function(){
+                // 3- Save Info and refresh
+                info.save();
+                $scope.reloadInfos();
+            });
+            info.updatePermissions($scope.currentThread.shared);
+        });
+        info.clearPermissions();
     }
 
     $scope.unpublishInfo = function(info){
         info.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-        info.save();
-        $scope.reloadInfos();
+
+        // 1- Clean permissions
+        info.on('clearPermissions', function(){
+            info.save();
+            $scope.reloadInfos();
+        });
+        info.clearPermissions();
+    }
+/*
+    $scope.submitInfo = function(info){
+
     }
 
+    $scope.unsubmitInfo = function(info){
+
+    }
+*/
     $scope.deleteInfo = function(info){
         info.remove($scope.currentThread);
         $scope.reloadInfos();

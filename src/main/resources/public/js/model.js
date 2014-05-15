@@ -106,6 +106,71 @@ Info.prototype.remove = function(thread){
 	}
 }
 
+Info.prototype.clearPermissions = function(){
+	// Check for permissions
+	if (this.shared === undefined || this.shared.length === 0) {
+		this.trigger('clearPermissions');
+		return;
+	}
+
+	// Remove all permissions
+	var count = this.shared.length;
+	var that = this;
+	_.each(this.shared, function(permission){
+		var data = undefined;
+        if(permission.userId !== undefined) {
+        	data = { userId: permission.userId };
+        }
+        else if (permission.groupId !== undefined) {
+        	data = { groupId: permission.groupId };
+        }
+
+        if (data !== undefined) {
+        	http().put('/workspace/share/remove/' + that._id, http().serialize(data)).done(function(){
+        		count--;
+	        	if (count <= 0) {
+	        		that.trigger('clearPermissions');
+	        	}	
+        	});
+        }
+    });
+}
+
+Info.prototype.updatePermissions = function(permissions){
+	// Check there are permissions
+	if (permissions.length === 0) {
+		this.trigger('updatePermissions');
+		return;
+	}
+
+	// Add all permissions
+	var count = permissions.length;
+	var that = this;
+	_.each(permissions, function(permission){
+		// Prepare data
+		var data = {};
+		data.actions = [];
+		_.each(permission, function(value, key){
+			if (key === 'userId') {
+				data.userId = value;
+			}
+			else if (key === 'groupId') {
+				data.groupId = value;
+			}
+			else {
+				data.actions.push(key);
+			}
+		});
+
+		http().put('/workspace/share/json/' + that._id, http().serialize(data)).done(function(){
+			count--;
+        	if (count <= 0) {
+        		that.trigger('updatePermissions');
+        	}	
+		});
+	});
+}
+
 Info.prototype.getApplicationInfosCollectionTag = function(){
 	return ACTUALITES_CONFIGURATION.applicationName + '-' + ACTUALITES_CONFIGURATION.infosCollectionName;
 }
@@ -194,6 +259,14 @@ Thread.prototype.getApplicationInfosCollectionTag = function(){
 	return ACTUALITES_CONFIGURATION.applicationName + '-' + ACTUALITES_CONFIGURATION.infosCollectionName;
 }
 
+/*
+WorkspaceService = function(){	
+}
+
+WorkspaceService.prototype.getPendingPermissions = function(){
+
+}
+*/
 
 /* Model Build */
 model.build = function(){
