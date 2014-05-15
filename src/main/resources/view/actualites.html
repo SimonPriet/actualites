@@ -8,36 +8,23 @@
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller-main.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
-	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
 <body ng-controller="ActualitesMainController">
 <portal>
-
+	<h1>Les actualités</h1>
 	<div class="cell four">
 		<!-- Thread Navigation -->
-		<div class="row">
-			<h1 translate content="actualites.threads.title"></h1>
-		</div>
-		<hr />
 		<nav class="vertical">
-			<!-- Latest thread -->
+			<h2 translate content="actualites.threads.title"></h2>
+			<a class="classic-link" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
 			<ul>
-				<li>
-		     		<a ng-class="{selected: latestThread === currentThread}" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
-		     	</li>
-			</ul>
-			<hr />
-			<!-- Real threads -->
-		    <ul>
 			 	<li ng-repeat="thread in threads.all">
 			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
 			  	</li>
 			</ul>
+			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition" class="classic-link"></a>
 		</nav>
-		<hr />
-		<div class="row">
-			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition"></a>
-		</div>
+
 	</div>
 
 	<!-- Thread panel -->

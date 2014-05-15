@@ -4,16 +4,20 @@
 
 <div class="row info-full" ng-repeat="info in infos">
 	<div class="row">
-		<h3>[[info.title]]</h3>
+		<h1 class="cell">[[info.title]]</h1>
+		<div class="toggle right-magnet" ng-click="switchPublish(info)" ng-class="{ on: isInfoPublished(info), off: isInfoPublishable(info) }">
+			<button></button>
+			<span translate content="actualites.edition.status.[[info.status]]"></span>
+		</div>
 	</div>
+
 
 	<article class="row info-content" bind-html="info.content">
 	</article>
 
 	<div class="row">
-		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit"></button>
-		<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
-		<button ng-click="unpublishInfo(info)" ng-if="isInfoPublished(info)" translate content="actualites.edition.infos.unpublish"></button>
-		<button ng-click="deleteInfo(info)" translate content="actualites.edition.infos.delete"></button>
+		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit" class="right-magnet"></button>
+		<button ng-click="deleteInfo(info)" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
 	</div>
+	<hr/>
 </div>

@@ -85,17 +85,16 @@ function ActualitesEditionController($injector, $scope, template, route){
     // Info display
     $scope.selectInfo = function(info){
         $scope.currentInfo = info;
-    }
+    };
 
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
-    }
-
+    };
 
     // Info Edition
     $scope.infoExists = function(info) {
         return (info._id !== undefined);
-    }
+    };
 
     $scope.createInfo = function(info){
         if (info === undefined) {
@@ -108,7 +107,7 @@ function ActualitesEditionController($injector, $scope, template, route){
             $scope.currentInfo = info;
         }
         template.open('thread', 'info-edit-form');
-    }
+    };
 
     $scope.saveInfo = function(info){
         if (info._id === undefined) {
@@ -140,7 +139,7 @@ function ActualitesEditionController($injector, $scope, template, route){
             info.updatePermissions($scope.currentThread.shared);
         });
         info.clearPermissions();
-    }
+    };
 
     $scope.unpublishInfo = function(info){
         info.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
@@ -151,7 +150,17 @@ function ActualitesEditionController($injector, $scope, template, route){
             $scope.reloadInfos();
         });
         info.clearPermissions();
-    }
+    };
+    
+    $scope.switchPublish = function(info){
+        if($scope.isInfoPublishable(info)){
+            $scope.publishInfo(info);
+        }
+        else{
+            $scope.unpublishInfo(info);
+        }
+    };
+    
 /*
     $scope.submitInfo = function(info){
 

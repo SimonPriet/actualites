@@ -34,7 +34,7 @@ function ActualitesAbstractController($scope, template, route){
         $scope.currentThread.infos.on('sync', function(){
             if (reloadFlag === true) {
                 $scope.infos = $scope.currentThread.infos;
-                $scope.apply("infos");
+                $scope.$apply("infos");
                 reloadFlag = false;
             }
         });

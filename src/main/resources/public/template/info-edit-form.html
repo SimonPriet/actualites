@@ -1,38 +1,37 @@
 <div class="row info-full">
 	<div class="row">
-		<label>Titre :</label>
-		<input ng-model="currentInfo.title" type="text"/>
+		<label class="three cell">Titre</label>
+		<input ng-model="currentInfo.title" type="text" class="cell" />
+
+		<div class="toggle right-magnet" ng-click="switchPublish(currentInfo)" ng-if="currentInfo._id" ng-class="{ on: isInfoPublished(currentInfo), off: isInfoPublishable(currentInfo) }">
+			<button></button>
+			<span translate content="actualites.edition.status.[[currentInfo.status]]"></span>
+		</div>
 	</div>
 
-	<div class="row">
-		<label>Status: </label>[[currentInfo.status]]
-	</div>
-
-	<div class="row">
-		<input ng-model="currentInfo.hasPublicationDate" type="checkbox"/>
-		<label>Date de publication :</label>
+	<div class="row" ng-if="isInfoPublishable(currentInfo) || !currentInfo._id">
+		<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> Date de publication</label>
 		<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
 	</div>
 
+
 	<div class="row">
-		<input ng-model="currentInfo.hasExpirationDate" type="checkbox"/>
-		<label>Date d'expiration' :</label>
+		<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> Date d'expiration</label>
 		<date-picker ng-model="currentInfo.expirationDate" ng-change="showDate = true"></date-picker>
+	</div>
+	<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
+		<label class="cell">&nbsp;</label>
 	</div>
 
 	<div class="row">
-		<label>Contenu :</label>
 		<article>
-			<rich-text-editor ng-model="currentInfo.content">
-			</rich-text-editor>
+			<html-editor ng-model="currentInfo.content"></html-editor>
 		</article>
 	</div>
 
 	<div class="row">
-		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save"></button>
-		<button ng-click="publishInfo(currentInfo)" ng-if="isInfoPublishable(currentInfo)" translate content="actualites.edition.infos.publish"></button>
-		<button ng-click="unpublishInfo(currentInfo)" ng-if="isInfoPublished(currentInfo)" translate content="actualites.edition.infos.unpublish"></button>
-		<button ng-click="deleteInfo(currentInfo)" translate content="actualites.edition.infos.delete"></button>
-		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="cancel"></button>
+		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
+		<button ng-click="deleteInfo(currentInfo)" translate content="actualites.edition.infos.delete" class="right-magnet" ng-if="currentInfo._id"></button>
+		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
 	</div>
 </div>

@@ -12,27 +12,15 @@
 </head>
 <body ng-controller="ActualitesEditionController">
 <portal>
-
+	<h1>Modifier les actualités</h1>
 	<div class="cell four">
-		<!-- Back link -->
-		<div class="row height-one">
-			<h2>
-				<a class="link-back" href="/actualites" translate content="actualites.links.back"></a>
-			</h2>
-		</div>
-		<hr class="solid nav"/>
-
-		<!-- Thread Navigation -->
-		<div class="row">
-			<h1 translate content="actualites.threads.title"></h1>
-		</div>
-		<hr />
 		<nav class="vertical">
 		    <ul>
 			 	<li ng-repeat="thread in threads.all">
 			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
 			  	</li>
 			</ul>
+			<a class="classic-link" href="/actualites">Voir les actualités</a>
 		</nav>
 	</div>
 
@@ -56,11 +44,8 @@
 	<!-- Lightbox : Thread share -->
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
-			<lightbox show="display.showPanel" on-close="cancelShareThread()">
-				<share-panel resources="currentThread">
-				</share-panel>
-				<button ng-click="saveShareThread()" translate content="actualites.edition.thread.save"></button>
-				<button ng-click="cancelShareThread()" translate content="actualites.edition.thread.cancel"></button>
+			<lightbox show="display.showPanel" on-close="cancelShareThread(); display.showPanel = false;">
+				<share-panel resources="currentThread"></share-panel>
 			</lightbox>
 		</behaviour>
 	</div>
