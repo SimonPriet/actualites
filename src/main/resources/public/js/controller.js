@@ -16,7 +16,11 @@ function ActualitesAbstractController($scope, template, route){
     }
 
     $scope.isInfoPublishable = function(info) {
-        return (info._id !== undefined) && (info.status !== ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED);
+        return ((info._id !== undefined) 
+                && ((info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING) 
+                    || ((info.owner === model.me.userId) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT))
+                )
+            );
     }
 
     $scope.isInfoVisible = function(info) {

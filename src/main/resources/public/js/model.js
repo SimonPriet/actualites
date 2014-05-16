@@ -259,14 +259,26 @@ Thread.prototype.getApplicationInfosCollectionTag = function(){
 	return ACTUALITES_CONFIGURATION.applicationName + '-' + ACTUALITES_CONFIGURATION.infosCollectionName;
 }
 
-/*
+
 WorkspaceService = function(){	
 }
 
-WorkspaceService.prototype.getPendingPermissions = function(){
+WorkspaceService.prototype.getFullPermissionForActorForResource = function(permission, resource){
+	var deferred = $.Deferred();
 
+	http().get('/workspace/share/json/' + resource._id).done(function(data){
+		_.each(data.actions, function(action){
+			_.each(action.name, function(name){
+				if (permission[name] === undefined) {
+					permission[name] = true;
+				}
+			});
+		});
+		deferred.resolve();
+	});
+	return deferred.promise();
 }
-*/
+
 
 /* Model Build */
 model.build = function(){
@@ -275,6 +287,8 @@ model.build = function(){
 	this.makeModels([Info, Thread]);
 	this.makePermanent(Thread);
 	// Info is not using the Permanent System
+
+	this.workspaceService = new WorkspaceService();
 
 	this.latestThread = new Thread();
 	this.latestThread.build({

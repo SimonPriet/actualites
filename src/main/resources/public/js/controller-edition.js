@@ -124,6 +124,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.cancelEditInfo();
     }
 
+    /* Info Publication */
     $scope.publishInfo = function(info){
         // Update status
         info.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
@@ -161,25 +162,33 @@ function ActualitesEditionController($injector, $scope, template, route){
         }
     };
     
-/*
+    /* Info Submit */
+    $scope.isInfoSubmitable = function(info){
+        return (info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT);
+    };
+
+    $scope.isInfoSubmited = function(info){
+        return info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING;
+    };
+
     $scope.submitInfo = function(info){
 
-    }
+    };
 
     $scope.unsubmitInfo = function(info){
 
-    }
-*/
+    };
+
     $scope.deleteInfo = function(info){
         info.remove($scope.currentThread);
         $scope.reloadInfos();
         $scope.cancelEditInfo();
-    }
+    };
 
     $scope.cancelEditInfo = function(){
         $scope.currentInfo = {};
         template.open('thread', 'threads-edit-view');
-    }
+    };
 
     $injector.invoke(ActualitesAbstractController, this, {
         $scope: $scope,
