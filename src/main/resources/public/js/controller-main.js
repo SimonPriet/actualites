@@ -50,8 +50,10 @@ function ActualitesMainController($injector, $scope, template, route){
         $scope.displayMode = 'latest';
         $scope.loadTotal = 0;
         
-        $scope.currentThread.loadInfos();
-        $scope.currentThread.on('loadInfos', function(){
+        // Load infos for Main View
+        $scope.currentThread.loadInfos(ACTUALITES_CONFIGURATION.threadFilters.main);
+
+        $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
                 return moment() - info.modified; });

@@ -15,14 +15,6 @@ function ActualitesAbstractController($scope, template, route){
         return info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
     }
 
-    $scope.isInfoPublishable = function(info) {
-        return ((info._id !== undefined) 
-                && ((info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING) 
-                    || ((info.owner === model.me.userId) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT))
-                )
-            );
-    }
-
     $scope.isInfoVisible = function(info) {
         if (info.hasPublicationDate) {
             return (moment().unix() > moment(info.publicationDate).unix());
@@ -31,16 +23,5 @@ function ActualitesAbstractController($scope, template, route){
             return (moment().unix() < moment(info.expirationDate).unix());
         }
         return $scope.isInfoPublished(info);
-    }
-
-    $scope.reloadInfos = function(){
-        var reloadFlag = true;
-        $scope.currentThread.infos.on('sync', function(){
-            if (reloadFlag === true) {
-                $scope.infos = $scope.currentThread.infos;
-                $scope.$apply("infos");
-                reloadFlag = false;
-            }
-        });
     }
 }

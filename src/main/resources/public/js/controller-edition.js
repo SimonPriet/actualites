@@ -43,8 +43,10 @@ function ActualitesEditionController($injector, $scope, template, route){
     }
 
     $scope.showInfos = function(){
-        $scope.currentThread.loadInfos();
-        $scope.currentThread.on('loadInfos', function(){
+        // Load infos for Edition view
+        $scope.currentThread.loadInfos(ACTUALITES_CONFIGURATION.threadFilters.edition);
+
+        $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
                 return moment() - info.modified; });
@@ -120,37 +122,37 @@ function ActualitesEditionController($injector, $scope, template, route){
             info.save();
         }
 
-        $scope.reloadInfos();
         $scope.cancelEditInfo();
     }
 
-    /* Info Publication */
-    $scope.publishInfo = function(info){
-        // Update status
-        info.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+    $scope.deleteInfo = function(info){
+        info.remove($scope.currentThread);
+        $scope.cancelEditInfo();
+    };
 
-        // 1- Clean permissions
-        info.on('clearPermissions', function(){
-            // 2- Update permissions
-            info.on('updatePermissions', function(){
-                // 3- Save Info and refresh
-                info.save();
-                $scope.reloadInfos();
-            });
-            info.updatePermissions($scope.currentThread.shared);
-        });
-        info.clearPermissions();
+    $scope.cancelEditInfo = function(){
+        $scope.currentInfo = {};
+        template.open('thread', 'threads-edit-view');
+    };
+
+
+    /* Info Publication */
+    $scope.isInfoPublishable = function(info) {
+        return ((info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING)
+            && info.owner === $scope.currentThread.owner);
+    }
+
+    $scope.isInfoUnpublishable = function(info) {
+        return ((info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED)
+            && info.owner === $scope.currentThread.owner);    
+    }
+    
+    $scope.publishInfo = function(info){
+        info.publish($scope.currentThread);
     };
 
     $scope.unpublishInfo = function(info){
-        info.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-
-        // 1- Clean permissions
-        info.on('clearPermissions', function(){
-            info.save();
-            $scope.reloadInfos();
-        });
-        info.clearPermissions();
+        info.unpublish($scope.currentThread);
     };
     
     $scope.switchPublish = function(info){
@@ -161,7 +163,8 @@ function ActualitesEditionController($injector, $scope, template, route){
             $scope.unpublishInfo(info);
         }
     };
-    
+
+
     /* Info Submit */
     $scope.isInfoSubmitable = function(info){
         return (info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT);
@@ -172,24 +175,15 @@ function ActualitesEditionController($injector, $scope, template, route){
     };
 
     $scope.submitInfo = function(info){
-
+        info.submit($scope.currentThread);
     };
 
     $scope.unsubmitInfo = function(info){
-
+        info.unsubmit($scope.currentThread);
     };
 
-    $scope.deleteInfo = function(info){
-        info.remove($scope.currentThread);
-        $scope.reloadInfos();
-        $scope.cancelEditInfo();
-    };
 
-    $scope.cancelEditInfo = function(){
-        $scope.currentInfo = {};
-        template.open('thread', 'threads-edit-view');
-    };
-
+    /* Inheritance */
     $injector.invoke(ActualitesAbstractController, this, {
         $scope: $scope,
         template: template,

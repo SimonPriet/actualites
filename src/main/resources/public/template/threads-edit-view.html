@@ -5,7 +5,7 @@
 <div class="row info-full" ng-repeat="info in infos">
 	<div class="row">
 		<h1 class="cell">[[info.title]]</h1>
-		<div class="toggle right-magnet" ng-click="switchPublish(info)" ng-class="{ on: isInfoPublished(info), off: isInfoPublishable(info) }">
+		<div class="toggle right-magnet" ng-class="{ on: isInfoPublished(info), off: (! isInfoPublished(info)) }">
 			<button></button>
 			<span translate content="actualites.edition.status.[[info.status]]"></span>
 		</div>
@@ -16,8 +16,12 @@
 	</article>
 
 	<div class="row">
-		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit" class="right-magnet"></button>
 		<button ng-click="deleteInfo(info)" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
+		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit" class="right-magnet"></button>
+		<button ng-click="submitInfo(info)" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit" class="right-magnet"></button>
+		<button ng-click="unsubmitInfo(info)" ng-if="isInfoSubmited(info)" translate content="actualites.edition.infos.unsubmit" class="right-magnet"></button>
+		<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish" class="right-magnet"></button>
+		<button ng-click="unpublishInfo(info)" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish" class="right-magnet"></button>
 	</div>
 	<hr/>
 </div>

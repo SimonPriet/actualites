@@ -3,13 +3,14 @@
 		<label class="three cell">Titre</label>
 		<input ng-model="currentInfo.title" type="text" class="cell" />
 
-		<div class="toggle right-magnet" ng-click="switchPublish(currentInfo)" ng-if="currentInfo._id" ng-class="{ on: isInfoPublished(currentInfo), off: isInfoPublishable(currentInfo) }">
+		<div class="toggle right-magnet" ng-class="{ on: isInfoPublished(currentInfo), off: (! isInfoPublished(currentInfo)) }">
 			<button></button>
 			<span translate content="actualites.edition.status.[[currentInfo.status]]"></span>
 		</div>
+
 	</div>
 
-	<div class="row" ng-if="isInfoPublishable(currentInfo) || !currentInfo._id">
+	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> Date de publication</label>
 		<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
 	</div>
@@ -30,8 +31,8 @@
 	</div>
 
 	<div class="row">
-		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
-		<button ng-click="deleteInfo(currentInfo)" translate content="actualites.edition.infos.delete" class="right-magnet" ng-if="currentInfo._id"></button>
 		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
+		<button ng-click="deleteInfo(currentInfo)" ng-if="currentInfo._id !=== undefined" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
+		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
 	</div>
 </div>
