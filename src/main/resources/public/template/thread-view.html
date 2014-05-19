@@ -3,7 +3,10 @@
 </div>
 
 <div class="row info-full" ng-repeat="info in infos | filter:isInfoVisible | limitTo: loadTotal">
-	<h1>[[info.title]]</h1>
+	<div class="row">
+		<h1 class="cell">[[info.title]]</h1>
+		<span class="infoThread right-magnet">[[getInfoThread(info)]]</span>
+	</div>
 
 	<article class="row info-content reduce-block-six" bind-html="info.content">
 	</article>

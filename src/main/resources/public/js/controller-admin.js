@@ -6,8 +6,10 @@ function ActualitesAdminController($injector, $scope, template, route){
         // Dependencies
         $scope.template = template;
 
-        // Variables
+        // Threads
         $scope.threads = model.threads.mixed;
+
+        // Variables
         $scope.currentThread = {};
         $scope.display = {showPanel: false};
 

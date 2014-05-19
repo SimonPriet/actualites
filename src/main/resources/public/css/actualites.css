@@ -1,4 +1,4 @@
-
+/* General */
 hr.solid {
 	border-style: dotted;
 	border-width: 1px;
@@ -29,14 +29,47 @@ a.link-back {
 	margin: 20px 10px;
 }
 
+/* Info display */
 .info-full {
-	padding-bottom: 85px;
+	padding-bottom: 25px;
+}
+
+.info-full h1 {
+	margin-bottom: 10px;
+}
+
+.info-full label {
+	line-height: 25px;
+	margin-bottom: 5px;
+	padding-left: 8px;
+	font-family: Lato;
+	font-size: 1.2em;
+}
+
+.info-full input {
+	padding: 2px 4px;
 }
 
 label{
 	line-height: 32px;
 }
 
+article.info-content {
+  background: #fff;
+  padding: 10px 20px;
+  margin: 7px 0 5px;
+}
+
+span.infoThread {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: #ddd;
+  font-family: Lato;
+  font-size: 1.2em;
+}
+
+/* Toggles */
 .toggle{
 	position: relative;
 	width: 120px;
@@ -86,6 +119,7 @@ label{
 	right: 2px;
 }
 
+/*
 .toggle button:hover{
 	border-color: transparent;
 }
@@ -97,3 +131,4 @@ label{
 .toggle.off:hover button{
 	background-color: #F70000;
 }
+*/

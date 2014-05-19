@@ -11,14 +11,6 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td>
-					<input type="text" placeholder="Titre du fil d'actualités" ng-model="currentThread.title" ng-if="!currentThread._id" />
-				</td>
-				<td></td>
-				<td style="height: 29px">&nbsp;</td>
-				<td><button ng-click="saveThread()" class="right-magnet" ng-if="!currentThread._id">Créer</button></td>
-			</tr>
 			<tr ng-repeat="thread in threads.all">
 				<td ng-if="currentThread !== thread">[[thread.title]]</td>
 				<td ng-if="currentThread === thread">
@@ -35,6 +27,14 @@
 						<button ng-click="shareThread(thread)" translate content="actualites.edition.thread.manage" ng-if="currentThread !== thread"></button>
 					</behaviour>
 				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" placeholder="Titre du fil d'actualités" ng-model="currentThread.title" ng-if="!currentThread._id" />
+				</td>
+				<td></td>
+				<td style="height: 35px">&nbsp;</td>
+				<td><button ng-click="saveThread()" class="right-magnet" ng-if="!currentThread._id">Créer</button></td>
 			</tr>
 		</tbody>
 	</table>

@@ -25,19 +25,21 @@
 	</div>
 
 	<!-- Thread panel -->
-	<div class="cell eight">
+	<div class="cell eight" ng-if="hasCurrentThread()">
 
 		<!-- Thread actions -->
 		<div class="row">
-			<button ng-click="createInfo()" ng-if="hasCurrentThread()" translate content="actualites.edition.infos.create"></button>
+			<behaviour name="edit" resource="currentThread" class="cell">
+				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+			</behaviour>
 			<behaviour name="share" resource="currentThread" class="right-magnet">
-				<button ng-click="shareThread()" ng-if="hasCurrentThread()" translate content="actualites.edition.thread.share"></button>
+				<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
 			</behaviour>
 		</div>
 		<hr class="solid"/>
 
 		<!-- Thread infos -->
-		<div ng-include="template.containers.thread">
+		<div id="actualites.container.threads" ng-include="template.containers.thread">
 		</div>
 	</div>
 

@@ -1,4 +1,4 @@
-<div ng-if="display.emptyThread">
+<div ng-if="display.emptyThread" class="row">
 	<h2 translate content="actualites.thread.empty"></h2>
 </div>
 
@@ -11,17 +11,34 @@
 		</div>
 	</div>
 
+	<div class="row" ng-if="info.hasPublicationDate">
+		<label class="three cell">Date de publication : </label>
+		<input value="[[formatDate(info.publicationDate)]]" disabled />
+	</div>
+
+	<div class="row" ng-if="info.hasExpirationDate">
+		<label class="three cell">Date d'expiration : </label>
+		<input value="[[formatDate(info.expirationDate)]]" disabled />
+	</div>
 
 	<article class="row info-content" bind-html="info.content">
 	</article>
 
+	
 	<div class="row">
-		<button ng-click="deleteInfo(info)" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
-		<button ng-click="createInfo(info)" translate content="actualites.edition.infos.edit" class="right-magnet"></button>
-		<button ng-click="submitInfo(info)" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit" class="right-magnet"></button>
-		<button ng-click="unsubmitInfo(info)" ng-if="isInfoSubmited(info)" translate content="actualites.edition.infos.unsubmit" class="right-magnet"></button>
-		<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish" class="right-magnet"></button>
-		<button ng-click="unpublishInfo(info)" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish" class="right-magnet"></button>
+		<behaviour name="edit" resource="info" class="cell right-magnet" ng-if="info.loaded">
+			<!-- Actions -->
+			<button ng-click="submitInfo(info)" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
+			<button ng-click="unsubmitInfo(info)" ng-if="isInfoSubmited(info)" translate content="actualites.edition.infos.unsubmit"></button>
+			<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
+			<button ng-click="unpublishInfo(info)" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
+			<button ng-click="createInfo(info)" ng-if="isInfoEditable(info)" translate content="actualites.edition.infos.edit"></button>
+			<button ng-click="deleteInfo(info)" ng-if="isInfoDeletable(info)" translate content="actualites.edition.infos.delete"></button>
+		</behaviour>
+			
+		<!-- Loaders -->
+		<button ng-if="! info.loaded" translate content="actualites.edition.infos.loading.[[info.action]]" disabled class="right-magnet"></button>
 	</div>
+	
 	<hr/>
 </div>

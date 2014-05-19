@@ -24,9 +24,12 @@ function ActualitesMainController($injector, $scope, template, route){
 	    $scope.loadSize = 4;
 	    $scope.displayMode = 'latest';
 
-	    // Variables
+	    // Special threads
 	    $scope.latestThread = model.latestThread;
-	    $scope.threads = model.threads.mixed;
+	    // Threads
+        $scope.threads = model.threads.mixed;
+
+        // Variables
 	    $scope.infos = {};
 	    $scope.loadTotal = 0;
 	    $scope.currentThread = {};
@@ -83,6 +86,12 @@ function ActualitesMainController($injector, $scope, template, route){
                 $scope.$apply("infos");
             });
         });
+    }
+
+    $scope.getInfoThread = function(info){
+        return ($scope.threads.filter(function(thread){
+            return thread._id === info.thread;
+        })[0].title);
     }
 
 	$injector.invoke(ActualitesAbstractController, this, {

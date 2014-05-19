@@ -44,7 +44,11 @@
 	"actualites.edition.status.1": "Envoyée pour validation",
 	"actualites.edition.status.2": "Publiée",
 	"actualites.edition.status.3": "Supprimée",
-	"workspace.read": "Lire",
-	"workspace.contrib": "Contribuer",
-	"workspace.comment": "Commenter"
+	"actualites.edition.infos.loading.submit": "Demande de validation en cours ...",
+	"actualites.edition.infos.loading.unsubmit": "Annulation de la demande en cours ...",
+	"actualites.edition.infos.loading.publish": "Publication en cours ...",
+	"actualites.edition.infos.loading.unpublish": "Dépublication en cours ...",
+	"workspace.read": "Voir les actualités",
+	"workspace.contrib": "Contribuer au fil",
+	"workspace.comment": "Commenter les actualités"
 }

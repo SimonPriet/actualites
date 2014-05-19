@@ -20,12 +20,17 @@ function ActualitesEditionController($injector, $scope, template, route){
         // Dependencies
         $scope.template = template;
 
-        // Variables
+        // Threads
         $scope.threads = model.threads.mixed;
+
+        // Variables
         $scope.infos = {};
         $scope.currentThread = {};
         $scope.currentInfo = {};
-        $scope.display = {showPanel: false, emptyThread: false};
+        $scope.display = {
+            showPanel: false, 
+            emptyThread: false, 
+        };
 
         // Default display : first thread
         model.threads.on('mixed.sync', function(){
@@ -46,6 +51,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         // Load infos for Edition view
         $scope.currentThread.loadInfos(ACTUALITES_CONFIGURATION.threadFilters.edition);
 
+        // On Sync refresh
         $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
@@ -65,6 +71,9 @@ function ActualitesEditionController($injector, $scope, template, route){
                     $scope.$apply("infos");
                 });
             });
+
+            $location.hash('actualites.container.threads');
+            $anchorScroll();
         });
     }
 
@@ -93,9 +102,17 @@ function ActualitesEditionController($injector, $scope, template, route){
         return ($scope.currentInfo instanceof Info);
     };
 
+    $scope.formatDate = function(date){
+        return moment(date).lang('fr').format('dddd DD MMM YYYY');
+    };
+
     // Info Edition
     $scope.infoExists = function(info) {
         return (info._id !== undefined);
+    };
+
+    $scope.isInfoEditable = function(info) {
+        return info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
     };
 
     $scope.createInfo = function(info){
@@ -125,6 +142,10 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.cancelEditInfo();
     }
 
+    $scope.isInfoDeletable = function(info) {
+        return (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT || info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING);
+    };
+
     $scope.deleteInfo = function(info){
         info.remove($scope.currentThread);
         $scope.cancelEditInfo();
@@ -148,10 +169,14 @@ function ActualitesEditionController($injector, $scope, template, route){
     }
     
     $scope.publishInfo = function(info){
+        info.loaded = false;
+        info.action = "publish";
         info.publish($scope.currentThread);
     };
 
     $scope.unpublishInfo = function(info){
+        info.loaded = false;
+        info.action = "unpublish";
         info.unpublish($scope.currentThread);
     };
     
@@ -175,10 +200,14 @@ function ActualitesEditionController($injector, $scope, template, route){
     };
 
     $scope.submitInfo = function(info){
+        info.loaded = false;
+        info.action = "submit";
         info.submit($scope.currentThread);
     };
 
     $scope.unsubmitInfo = function(info){
+        info.loaded = false;
+        info.action = "unsubmit";
         info.unsubmit($scope.currentThread);
     };
 

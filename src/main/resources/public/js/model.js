@@ -62,6 +62,7 @@ Info.prototype.load = function(data){
 			hasExpirationDate: content.expirationDate === undefined ? false : true,
 			content: content.content,
 			loaded: true,
+			action: undefined,
 			modified: content.modified || this.modified,
 			owner: content.owner || this.owner,
 			ownerName: content.ownerName || this.ownerName,
