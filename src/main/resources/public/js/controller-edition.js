@@ -49,7 +49,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
-                return moment() - info.modified; });
+                return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat); });
 
             if ($scope.currentThread.infos.empty()) {
                 $scope.display.emptyThread = true;
@@ -119,7 +119,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         }
         else {
             // Info edition
-            info.save();
+            info.save($scope.currentThread);
         }
 
         $scope.cancelEditInfo();
@@ -139,12 +139,12 @@ function ActualitesEditionController($injector, $scope, template, route){
     /* Info Publication */
     $scope.isInfoPublishable = function(info) {
         return ((info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING)
-            && info.owner === $scope.currentThread.owner);
+            && model.me.userId === $scope.currentThread.owner);
     }
 
     $scope.isInfoUnpublishable = function(info) {
         return ((info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED)
-            && info.owner === $scope.currentThread.owner);    
+            && model.me.userId === $scope.currentThread.owner);    
     }
     
     $scope.publishInfo = function(info){

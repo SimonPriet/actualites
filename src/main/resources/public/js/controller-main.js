@@ -56,7 +56,7 @@ function ActualitesMainController($injector, $scope, template, route){
         $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
             $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
-                return moment() - info.modified; });
+                return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat); });
 
             if ($scope.currentThread.infos.empty()) {
                 $scope.display.emptyThread = true;

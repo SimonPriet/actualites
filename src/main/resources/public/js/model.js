@@ -30,7 +30,8 @@ var ACTUALITES_CONFIGURATION = {
 	},
 	permissions: {
 		contributor: 'org-entcore-workspace-service-WorkspaceService|updateDocument'
-	}
+	},
+	momentFormat: "YYYY-MM-DD HH:mm.ss.SSS"
 };
 
 
@@ -88,16 +89,18 @@ Info.prototype.create = function(thread, data){
 	form.append('blob', blob, info.title + '.json');
 	http().postFile('/workspace/document?application=' + this.getApplicationInfosCollectionTag(), form).done(function(e){
 		http().put('/workspace/documents/move/' + e._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-			thread.infos.sync();
+			this.shareToThread(thread).done(function(){
+				thread.infos.sync();
+			});
 		}.bind(this));
 	}.bind(this));
 }
 
-Info.prototype.save = function(){
+Info.prototype.save = function(thread){
 
 	var info = {
 		_id: this._id,
-		modified: this.modified,
+		modified: moment().format(ACTUALITES_CONFIGURATION.momentFormat),
 		owner: this.owner,
 		ownerName: this.ownerName,
 		thread: this.thread,
@@ -113,8 +116,9 @@ Info.prototype.save = function(){
 	http().putFile('/workspace/document/' + this._id, form);
 
 	// Permissions
-	//var permissions = thread.shared;
-	//this.updatePermissions(thread.shared);
+	this.shareToThread(thread).done(function(){
+		thread.infos.sync();
+	});
 }
 
 Info.prototype.remove = function(thread){
@@ -131,10 +135,7 @@ Info.prototype.submit = function(thread){
 	
 	var info = this;
 	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.PENDING + '-' + thread._id).done(function(){
-		this.updatePermissions(thread.shared).done(function(){
-			info.save();
-			thread.infos.sync();
-		});
+		info.save(thread);
 	}.bind(this));
 }
 
@@ -143,10 +144,7 @@ Info.prototype.unsubmit = function(thread){
 
 	var info = this;
 	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-		this.clearPermissions().done(function(){
-			info.save();
-			thread.infos.sync();
-		});
+		info.save(thread);
 	}.bind(this));
 }
 
@@ -155,10 +153,7 @@ Info.prototype.publish = function(thread){
 
 	var info = this;
 	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.PUBLISHED + '-' + thread._id).done(function(){
-		this.updatePermissions(thread.shared).done(function(){
-			info.save();
-			thread.infos.sync();
-		});
+		info.save(thread);
 	}.bind(this));
 }
 
@@ -167,11 +162,47 @@ Info.prototype.unpublish = function(thread){
 
 	var info = this;
 	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-		this.clearPermissions().done(function(){
-			info.save();
-			thread.infos.sync();
-		});
+		info.save(thread);
 	}.bind(this));
+}
+
+Info.prototype.shareToThreadContributors = function(thread){
+	var deferred = $.Deferred();
+
+	if (! this.isShareable()) {
+		return deferred.resolve().promise();
+	}
+
+	var info = this;
+	var permissions = model.workspaceService.getContributorsForResource(thread);
+	model.workspaceService.getFullPermissionsForActorsForResource(permissions, this).done(function(){
+		info.updatePermissions(permissions).done(function(){
+			deferred.resolve();
+		});
+	});
+
+	return deferred.promise();
+}
+
+Info.prototype.shareToThread = function(thread){
+	var deferred = $.Deferred();
+
+	if (! this.isShareable()) {
+		return deferred.resolve().promise();
+	}
+
+	var info = this;
+	var permissions = model.workspaceService.getManagersForResource(thread);
+	model.workspaceService.getFullPermissionsForActorsForResource(permissions, this).done(function(){
+		if (thread.hasPermissions()){
+			permissions = _.union(permissions, thread.shared);
+		}
+		info.updatePermissions(permissions).done(function(){
+			deferred.resolve();
+		});
+	});
+
+	return deferred.promise();
 }
 
 Info.prototype.hasPermissions = function(){
@@ -182,13 +213,13 @@ Info.prototype.hasPermissions = function(){
 }
 
 Info.prototype.isShareable = function(){
-	return info.owner === model.me.userId;
+	return this.owner === model.me.userId;
 }
 
 Info.prototype.clearPermissions = function(){
 	var deferred = $.Deferred();
 
-	if ((! this.isShareable) || (! this.hasPermissions())) {
+	if ((! this.isShareable()) || (! this.hasPermissions())) {
 		return deferred.resolve().promise();
 	}
 
@@ -220,7 +251,7 @@ Info.prototype.clearPermissions = function(){
 Info.prototype.addPermissions = function(permissions){
 	var deferred = $.Deferred();
 
-	if ((! this.isShareable) || permissions === undefined || permissions.length === 0) {
+	if ((! this.isShareable()) || permissions === undefined || permissions.length === 0) {
 		return deferred.resolve().promise();
 	}
 
@@ -243,12 +274,21 @@ Info.prototype.addPermissions = function(permissions){
 			}
 		});
 
-		http().put('/workspace/share/json/' + that._id, http().serialize(data)).done(function(){
+		// User cannot share with self
+		if (data.userId === model.me.userId) {
 			count--;
-        	if (count <= 0) {
+			if (count <= 0) {
         		deferred.resolve();
         	}	
-		});
+		}
+		else {
+			http().put('/workspace/share/json/' + that._id, http().serialize(data)).done(function(){
+				count--;
+	        	if (count <= 0) {
+	        		deferred.resolve();
+	        	}	
+			});
+		}
 	});
 
 	return deferred.promise();
@@ -374,18 +414,11 @@ Thread.prototype.loadInfos = function(filters){
 	this.infos.sync();
 }
 
-Thread.prototype.getSharingPermissionsForInfo = function(permissions, info){
-	var deferred = $.Deferred();
-
-	if (this.shared !== undefined) {
-		permissions = this.shared;
+Thread.prototype.hasPermissions = function(){
+	if (this.shared === undefined || this.shared.length === 0) {
+		return false;
 	}
-	var managerPermission = {userId: this.owner};
-	model.workspaceService.getFullPermissionsForActorForResource(managerPermission, info).done(function(){
-		permissions.push(managerPermission);
-		deferred.resolve();
-	});
-	return deferred.promise();
+	return true;
 }
 
 Thread.prototype.getApplicationInfosCollectionTag = function(){
@@ -397,15 +430,17 @@ Thread.prototype.getApplicationInfosCollectionTag = function(){
 WorkspaceService = function(){	
 }
 
-WorkspaceService.prototype.getFullPermissionsForActorForResource = function(permission, resource){
+WorkspaceService.prototype.getFullPermissionsForActorsForResource = function(permissions, resource){
 	var deferred = $.Deferred();
 
 	http().get('/workspace/share/json/' + resource._id).done(function(data){
 		_.each(data.actions, function(action){
 			_.each(action.name, function(name){
-				if (permission[name] === undefined) {
-					permission[name] = true;
-				}
+				_.each(permissions, function(permission){
+					if (permission[name] === undefined) {
+						permission[name] = true;
+					}
+				});
 			});
 		});
 		deferred.resolve();
@@ -414,7 +449,7 @@ WorkspaceService.prototype.getFullPermissionsForActorForResource = function(perm
 }
 
 WorkspaceService.prototype.getManagersForResource = function(resource){
-	return ([resource.owner]);
+	return ([{userId: resource.owner}]);
 }
 
 WorkspaceService.prototype.isManagersForResource = function(actor, resource){
@@ -422,7 +457,7 @@ WorkspaceService.prototype.isManagersForResource = function(actor, resource){
 }
 
 WorkspaceService.prototype.getContributorsForResource = function(resource){
-	var actors = [resource.owner];
+	var actors = [{userId: resource.owner}];
 
 	if (resource.shared === undefined) {
 		return actors;
@@ -431,10 +466,10 @@ WorkspaceService.prototype.getContributorsForResource = function(resource){
 	_.each(resource.shared, function(share){
 		if (share[ACTUALITES_CONFIGURATION.permissions.contributor] === true) {
 			if (share['userId'] !== undefined) {
-				actors.push(share['userId']);
+				actors.push({userId: share['userId']});
 			}
 			else if (share['groupId'] !== undefined) {
-				actors.push(share['groupId']);
+				actors.push({groupId: share['groupId']});
 			}
 		}
 	});
