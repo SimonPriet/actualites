@@ -8,8 +8,29 @@
 		<span class="infoThread right-magnet">[[getInfoThread(info)]]</span>
 	</div>
 
+	<div class="row">
+		<label class="cell" translate content="actualites.info.label.author"></label>
+		<span class="cell info-metadata">[[info.ownerName]]</span>
+
+		<div class="cell right-magnet">
+			<label class="cell" translate content="actualites.info.label.publication"></label>
+			<span class="cell info-metadata">[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]</span>
+		</div>
+	</div>
+
 	<article class="row info-content reduce-block-six" bind-html="info.content">
 	</article>
+
+	<div class="row">
+		<a ng-click="switchInfoComments(info)">
+			<p translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></p>
+			<p ng-if="hasInfoComments(info) && (currentInfo !== info)">([[info.comments.length]])</p>
+		</a>
+	</div>
+
+	<div class="row" ng-if="currentInfo === info">
+		<div class="cell nine" ng-include="template.containers.comments"></div>
+	</div>
 
 	<hr />
 </div>

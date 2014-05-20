@@ -8,8 +8,14 @@
 	"actualites.threads.latest": "Dernières actualités",
 	"actualites.threads.pending": "En attente d'approbation",
 	"actualites.threads.trash": "Corbeille",
-
 	"actualites.thread.empty": "Aucune actualité",
+
+	"actualites.info.label.author": "Auteur : ",
+	"actualites.info.label.publication": "Publié le : ",
+	"actualites.info.label.comments.none": "Aucun commentaire",
+	"actualites.info.label.comments.many": "Afficher les commentaires",
+	"actualites.info.label.comments.close": "Masquer les commentaires",
+	"actualites.info.label.comments.submit": "Commenter",
 
 	"actualites.links.latest": "Dernières actualités",
 	"actualites.links.mine": "Mes actualités",

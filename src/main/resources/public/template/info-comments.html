@@ -1,0 +1,16 @@
+<div class="row" ng-if="currentInfo.comments === undefined || currentInfo.comments.length === 0">
+	<span class="cell" translate content=""></span>
+</div>
+
+<div class="row comment" ng-repeat="comment in currentInfo.comments">
+	<a href="">[[comment.authorName]]</a>
+	<em>le [[formatDate(comment.posted)]] :</em>
+	<p>[[comment.comment]]</p>
+</div>
+
+<div class="row">
+	<form>
+		<textarea ng-model="newComment.comment" required></textarea>
+		<button ng-click="postInfoComment(currentInfo)" translate content="actualites.info.label.comments.submit"></button>
+	</form>
+</div>

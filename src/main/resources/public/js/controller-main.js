@@ -34,7 +34,8 @@ function ActualitesMainController($injector, $scope, template, route){
 	    $scope.loadTotal = 0;
 	    $scope.currentThread = {};
 	    $scope.currentInfo = {};
-	    $scope.display = {showPanel: false, emptyThread: false};
+        $scope.newComment = {};
+	    $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
 	    // Default display
 		$scope.selectThread(model.latestThread);
@@ -58,8 +59,9 @@ function ActualitesMainController($injector, $scope, template, route){
 
         $scope.currentThread.infos.on('sync', function(){
             // Sort by latest modified
-            $scope.infos = $scope.currentThread.infos.sortBy(function(info){ 
-                return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat); });
+            $scope.infos = $scope.currentThread.infos.sortBy(function(info){
+                return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat);
+            });
 
             if ($scope.currentThread.infos.empty()) {
                 $scope.display.emptyThread = true;
@@ -92,6 +94,25 @@ function ActualitesMainController($injector, $scope, template, route){
         return ($scope.threads.filter(function(thread){
             return thread._id === info.thread;
         })[0].title);
+    }
+
+    /* Comments */
+    $scope.postInfoComment = function(info){
+        info.comment($scope.newComment.comment).done(function(){
+            if (info.comments === undefined) {
+                info.comments = [];
+            }
+
+            info.comments.push({
+                author: model.me.userId,
+                authorName: model.me.username,
+                comment: $scope.newComment.comment,
+                posted: undefined
+            });
+        });
+
+        $scope.newComment = {};
+        $scope.apply('currentInfo');
     }
 
 	$injector.invoke(ActualitesAbstractController, this, {

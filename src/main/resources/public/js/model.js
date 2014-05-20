@@ -122,6 +122,11 @@ Info.prototype.save = function(thread){
 	});
 }
 
+Info.prototype.comment = function(commentText){
+	// Post comment
+	return http().post('/workspace/document/' + this._id + '/comment', 'comment=' + commentText);
+}
+
 Info.prototype.remove = function(thread){
 	if(thread.type === ACTUALITES_CONFIGURATION.threadTypes.trash){
 		http().delete('/workspace/document/' + this._id);
@@ -129,6 +134,10 @@ Info.prototype.remove = function(thread){
 	else{
 		http().put('/workspace/document/trash/' + this._id);
 	}
+}
+
+Info.prototype.delete = function(thread){
+	http().delete('/workspace/document/' + this._id);
 }
 
 Info.prototype.submit = function(thread){

@@ -27,10 +27,7 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.infos = {};
         $scope.currentThread = {};
         $scope.currentInfo = {};
-        $scope.display = {
-            showPanel: false, 
-            emptyThread: false, 
-        };
+        $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
         // Default display : first thread
         model.threads.on('mixed.sync', function(){
@@ -96,14 +93,6 @@ function ActualitesEditionController($injector, $scope, template, route){
     // Info display
     $scope.selectInfo = function(info){
         $scope.currentInfo = info;
-    };
-
-    $scope.hasCurrentInfo = function(){
-        return ($scope.currentInfo instanceof Info);
-    };
-
-    $scope.formatDate = function(date){
-        return moment(date).lang('fr').format('dddd DD MMM YYYY');
     };
 
     // Info Edition

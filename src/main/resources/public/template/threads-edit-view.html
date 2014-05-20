@@ -11,6 +11,11 @@
 		</div>
 	</div>
 
+	<div class="row">
+		<label class="three cell" translate content="actualites.info.label.author"></label>
+		<span class="cell info-metadata">[[info.ownerName]]</span>
+	</div>
+
 	<div class="row" ng-if="info.hasPublicationDate">
 		<label class="three cell">Date de publication : </label>
 		<input value="[[formatDate(info.publicationDate)]]" disabled />
@@ -37,7 +42,9 @@
 		</behaviour>
 			
 		<!-- Loaders -->
-		<button ng-if="! info.loaded" translate content="actualites.edition.infos.loading.[[info.action]]" disabled class="right-magnet"></button>
+		<button ng-if="! info.loaded" translate content="actualites.edition.infos.loading.[[info.action]]" disabled class="right-magnet">
+			<i role="loading"></i>
+		</button>
 	</div>
 	
 	<hr/>
