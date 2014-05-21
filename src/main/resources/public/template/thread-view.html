@@ -21,10 +21,10 @@
 	<article class="row info-content reduce-block-six" bind-html="info.content">
 	</article>
 
-	<div class="row">
-		<a ng-click="switchInfoComments(info)">
-			<p translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></p>
-			<p ng-if="hasInfoComments(info) && (currentInfo !== info)">([[info.comments.length]])</p>
+	<div class="row info-control">
+		<a class="cell" ng-click="switchInfoComments(info)">
+			<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></div>
+			<div class="cell" ng-if="hasInfoComments(info) && (currentInfo !== info)">&nbsp;([[info.comments.length]])</div>
 		</a>
 	</div>
 

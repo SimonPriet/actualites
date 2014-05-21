@@ -125,6 +125,38 @@ span.info-metadata {
 	right: 2px;
 }
 
+/* Comments */
+div.info-control {
+	padding-left: 5px;
+	font-family: Lato;
+}
+
+div.info-control a {
+	margin-bottom: 5px;
+}
+
+div.info-comment {
+	background: #f8f8f8;
+	padding: 5px;
+	margin-bottom: 5px;
+	border-radius: 3px;
+	border: none;
+}
+
+div.info-comment a {
+	font-family: Lato;
+}
+
+div.info-comment em {
+	font-family: Lato;
+}
+
+div.info-comment textarea {
+	padding: 5px;
+	margin-bottom: 5px;
+	height: 40px;
+}
+
 /* Icons */
 i[role=loading] {
   height: 25px;

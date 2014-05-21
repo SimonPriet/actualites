@@ -98,6 +98,10 @@ function ActualitesMainController($injector, $scope, template, route){
 
     /* Comments */
     $scope.postInfoComment = function(info){
+        if ((! _.isString($scope.newComment.comment)) || ($scope.newComment.comment.trim() === "")) {
+            return;
+        }
+
         info.comment($scope.newComment.comment).done(function(){
             if (info.comments === undefined) {
                 info.comments = [];
@@ -109,10 +113,10 @@ function ActualitesMainController($injector, $scope, template, route){
                 comment: $scope.newComment.comment,
                 posted: undefined
             });
-        });
 
-        $scope.newComment = {};
-        $scope.apply('currentInfo');
+            $scope.newComment = {};
+            $scope.$apply("currentInfo");
+        });
     }
 
 	$injector.invoke(ActualitesAbstractController, this, {
