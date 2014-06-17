@@ -68,4 +68,12 @@ function ActualitesAbstractController($scope, template, route){
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     };
+
+	$scope.loadNextThreads = function(){
+		_.first(model.threads.mixed.rest($scope.loadedThreadsNumber), $scope.loadThreadsIncrement).forEach(function(thread){
+			thread.open();
+		});
+
+		$scope.loadedThreadsNumber += $scope.loadThreadsIncrement;
+	};
 }

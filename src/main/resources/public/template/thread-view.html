@@ -18,18 +18,23 @@
 		</div>
 	</div>
 
-	<article class="row info-content reduce-block-six" bind-html="info.content">
+	<article class="row info-content reduce-block-six">
+		<div class="twelve cell" bind-html="info.content">
+
+		</div>
+		<div class="row">
+			<a class="cell" ng-click="switchInfoComments(info)">
+				<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></div>
+				<div class="cell" ng-if="hasInfoComments(info) && (currentInfo !== info)">&nbsp;([[info.comments.length]])</div>
+			</a>
+		</div>
+		<div class="row"></div>
 	</article>
 
-	<div class="row info-control">
-		<a class="cell" ng-click="switchInfoComments(info)">
-			<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></div>
-			<div class="cell" ng-if="hasInfoComments(info) && (currentInfo !== info)">&nbsp;([[info.comments.length]])</div>
-		</a>
-	</div>
+
 
 	<div class="row" ng-if="currentInfo === info">
-		<div class="cell nine" ng-include="template.containers.comments"></div>
+		<div class="cell twelve" ng-include="template.containers.comments"></div>
 	</div>
 
 	<hr />

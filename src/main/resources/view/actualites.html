@@ -14,18 +14,11 @@
 <portal>
 	<h1>Les actualités</h1>
 	<div class="cell four">
-		<!-- Thread Navigation -->
-		<nav class="vertical">
-			<h2 translate content="actualites.threads.title"></h2>
+		<nav class="vertical stamps" >
 			<a class="classic-link" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
-			<ul>
-			 	<li ng-repeat="thread in threads.all">
-			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
-			  	</li>
-			</ul>
 			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition" class="classic-link"></a>
+			<div ng-include="template.containers.threadsList"></div>
 		</nav>
-
 	</div>
 
 	<!-- Thread panel -->

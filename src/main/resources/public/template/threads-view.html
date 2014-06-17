@@ -6,7 +6,7 @@
 				<th class="six">Libelle</th>
 				<th class="one">Ordre</th>
 
-				<th class="one">Couleur</th>
+				<th class="one">Image</th>
 				<th class="four"></th>
 			</tr>
 		</thead>
@@ -18,7 +18,9 @@
 				</td>
 				<td>[[thread.order]]</td>
 
-				<td>[[thread.color]]</td>
+				<td>
+					<image-select ng-model="thread.icon" default="/img/illustrations/info.png" ng-change="thread.save()"></image-select>
+				</td>
 				<td>
 					<button ng-click="editThread(thread)" translate content="actualites.edition.thread.edit" class="right-magnet" ng-if="currentThread !== thread"></button>
 					<button ng-click="saveThread()" translate content="actualites.edition.thread.save" class="right-magnet" ng-if="currentThread === thread"></button>

@@ -12,7 +12,6 @@ hr.solid {
 .admin-edit-link{
 	display: block;
 	margin-top: -8px;
-	font-family: Lato;
 	font-size: 17px;
 	padding-bottom: 28px;
 }
@@ -44,20 +43,6 @@ a.link-back {
 	padding-left: 8px;
 	font-family: Lato;
 	font-size: 1.2em;
-}
-
-.info-full input {
-	padding: 2px 4px;
-}
-
-label{
-	line-height: 32px;
-}
-
-article.info-content {
-  background: #fff;
-  padding: 10px 20px;
-  margin: 7px 0 5px;
 }
 
 span.infoThread {
@@ -123,38 +108,6 @@ span.info-metadata {
 .toggle.off span{
 	position: absolute;
 	right: 2px;
-}
-
-/* Comments */
-div.info-control {
-	padding-left: 5px;
-	font-family: Lato;
-}
-
-div.info-control a {
-	margin-bottom: 5px;
-}
-
-div.info-comment {
-	background: #f8f8f8;
-	padding: 5px;
-	margin-bottom: 5px;
-	border-radius: 3px;
-	border: none;
-}
-
-div.info-comment a {
-	font-family: Lato;
-}
-
-div.info-comment em {
-	font-family: Lato;
-}
-
-div.info-comment textarea {
-	padding: 5px;
-	margin-bottom: 5px;
-	height: 40px;
 }
 
 /* Icons */
