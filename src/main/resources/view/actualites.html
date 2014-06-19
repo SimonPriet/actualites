@@ -6,26 +6,46 @@
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
-	<script src="/actualites/public/js/controller-main.js" type="text/javascript"></script>
+	<script src="/actualites/public/js/controller-edition.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
 	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
-<body ng-controller="ActualitesMainController">
+<body ng-controller="ActualitesEditionController">
 <portal>
-	<h1>Les actualités</h1>
+	<h1>Actualités</h1>
 	<div class="cell four">
-		<nav class="vertical stamps" >
-			<a class="classic-link" ng-click="selectThread(latestThread)" translate content="actualites.threads.latest"></a>
-			<a href="/actualites/edit" workflow="actualites.edit" translate content="actualites.links.edition" class="classic-link"></a>
+		<nav class="vertical stamps">
 			<div ng-include="template.containers.threadsList"></div>
 		</nav>
 	</div>
 
 	<!-- Thread panel -->
-	<div class="cell eight">
+	<div class="cell eight" ng-if="hasCurrentThread()">
+
+		<!-- Thread actions -->
+		<nav class="contextual-buttons">
+			<div class="row action-buttons">
+				<behaviour name="edit" resource="currentThread" class="cell">
+					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+				</behaviour>
+				<behaviour name="share" resource="currentThread" class="cell">
+					<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
+				</behaviour>
+			</div>
+		</nav>
+
 		<!-- Thread infos -->
-		<div ng-include="template.containers.thread">
+		<div id="actualites.container.threads" ng-include="template.containers.thread">
 		</div>
+	</div>
+
+	<!-- Lightbox : Thread share -->
+	<div ng-if="hasCurrentThread()">
+		<behaviour name="share" resource="currentThread">
+			<lightbox show="display.showPanel" on-close="cancelShareThread(); display.showPanel = false;">
+				<share-panel resources="currentThread"></share-panel>
+			</lightbox>
+		</behaviour>
 	</div>
 
 </portal>

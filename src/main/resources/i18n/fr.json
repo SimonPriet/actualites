@@ -10,8 +10,8 @@
 	"actualites.threads.trash": "Corbeille",
 	"actualites.thread.empty": "Aucune actualité",
 
-	"actualites.info.label.author": "Auteur : ",
-	"actualites.info.label.publication": "Publié le : ",
+	"actualites.info.label.author": "Par",
+	"actualites.info.label.publication": ", le",
 	"actualites.info.label.comments.none": "Aucun commentaire",
 	"actualites.info.label.comments.many": "Afficher les commentaires",
 	"actualites.info.label.comments.close": "Masquer les commentaires",

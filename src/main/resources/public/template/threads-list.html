@@ -1,4 +1,4 @@
-<div data-ng-repeat="thread in threads.all" class="vertical-spacing row" bottom-scroll="loadNextThreads()">
+<div data-ng-repeat="thread in threads.all" class="row" bottom-scroll="loadNextThreads()">
 	<article class="height-four twelve clip cell" ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">
 		<div class="four cell absolute">
 			<img ng-src="[[thread.icon]]?thumbnail=120x120" style="height: 100%" />
@@ -9,5 +9,4 @@
 			</div>
 		</div>
 	</article>
-	<hr class="row" />
 </div>

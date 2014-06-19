@@ -3,22 +3,19 @@
 </div>
 
 <div class="row info-full" ng-repeat="info in infos | filter:isInfoVisible | limitTo: loadTotal">
-	<div class="row">
-		<h1 class="cell">[[info.title]]</h1>
-		<span class="infoThread right-magnet">[[getInfoThread(info)]]</span>
-	</div>
-
-	<div class="row">
-		<label class="cell" translate content="actualites.info.label.author"></label>
-		<span class="cell info-metadata">[[info.ownerName]]</span>
-
-		<div class="cell right-magnet">
-			<label class="cell" translate content="actualites.info.label.publication"></label>
-			<span class="cell info-metadata">[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]</span>
+	<article class="row reduce-block-six">
+		<div class="row">
+			<h1 class="cell">[[info.title]]</h1>
+			<span class="infoThread right-magnet">[[getInfoThread(info)]]</span>
 		</div>
-	</div>
 
-	<article class="row info-content reduce-block-six">
+		<div class="row">
+			<label class="cell" translate content="actualites.info.label.author"></label>
+			<a ng-href="/userbook/annuaire#[[info.owner]]"><span class="cell info-metadata">&nbsp;[[info.ownerName]]</span></a>
+			<label class="cell" translate content="actualites.info.label.publication"></label>
+			<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]</span>
+		</div>
+
 		<div class="twelve cell" bind-html="info.content">
 
 		</div>
@@ -29,13 +26,10 @@
 			</a>
 		</div>
 		<div class="row"></div>
+		<div class="row" ng-if="currentInfo === info">
+			<div class="cell twelve" ng-include="template.containers.comments"></div>
+		</div>
+
+		<hr class="row" />
 	</article>
-
-
-
-	<div class="row" ng-if="currentInfo === info">
-		<div class="cell twelve" ng-include="template.containers.comments"></div>
-	</div>
-
-	<hr />
 </div>

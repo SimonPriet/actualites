@@ -1,7 +1,7 @@
 <div ng-repeat="info in currentThread.infos.all">
 
 	<!-- Info display -->
-	<article class="cell twelve info-full" ng-if="(! hasCurrentInfo()) || (info !== currentInfo)">
+	<article class="cell twelve reduce-block-six" ng-if="(! hasCurrentInfo()) || (info !== currentInfo)">
 		<div class="row">
 			<h2 class="cell">[[info.title]]</h2>
 			<i class="right-magnet" role="close" ng-click="removeInfo(info)"></i>
@@ -27,6 +27,17 @@
 				<button class="cell" ng-click="unpublishInfo(info)" workflow="actualites.publish" ng-if="info.status === infoStatus.PUBLISHED">Dépublier</button>
 			</behaviour>
 		</div>
+		<div class="row">
+			<a class="cell" ng-click="switchInfoComments(info)">
+				<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info)]]"></div>
+				<div class="cell" ng-if="hasInfoComments(info) && (currentInfo !== info)">&nbsp;([[info.comments.length]])</div>
+			</a>
+		</div>
+		<div class="row"></div>
+		<div class="row" ng-if="currentInfo === info">
+			<div class="cell twelve" ng-include="template.containers.comments"></div>
+		</div>
+		<div class="row"></div>
 	</article>
 
 	<hr class="row"/>

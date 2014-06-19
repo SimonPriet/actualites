@@ -19,7 +19,7 @@
 				<td>[[thread.order]]</td>
 
 				<td>
-					<image-select ng-model="thread.icon" default="/img/illustrations/info.png" ng-change="thread.save()"></image-select>
+					<image-select ng-model="thread.icon" default="/img/illustrations/info.png" ng-change="thread.save()" class="twelve cell"></image-select>
 				</td>
 				<td>
 					<button ng-click="editThread(thread)" translate content="actualites.edition.thread.edit" class="right-magnet" ng-if="currentThread !== thread"></button>

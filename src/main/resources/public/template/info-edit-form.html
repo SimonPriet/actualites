@@ -31,8 +31,9 @@
 	</div>
 
 	<div class="row">
-		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
+
 		<button ng-click="deleteInfo(currentInfo)" ng-if="currentInfo._id !=== undefined" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
 		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
+		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
 	</div>
 </div>
