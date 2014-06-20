@@ -1,26 +1,20 @@
 package fr.wseduc.actualites;
 
-import fr.wseduc.actualites.controllers.ActionFilter;
 import fr.wseduc.actualites.controllers.ActualitesController;
-import fr.wseduc.webutils.Server;
-import fr.wseduc.webutils.request.filter.SecurityHandler;
+import fr.wseduc.actualites.filters.ActualitesFilter;
 
-public class Actualites extends Server {
+import org.entcore.common.http.BaseServer;
 
+public class Actualites extends BaseServer {
+
+	protected final String THREADS_COLLECTION = "thread";
+	protected final String ACTUALITES_COLLECTION = "actualites";
+	
 	@Override
 	public void start() {
+		setResourceProvider(new ActualitesFilter(THREADS_COLLECTION));
 		super.start();
-
-		ActualitesController controller = new ActualitesController(vertx, container, rm, securedActions);
-		controller.get("", "view");
-		controller.get("/edit", "viewEdit");
-		controller.get("/admin", "viewAdmin");
-		controller.get("", "publish");
-		controller.get("", "unpublish");
-
-		SecurityHandler.addFilter(
-				new ActionFilter(controller.securedUriBinding(), container.config(), vertx)
-		);
+		addController(new ActualitesController(THREADS_COLLECTION, ACTUALITES_COLLECTION));
 	}
 
 }

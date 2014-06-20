@@ -7,16 +7,16 @@ function ActualitesAdminController($injector, $scope, template, route){
         $scope.template = template;
 
         // Threads
-        $scope.threads = model.threads.mixed;
+        $scope.threads = model.threads;
 
         // Variables
         $scope.currentThread = {};
         $scope.display = {showPanel: false};
 
         // Default display
-        model.threads.on('mixed.sync', function(){
+        model.threads.on('sync', function(){
             $scope.threads.forEach(function(thread){
-                thread.open();
+                thread.load();
                 thread.on('change', function(){
                     $scope.$apply("threads");
                 });
