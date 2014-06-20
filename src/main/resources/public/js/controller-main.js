@@ -41,6 +41,8 @@ function ActualitesMainController($injector, $scope, template, route){
         $scope.newComment = {};
 	    $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
+		$scope.me = model.me;
+
 	    // Default display
 		$scope.selectThread(model.latestThread);
 	};
@@ -58,30 +60,7 @@ function ActualitesMainController($injector, $scope, template, route){
         $scope.showLatestInfos();
     };
 
-	$scope.showLatestInfos = function(){
-        $scope.displayMode = 'latest';
-        $scope.loadTotal = 0;
-        
-        // Load infos for Main View
-        $scope.currentThread.loadInfos(ACTUALITES_CONFIGURATION.threadFilters.main);
 
-        $scope.currentThread.infos.on('sync', function(){
-            // Sort by latest modified
-            $scope.infos = $scope.currentThread.infos.sortBy(function(info){
-                return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat);
-            });
-
-            if ($scope.currentThread.infos.empty()) {
-                $scope.display.emptyThread = true;
-                $scope.$apply("infos");
-            }
-            else {
-                $scope.display.emptyThread = false;
-            }
-
-            $scope.loadMoreInfos();
-        });
-    };
 
     $scope.loadMoreInfos = function(){
         $scope.loadTotal = $scope.loadTotal + $scope.loadSize;
@@ -105,27 +84,7 @@ function ActualitesMainController($injector, $scope, template, route){
     };
 
     /* Comments */
-    $scope.postInfoComment = function(info){
-        if ((! _.isString($scope.newComment.comment)) || ($scope.newComment.comment.trim() === "")) {
-            return;
-        }
 
-        info.comment($scope.newComment.comment).done(function(){
-            if (info.comments === undefined) {
-                info.comments = [];
-            }
-
-            info.comments.push({
-                author: model.me.userId,
-                authorName: model.me.username,
-                comment: $scope.newComment.comment,
-                posted: undefined
-            });
-
-            $scope.newComment = {};
-            $scope.$apply("currentInfo");
-        });
-    };
 
 	$injector.invoke(ActualitesAbstractController, this, {
 		$scope: $scope,

@@ -19,7 +19,12 @@ function ActualitesEditionController($injector, $scope, template, route){
 
         // Dependencies
         $scope.template = template;
+		$scope.me = model.me;
 		template.open('threadsList', 'threads-list');
+		template.open('comments', 'info-comments');
+		template.open('infoEdit', 'info-edit');
+		template.open('infoView', 'info-view');
+		$scope.newComment = {};
 
         // Threads
         $scope.threads = model.threads.mixed;
@@ -32,9 +37,11 @@ function ActualitesEditionController($injector, $scope, template, route){
         $scope.currentInfo = {};
         $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
+		$scope.selectThread(model.latestThread);
+
         // Default display : first thread
         model.threads.on('mixed.sync', function(){
-            $scope.selectThread(model.threads.mixed.first());
+            $scope.showLatestInfos();
 			$scope.loadNextThreads();
         });
     };
@@ -42,7 +49,7 @@ function ActualitesEditionController($injector, $scope, template, route){
     // Thread display
     $scope.selectThread = function(thread){
         $scope.currentThread = thread;
-        template.open('thread', 'threads-edit-view');
+        template.open('thread', 'infos-list');
 
         // Display mode
         $scope.showInfos();
@@ -113,12 +120,12 @@ function ActualitesEditionController($injector, $scope, template, route){
             // Info creation
             $scope.currentInfo = new Info();
             $scope.currentInfo.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+			template.open('thread', 'info-create-form')
         }
         else {
             // Info edition
             $scope.currentInfo = info;
         }
-        template.open('thread', 'info-edit-form');
     };
 
     $scope.saveInfo = function(info){
@@ -126,6 +133,7 @@ function ActualitesEditionController($injector, $scope, template, route){
             // Info creation
             var newInfo = new Info();
             newInfo.create($scope.currentThread, info);
+			template.open('thread', 'infos-list');
         }
         else {
             // Info edition
@@ -140,19 +148,18 @@ function ActualitesEditionController($injector, $scope, template, route){
     };
 
     $scope.deleteInfo = function(info){
-        info.remove($scope.currentThread);
+		$scope.currentThread.infos.remove(info);
         $scope.cancelEditInfo();
     };
 
     $scope.cancelEditInfo = function(){
-        $scope.currentInfo = {};
-        template.open('thread', 'threads-edit-view');
+        $scope.currentInfo = undefined;
     };
 
 
     /* Info Publication */
     $scope.isInfoPublishable = function(info) {
-        return ((info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING)
+        return ((info._id !== undefined) && (info.status !== ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED)
             && model.me.userId === $scope.currentThread.owner);
     }
 
@@ -183,6 +190,28 @@ function ActualitesEditionController($injector, $scope, template, route){
     };
 
 
+	$scope.postInfoComment = function(info){
+		if ((! _.isString($scope.newComment.comment)) || ($scope.newComment.comment.trim() === "")) {
+			return;
+		}
+
+		info.comment($scope.newComment.comment).done(function(){
+			if (info.comments === undefined) {
+				info.comments = [];
+			}
+
+			info.comments.push({
+				author: model.me.userId,
+				authorName: model.me.username,
+				comment: $scope.newComment.comment,
+				posted: undefined
+			});
+
+			$scope.newComment = {};
+			$scope.$apply("currentInfo");
+		});
+	};
+
     /* Info Submit */
     $scope.isInfoSubmitable = function(info){
         return (info._id !== undefined) && (info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT);
@@ -204,6 +233,45 @@ function ActualitesEditionController($injector, $scope, template, route){
         info.unsubmit($scope.currentThread);
     };
 
+	$scope.showLatestInfos = function(){
+		$scope.displayMode = 'latest';
+		$scope.loadTotal = 0;
+
+		// Load infos for Main View
+		$scope.currentThread.loadInfos(ACTUALITES_CONFIGURATION.threadFilters.main);
+
+		$scope.currentThread.infos.on('sync', function(){
+			// Sort by latest modified
+			$scope.infos = $scope.currentThread.infos.sortBy(function(info){
+				return moment() - moment(info.modified, ACTUALITES_CONFIGURATION.momentFormat);
+			});
+
+			if ($scope.currentThread.infos.empty()) {
+				$scope.display.emptyThread = true;
+				$scope.$apply("infos");
+			}
+			else {
+				$scope.display.emptyThread = false;
+			}
+
+			$scope.loadMoreInfos();
+		});
+	};
+
+	$scope.loadMoreInfos = function(){
+		$scope.loadTotal = $scope.loadTotal + $scope.loadSize;
+		// Open 'loadTotal' threads only
+		var i = 0;
+		$scope.infos.forEach(function(info){
+			if (i++ === $scope.loadTotal) {
+				return;
+			}
+			info.load();
+			info.on('change', function(){
+				$scope.$apply("infos");
+			});
+		});
+	};
 
     /* Inheritance */
     $injector.invoke(ActualitesAbstractController, this, {

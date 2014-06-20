@@ -1,3 +1,4 @@
+<a class="classic-link" ng-click="showLatestInfos()">Dernières actualités</a>
 <div data-ng-repeat="thread in threads.all" class="row" bottom-scroll="loadNextThreads()">
 	<article class="height-four twelve clip cell" ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">
 		<div class="four cell absolute">
@@ -8,5 +9,8 @@
 				<h3>[[thread.title]]</h3>
 			</div>
 		</div>
+	</article>
+	<article ng-if="!threads.all.length">
+		Il n'y a pas de fil d'actualités.
 	</article>
 </div>

@@ -1,0 +1,17 @@
+<div ng-if="display.emptyThread" class="row">
+	<h2 translate content="actualites.thread.empty"></h2>
+</div>
+
+<article class="row reduce-block-six vertical-spacing" ng-repeat="info in infos">
+
+
+	<div ng-if="currentInfo !== info">
+		<div ng-include="template.containers.infoView"></div>
+	</div>
+	<div ng-if="currentInfo === info">
+		<div ng-include="template.containers.infoEdit"></div>
+	</div>
+
+	<div class="row"></div>
+
+</article>

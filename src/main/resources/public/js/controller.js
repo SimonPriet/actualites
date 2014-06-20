@@ -40,29 +40,14 @@ function ActualitesAbstractController($scope, template, route){
         return (info.comments !== undefined && info.comments.length > 0);
     };
 
-    $scope.getInfoCommentsStatus = function(info){
-        if ($scope.currentInfo === info) {
+    $scope.getInfoCommentsStatus = function(info, showComments){
+        if (showComments) {
             return 'close';
         }
         if ($scope.hasInfoComments(info)) {
             return 'many';
         }
         return 'none';
-    };
-
-    $scope.switchInfoComments = function(info){
-        template.close('comments');
-        $scope.newComment = {};
-
-        if ($scope.currentInfo !== info){
-            // Show
-            $scope.currentInfo = info;
-            template.open('comments', 'info-comments');
-        }
-        else {
-            // Hide
-            $scope.currentInfo = {};
-        }
     };
 
     $scope.hasCurrentInfo = function(){
@@ -72,6 +57,9 @@ function ActualitesAbstractController($scope, template, route){
 	$scope.loadNextThreads = function(){
 		_.first(model.threads.mixed.rest($scope.loadedThreadsNumber), $scope.loadThreadsIncrement).forEach(function(thread){
 			thread.open();
+			thread.on('change', function(){
+				$scope.$apply('threads');
+			})
 		});
 
 		$scope.loadedThreadsNumber += $scope.loadThreadsIncrement;
