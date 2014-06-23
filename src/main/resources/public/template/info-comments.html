@@ -2,14 +2,14 @@
 	<span class="cell" translate content=""></span>
 </div>
 
-<article class="row comment reduce-block-six vertical-spacing" ng-repeat="comment in info.comments">
+<article class="row comment" ng-repeat="comment in info.comments">
 	<a href="">[[comment.authorName]]</a>
 	<em>le [[formatDate(comment.posted)]] :</em>
 	<p>[[comment.comment]]</p>
 </article>
 
 <div class="row">
-	<textarea class="cell vertical-spacing" ng-model="newComment.comment"></textarea>
+	<textarea class="cell" ng-model="newComment.comment"></textarea>
 	<button ng-click="postInfoComment(info)" translate content="actualites.info.label.comments.submit" class="right-magnet"></button>
 	<div class="clear"></div>
 </div>

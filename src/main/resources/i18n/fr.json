@@ -14,7 +14,7 @@
 	"actualites.info.label.publication": ", le",
 	"actualites.info.label.initialDate": ", du",
 	"actualites.info.label.expiration": "au",
-	"actualites.info.label.comments.none": "Aucun commentaire",
+	"actualites.info.label.comments.none": "Afficher les commentaires (aucun commentaire)",
 	"actualites.info.label.comments.many": "Afficher les commentaires",
 	"actualites.info.label.comments.close": "Masquer les commentaires",
 	"actualites.info.label.comments.submit": "Commenter",

@@ -35,13 +35,12 @@
 	<button ng-if="! info.loaded" translate content="actualites.edition.infos.loading.[[info.action]]" disabled class="right-magnet">
 		<i class="loading"></i>
 	</button>
-</div>
-<div class="row">
 	<a class="cell" ng-click="showComments = !showComments">
 		<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info, showComments)]]"></div>
 		<div class="cell" ng-if="hasInfoComments(info) && !showComments">&nbsp;([[info.comments.length]])</div>
 	</a>
 </div>
+
 <div class="row"></div>
 <div class="row" ng-if="showComments">
 	<div class="cell twelve" ng-include="template.containers.comments"></div>
