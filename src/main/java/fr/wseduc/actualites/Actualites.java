@@ -1,14 +1,14 @@
 package fr.wseduc.actualites;
 
+import org.entcore.common.http.BaseServer;
+
 import fr.wseduc.actualites.controllers.ActualitesController;
 import fr.wseduc.actualites.filters.ActualitesFilter;
 
-import org.entcore.common.http.BaseServer;
-
 public class Actualites extends BaseServer {
 
-	protected final String THREADS_COLLECTION = "thread";
-	protected final String ACTUALITES_COLLECTION = "actualites";
+	protected final String THREADS_COLLECTION = "actualites.threads";
+	protected final String ACTUALITES_COLLECTION = "actualites.infos";
 	
 	@Override
 	public void start() {

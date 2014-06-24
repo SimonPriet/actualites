@@ -1,10 +1,16 @@
 package fr.wseduc.actualites.services;
 
-import fr.wseduc.mongodb.MongoDb;
+import org.entcore.common.user.UserInfos;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 
-public class StateService extends AbstractService {
+import fr.wseduc.actualites.model.InfoResource;
+import fr.wseduc.actualites.model.InfoState;
+import fr.wseduc.webutils.Either;
 
-	public StateService(final MongoDb mongo, final String threadCollection, final String actualitesCollection) {
-		super(mongo, threadCollection, actualitesCollection);
-	}
+public interface StateService extends RequestService {
+	
+	public void changeState(InfoResource info, InfoState targetState, Handler<Either<String, JsonObject>> handler);
+	
+	public void retrieveState(String id, UserInfos user, Handler<InfoResource> handler);
 }

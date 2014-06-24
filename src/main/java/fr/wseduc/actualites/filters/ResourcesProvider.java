@@ -1,9 +1,10 @@
-package fr.wseduc.actualites.controllers;
+package fr.wseduc.actualites.filters;
 
-import fr.wseduc.webutils.http.Binding;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
+
+import fr.wseduc.webutils.http.Binding;
 
 public interface ResourcesProvider {
 
