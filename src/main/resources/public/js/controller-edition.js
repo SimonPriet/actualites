@@ -6,7 +6,7 @@ routes.define(function($routeProvider){
 });
 
 /* Edition Controller */
-function ActualitesEditionController($injector, $scope, template, route){
+function ActualitesEditionController($injector, $scope, $location, $anchorScroll, template, route){
 
     this.initialize = function(){
 
@@ -19,12 +19,9 @@ function ActualitesEditionController($injector, $scope, template, route){
 
         // Dependencies
         $scope.template = template;
-		template.open('threadsList', 'threads-list');
 
         // Threads
         $scope.threads = model.threads.mixed;
-
-		$scope.loadThreadsIncrement = 10;
 
         // Variables
         $scope.infos = {};
@@ -35,9 +32,8 @@ function ActualitesEditionController($injector, $scope, template, route){
         // Default display : first thread
         model.threads.on('mixed.sync', function(){
             $scope.selectThread(model.threads.mixed.first());
-			$scope.loadNextThreads();
         });
-    };
+    }
 
     // Thread display
     $scope.selectThread = function(thread){
@@ -46,7 +42,7 @@ function ActualitesEditionController($injector, $scope, template, route){
 
         // Display mode
         $scope.showInfos();
-    };
+    }
 
     $scope.showInfos = function(){
         // Load infos for Edition view

@@ -23,10 +23,10 @@ var ACTUALITES_CONFIGURATION = {
 		trash: ['trash']
 	},
 	infoStatus: {
-		DRAFT: 0,
-		PENDING: 1,
-		PUBLISHED: 2,
-		TRASH: 3
+		DRAFT: 1,
+		PENDING: 2,
+		PUBLISHED: 3,
+		TRASH: 0
 	},
 	permissions: {
 		contributor: 'org-entcore-workspace-service-WorkspaceService|updateDocument'

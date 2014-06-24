@@ -19,14 +19,10 @@ function ActualitesMainController($injector, $scope, template, route){
 
 	  	// Dependencies
 	    $scope.template = template;
-		template.open('threadsList', 'threads-list');
 
 	    // Configuration
 	    $scope.loadSize = 4;
 	    $scope.displayMode = 'latest';
-
-		$scope.loadedThreadsNumber = 0;
-		$scope.loadThreadsIncrement = 10;
 
 	    // Special threads
 	    $scope.latestThread = model.latestThread;
@@ -43,11 +39,7 @@ function ActualitesMainController($injector, $scope, template, route){
 
 	    // Default display
 		$scope.selectThread(model.latestThread);
-	};
-
-	model.threads.mixed.on('sync', function(){
-		$scope.loadNextThreads();
-	});
+	}
 
 	/* Thread display */
     $scope.selectThread = function(thread){
@@ -56,7 +48,7 @@ function ActualitesMainController($injector, $scope, template, route){
 
         // Display modes
         $scope.showLatestInfos();
-    };
+    }
 
 	$scope.showLatestInfos = function(){
         $scope.displayMode = 'latest';
@@ -81,7 +73,7 @@ function ActualitesMainController($injector, $scope, template, route){
 
             $scope.loadMoreInfos();
         });
-    };
+    }
 
     $scope.loadMoreInfos = function(){
         $scope.loadTotal = $scope.loadTotal + $scope.loadSize;
@@ -96,13 +88,13 @@ function ActualitesMainController($injector, $scope, template, route){
                 $scope.$apply("infos");
             });
         });
-    };
+    }
 
     $scope.getInfoThread = function(info){
         return ($scope.threads.filter(function(thread){
             return thread._id === info.thread;
         })[0].title);
-    };
+    }
 
     /* Comments */
     $scope.postInfoComment = function(info){
@@ -125,7 +117,7 @@ function ActualitesMainController($injector, $scope, template, route){
             $scope.newComment = {};
             $scope.$apply("currentInfo");
         });
-    };
+    }
 
 	$injector.invoke(ActualitesAbstractController, this, {
 		$scope: $scope,

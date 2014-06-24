@@ -3,6 +3,8 @@ function ActualitesAdminController($injector, $scope, template, route){
 
     this.initialize = function(){
 
+        $scope.appPrefix = 'actualites';
+
         // Dependencies
         $scope.template = template;
 

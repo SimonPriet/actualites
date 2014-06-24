@@ -3,27 +3,28 @@ function ActualitesAbstractController($scope, template, route){
 
     this.initialize = this.initialize || function(){
         // to be overriden
-    };
+    }
 
     // Thread display
     $scope.hasCurrentThread = function(){
         return ($scope.currentThread instanceof Thread);
-    };
+    }
 
     // Info display
     $scope.isInfoPublished = function(info) {
         return info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-    };
+    }
 
     $scope.isInfoVisible = function(info) {
+        var visibility = true;
         if (info.hasPublicationDate) {
-            return (moment().unix() > moment(info.publicationDate).unix());
+            visibility = (moment().unix() > moment(info.publicationDate).unix());
         }
         if (info.hasExpirationDate) {
-            return (moment().unix() < moment(info.expirationDate).unix());
+            visibility = (moment().unix() < moment(info.expirationDate).unix());
         }
-        return $scope.isInfoPublished(info);
-    };
+        return (visibility && $scope.isInfoPublished(info));
+    }
 
     $scope.formatDate = function(date){
         var momentDate = moment(date);
@@ -68,12 +69,4 @@ function ActualitesAbstractController($scope, template, route){
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     };
-
-	$scope.loadNextThreads = function(){
-		_.first(model.threads.mixed.rest($scope.loadedThreadsNumber), $scope.loadThreadsIncrement).forEach(function(thread){
-			thread.open();
-		});
-
-		$scope.loadedThreadsNumber += $scope.loadThreadsIncrement;
-	};
 }
