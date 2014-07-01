@@ -8,6 +8,4 @@ public interface BaseResource {
 	public JsonObject getBody();
 
 	public UserInfos getUser();
-	
-	public void cleanPersistedObject();
 }

@@ -1,6 +1,5 @@
 package fr.wseduc.actualites.services;
 
-import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -19,8 +18,6 @@ public interface InfoService {
 	public void update(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
 	public void delete(InfoResource info, Handler<Either<String, JsonObject>> handler);
-
-	public void list(UserInfos user, Handler<Either<String, JsonArray>> handler);
 	
 	public void list(ThreadResource thread, Handler<Either<String, JsonArray>> handler);
 	

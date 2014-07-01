@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.entcore.common.service.VisibilityFilter;
-import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -43,7 +42,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			.putObject("owner", new JsonObject()
 				.putString("userId", info.getUser().getUserId())
 				.putString("displayName", info.getUser().getUsername()))
-			.putObject("created", now).putObject("modified", now);
+			.putObject("created", now).putObject("modified", now)
+			.putNumber("status", InfoState.DRAFT.getId());
 		
 		// Prepare Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId());
@@ -57,9 +57,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	@Override
 	public void retrieve(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
 		// Query
-		DBObject infoMatch = new BasicDBObject();
-		infoMatch.put("_id", info.getInfoId());
-		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
+		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
+				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
 		
 		// Projection
 		JsonObject projection = new JsonObject();
@@ -89,9 +88,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	@Override
 	public void update(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
 		// Query
-		DBObject infoMatch = new BasicDBObject();
-		infoMatch.put("_id", info.getInfoId());
-		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
+		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
+				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
 		
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare Info object update
@@ -112,13 +110,29 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	@Override
 	public void delete(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
 		// Query
+		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
+				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
+		
+		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
+		// Prepare Info delete
+		JsonObject infoMatcher = new JsonObject();
+		modifier.pull("infos", infoMatcher.putString("_id", info.getInfoId()));
+		
+		// Execute query
+		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
+	}
+	
+	@Override
+	public void changeState(final InfoResource info, final InfoState targetState, final Handler<Either<String, JsonObject>> handler) {
+		// Query
 		DBObject infoMatch = new BasicDBObject();
 		infoMatch.put("_id", info.getInfoId());
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
 		
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
-		// Prepare Info delete
-		modifier.pull("infos", new BasicDBObject("_id", info.getInfoId()));
+		// Prepare Info object update
+		modifier.set("infos.$.status", targetState.getId());
+		modifier.set("infos.$.modified", MongoDb.now());
 		
 		// Prepare Thread update
 		modifier.set("modified", MongoDb.now());
@@ -126,53 +140,80 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
 	}
-
-	@Override
-	public void list(final UserInfos user, final Handler<Either<String, JsonArray>> handler) {
-		list(user, null, null, handler);
-	}
 	
 	@Override
 	public void list(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-		list(thread.getUser(), thread.getThreadId(), thread.getStateFilter(), handler);
-	}
-	
-	protected void list(final UserInfos user, final String threadId, final InfoState state, final Handler<Either<String, JsonArray>> handler) {
-		// TODO IMPLEMENT list Infos by state
-		// TODO real Case User
-		QueryBuilder query;
-		if (user != null) {
-			List<DBObject> groups = new ArrayList<>();
-			groups.add(QueryBuilder.start("userId").is(user.getUserId()).get());
-			for (String gpId: user.getProfilGroupsIds()) {
-				groups.add(QueryBuilder.start("groupId").is(gpId).get());
-			}
-			
-			QueryBuilder subQuery = new QueryBuilder().or(
-				QueryBuilder.start("owner.userId").is(user.getUserId()).get(),
-				QueryBuilder.start("shared").elemMatch(
-						new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
-				).get()
-			);
-			
-			if (state == null) {
-				query = subQuery;
-			}
-			else {
-				query = new QueryBuilder().and(
-					subQuery.get(),
-					QueryBuilder.start("state").is(state.getId()).get()
-				);
-			}
-		} else {	
-			query = QueryBuilder.start("visibility").is(VisibilityFilter.PUBLIC.name());
+		// TODO IMPLEMENT list without thread
+		QueryBuilder query = QueryBuilder.start("_id").is(thread.getThreadId());
+		
+		// Visibility Filter
+		if (thread.getUser() != null) {
+			prepareVisibilityFilteredQuery(query, thread);
+		} else {
+			preparePublicVisibleQuery(query, thread);
 		}
+		
+		// State Filter
+		if (thread.getStateFilter() != null) {
+			prepareStateFilteredQuery(query, thread);
+		}
+		
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
 		mongo.find(collection, MongoQueryBuilder.build(query), sort, null, validResultsHandler(handler));
 	}
 	
-	@Override
-	public void changeState(final InfoResource info, final InfoState targetState, final Handler<Either<String, JsonObject>> handler) {
-		// TODO IMPLEMENT changeState
+	protected void prepareVisibilityFilteredQuery(final QueryBuilder query, final ThreadResource thread) {
+		List<DBObject> groups = new ArrayList<>();
+		groups.add(QueryBuilder.start("userId").is(thread.getUser().getUserId()).get());
+		for (String gpId: thread.getUser().getProfilGroupsIds()) {
+			groups.add(QueryBuilder.start("groupId").is(gpId).get());
+		}
+		switch (thread.getVisibilityFilter()) {
+			case OWNER:
+				query.put("infos").elemMatch(
+						QueryBuilder.start("owner.userId").is(thread.getUser().getUserId()).get()
+				);
+				break;
+			case OWNER_AND_SHARED:
+				query.or(
+						QueryBuilder.start("infos").elemMatch(
+								QueryBuilder.start("owner.userId").is(thread.getUser().getUserId()).get()
+						).get(),
+						QueryBuilder.start("shared").elemMatch(
+								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
+						).get());
+				break;
+			case SHARED:
+				query.put("shared").elemMatch(
+								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get());
+				break;
+			case PROTECTED:
+				query.put("visibility").is(VisibilityFilter.PROTECTED.name());
+				break;
+			case PUBLIC:
+				query.put("visibility").is(VisibilityFilter.PUBLIC.name());
+				break;
+			default:
+				query.or(
+						QueryBuilder.start("visibility").is(VisibilityFilter.PUBLIC.name()).get(),
+						QueryBuilder.start("visibility").is(VisibilityFilter.PROTECTED.name()).get(),
+						QueryBuilder.start("infos").elemMatch(
+								QueryBuilder.start("owner.userId").is(thread.getUser().getUserId()).get()
+						).get(),
+						QueryBuilder.start("shared").elemMatch(
+								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
+						).get());
+				break;
+		}
+	}
+	
+	protected void prepareStateFilteredQuery(final QueryBuilder query, ThreadResource thread) {
+		query.put("infos").elemMatch(
+				QueryBuilder.start("status").is(thread.getStateFilter().getId()).get()
+		);
+	}
+	
+	protected void preparePublicVisibleQuery(final QueryBuilder query, ThreadResource thread) {
+		query.put("visibility").is(VisibilityFilter.PUBLIC.name());
 	}
 }

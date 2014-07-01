@@ -5,8 +5,8 @@ public interface InfoResource extends BaseResource {
 	public String getInfoId();
 
 	public String getThreadId();
-
-	public InfoState getState();
+	
+	public void cleanPersistedObject();
 	
 	public boolean isProtectedField(String field);
 }
