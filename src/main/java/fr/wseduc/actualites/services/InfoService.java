@@ -7,19 +7,22 @@ import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.actualites.model.InfoResource;
 import fr.wseduc.actualites.model.InfoState;
+import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.webutils.Either;
 
-public interface InfoService extends RequestService {
+public interface InfoService {
 	
 	public void create(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
-	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler);
+	public void retrieve(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
-	public void update(String id, InfoResource info, Handler<Either<String, JsonObject>> handler);
+	public void update(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
-	public void delete(String id, UserInfos user, Handler<Either<String, JsonObject>> handler);
+	public void delete(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
 	public void list(UserInfos user, Handler<Either<String, JsonArray>> handler);
 	
-	public void list(InfoState state, UserInfos user, Handler<Either<String, JsonArray>> handler);
+	public void list(ThreadResource thread, Handler<Either<String, JsonArray>> handler);
+	
+	public void changeState(InfoResource info, InfoState targetState, Handler<Either<String, JsonObject>> handler);
 }

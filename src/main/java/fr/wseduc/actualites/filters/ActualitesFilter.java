@@ -8,4 +8,5 @@ public class ActualitesFilter extends MongoAppFilter {
 		super(collection);
 	}
 
+	// TODO IMPLEMENT ActualitesFilter
 }

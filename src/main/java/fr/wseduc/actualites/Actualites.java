@@ -7,14 +7,13 @@ import fr.wseduc.actualites.filters.ActualitesFilter;
 
 public class Actualites extends BaseServer {
 
-	protected final String THREADS_COLLECTION = "actualites.threads";
-	protected final String ACTUALITES_COLLECTION = "actualites.infos";
+	protected final String COLLECTION = "actualites.threads";
 	
 	@Override
 	public void start() {
-		setResourceProvider(new ActualitesFilter(THREADS_COLLECTION));
+		setResourceProvider(new ActualitesFilter(COLLECTION));
 		super.start();
-		addController(new ActualitesController(THREADS_COLLECTION, ACTUALITES_COLLECTION));
+		addController(new ActualitesController(COLLECTION));
 	}
 
 }

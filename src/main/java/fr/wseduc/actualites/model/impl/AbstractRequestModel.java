@@ -10,6 +10,14 @@ public abstract class AbstractRequestModel {
 	private final JsonObject body;
 	private final UserInfos user;
 	
+	public AbstractRequestModel(final UserInfos user) throws InvalidRequestException {
+		if (user == null) {
+			throw new InvalidRequestException("Missing User in Session");
+		}
+		this.user = user;
+		this.body = null;
+	}
+	
 	public AbstractRequestModel(final UserInfos user, final JsonObject body) throws InvalidRequestException {
 		if (user == null) {
 			throw new InvalidRequestException("Missing User in Session");

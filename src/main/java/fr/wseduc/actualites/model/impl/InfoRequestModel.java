@@ -17,6 +17,18 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 	private String threadId;
 	private InfoState state;
 	
+	public InfoRequestModel(UserInfos user, String threadId, String infoId, InfoState state) throws InvalidRequestException {
+		super(user);
+	
+		if (infoId == null || threadId == null) {
+			throw new InvalidRequestException("Invalid Parameters : InfoId, ThreadId cannot be null");
+		}
+		
+		this.infoId = infoId;
+		this.threadId = threadId;
+		this.state = state;
+	}
+	
 	public InfoRequestModel(UserInfos user, JsonObject body) throws InvalidRequestException {
 		super(user, body);
 		try {
@@ -31,6 +43,14 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 		if (this.state == null) {
 			throw new InvalidRequestException("Invalid Info State");
 		}
+	}
+	
+	public boolean isProtectedField(final String field) {
+		return (ID_FIELD.equals(field) || THREAD_FIELD.equals(field) || STATE_FIELD.equals(field));
+	}
+	
+	public void cleanPersistedObject() {
+		getBody().removeField(THREAD_FIELD);
 	}
 
 	public String getInfoId() {

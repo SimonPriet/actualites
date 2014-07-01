@@ -44,7 +44,7 @@ public enum InfoState {
 	
 	public static InfoState stateFromName(final String name) {
 		for(InfoState state : Arrays.asList(InfoState.values())) {
-			if (state.getName() == name) {
+			if (state.getName().equals(name)) {
 				return (InfoState.valueOf(state.toString()));
 			}
 		}
