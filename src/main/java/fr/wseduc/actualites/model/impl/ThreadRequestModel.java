@@ -1,59 +1,24 @@
 package fr.wseduc.actualites.model.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.entcore.common.service.VisibilityFilter;
-import org.entcore.common.user.UserInfos;
 
 import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
+import fr.wseduc.actualites.model.ThreadStateVisibility;
 
 public class ThreadRequestModel extends AbstractRequestModel implements ThreadResource {
 	
-	private String threadId = null;
-	private InfoState stateFilter = null;
-	private VisibilityFilter visibilityFilter = null;
+	private InfoState stateFilter;
+	private VisibilityFilter visibilityFilter;
 	
-	public ThreadRequestModel(final UserInfos user, final String visibilityFilter) throws InvalidRequestException {
-		super(user, false);
-		
-		try {
-			this.visibilityFilter = VisibilityFilter.valueOf(visibilityFilter);
-		}
-		catch (Exception e) {
-			this.visibilityFilter = VisibilityFilter.ALL;
-		}
-	}
+	private boolean requireStateFilter = false;
+	private boolean requireVisibilityFilter = false;
 	
-	public ThreadRequestModel(final UserInfos user, final String visibilityFilter, final InfoState stateFilter) throws InvalidRequestException {
-		this(user, visibilityFilter);
-		this.stateFilter = stateFilter;
-		if (stateFilter == null) {
-			throw new InvalidRequestException("Invalid Parameters : StateFilter cannot be null");
-		}
-	}
-	
-	public ThreadRequestModel(final String threadId, final UserInfos user, final String visibilityFilter) throws InvalidRequestException {
-		this(user, visibilityFilter);
-		
-		if (threadId == null) {
-			throw new InvalidRequestException("Invalid Parameters : ThreadId cannot be null");
-		}
-		
-		this.threadId = threadId;
-	}
-	
-	public ThreadRequestModel(final String threadId, final UserInfos user, final String visibilityFilter, final InfoState stateFilter) throws InvalidRequestException {
-		this(threadId, user, visibilityFilter);
-		this.stateFilter = stateFilter;
-		if (stateFilter == null) {
-			throw new InvalidRequestException("Invalid Parameters : StateFilter cannot be null");
-		}
-	}
-	
-	@Override
-	public String getThreadId() {
-		return threadId;
-	}
 	
 	@Override
 	public InfoState getStateFilter() {
@@ -63,5 +28,55 @@ public class ThreadRequestModel extends AbstractRequestModel implements ThreadRe
 	@Override
 	public VisibilityFilter getVisibilityFilter() {
 		return visibilityFilter;
+	}
+	
+	
+	@Override
+	public void setVisibilityFilter(final String visibilityFilter, final VisibilityFilter defaultVisibilityFilter) throws InvalidRequestException {
+		if (requireVisibilityFilter && visibilityFilter == null) {
+			throw new InvalidRequestException("Invalid Parameters : Visibility Filter cannot be null");
+		}
+		
+		try {
+			this.visibilityFilter = VisibilityFilter.valueOf(visibilityFilter);
+		}
+		catch (Exception e) {
+			this.visibilityFilter = defaultVisibilityFilter;
+		}
+	}
+	
+	@Override
+	public void setStateFilter(String stateFilter) throws InvalidRequestException {
+		this.stateFilter = InfoState.stateFromName(stateFilter);
+		if (requireStateFilter && this.stateFilter == null) {
+			throw new InvalidRequestException("Invalid Parameters : Invalid or null State filter");
+		}
+	}
+	
+	@Override
+	public void setStateFilter(InfoState state) throws InvalidRequestException {
+		if (requireStateFilter && state == null) {
+			throw new InvalidRequestException("Invalid Parameters : Invalid State filter");
+		}
+		this.stateFilter = state;
+	}
+	
+	
+	@Override
+	public ThreadResource requireVisibiliyFilter() {
+		this.requireVisibilityFilter = true;
+		return this;
+	}
+	
+	@Override
+	public ThreadResource requireStateFilter()  {
+		this.requireStateFilter = true;
+		return this;
+	}
+	
+	
+	@Override
+	public boolean hasStateFilter() {
+		return (this.stateFilter != null);
 	}
 }

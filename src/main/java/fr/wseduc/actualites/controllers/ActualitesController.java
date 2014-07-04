@@ -16,6 +16,7 @@ import fr.wseduc.actualites.controllers.helpers.InfoControllerHelper;
 import fr.wseduc.actualites.controllers.helpers.StateControllerHelper;
 import fr.wseduc.actualites.controllers.helpers.ThreadControllerHelper;
 import fr.wseduc.actualites.model.InfoState;
+import fr.wseduc.actualites.model.ThreadStateVisibility;
 import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.actualites.services.ThreadService;
 import fr.wseduc.actualites.services.impl.MongoDbInfoService;
@@ -39,14 +40,12 @@ public class ActualitesController extends BaseController {
 	private final ThreadService threadService;
 	
 	private final Map<String, List<String>> groupedActions;
-	private final Map<String, List<InfoState>> viewStatePermissions;
 	
 	public ActualitesController(final String collection, final ThreadService threadService, final InfoService infoService) {
 		this.infoService = infoService;
 		this.threadService = threadService;
 		
 		this.groupedActions = new HashMap<String, List<String>>();
-		this.viewStatePermissions = new HashMap<String, List<InfoState>>();
 		
 		this.threadHelper = new ThreadControllerHelper(collection, threadService, groupedActions);
 		this.infoHelper = new InfoControllerHelper(infoService);
@@ -60,34 +59,11 @@ public class ActualitesController extends BaseController {
 		this.infoHelper.init(vertx, container, rm, securedActions);
 		this.stateHelper.init(vertx, container, rm, securedActions);
 		
-		((MongoDbInfoService) this.infoService).init(vertx, container, rm, securedActions, viewStatePermissions);
-		((MongoDbThreadService) this.threadService).init(vertx, container, rm, securedActions);
-		
 		loadGroupedActions(securedActions);
 		
-		// Mapping between (groupedActions alias name) and (Viewable Info states)
-		List<InfoState> viewStates = new ArrayList<InfoState>();
-		viewStates.add(InfoState.PUBLISHED);
-		viewStatePermissions.put("thread.view", viewStates);
-		
-		List<InfoState> contributeStates = new ArrayList<InfoState>();
-		contributeStates.add(InfoState.DRAFT);
-		contributeStates.add(InfoState.PENDING);
-		contributeStates.add(InfoState.PUBLISHED);
-		contributeStates.add(InfoState.TRASH);
-		viewStatePermissions.put("thread.contribute", contributeStates);
-		
-		List<InfoState> publishStates = new ArrayList<InfoState>();
-		publishStates.add(InfoState.PENDING);
-		publishStates.add(InfoState.PUBLISHED);
-		viewStatePermissions.put("thread.publish", publishStates);
-		
-		List<InfoState> manageStates = new ArrayList<InfoState>();
-		manageStates.add(InfoState.DRAFT);
-		manageStates.add(InfoState.PENDING);
-		manageStates.add(InfoState.PUBLISHED);
-		manageStates.add(InfoState.TRASH);
-		viewStatePermissions.put("thread.manage", manageStates);
+		// Init the Services
+		((MongoDbInfoService) this.infoService).init(vertx, container, rm, securedActions);
+		((MongoDbThreadService) this.threadService).init(vertx, container, rm, securedActions);
 	}
 
 	@Get("")

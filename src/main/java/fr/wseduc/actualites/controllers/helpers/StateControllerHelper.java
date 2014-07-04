@@ -23,82 +23,74 @@ public class StateControllerHelper extends BaseExtractorHelper {
 	}
 	
 	public void submit(final HttpServerRequest request) {
-		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.PENDING, notEmptyResponseHandler(request));
-		}
-		catch (InvalidRequestException ire) {
-			log.debug("Invalid request : " + ire.getMessage());
-			Renders.badRequest(request, ire.getMessage());
-		}
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.PENDING, notEmptyResponseHandler(request));
 	}
 	
 	public void unsubmit(final HttpServerRequest request) {
-		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
-		}
-		catch (InvalidRequestException ire) {
-			log.debug("Invalid request : " + ire.getMessage());
-			Renders.badRequest(request, ire.getMessage());
-		}
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
 	}
 	
 	public void publish(final HttpServerRequest request) {
-		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.PUBLISHED, notEmptyResponseHandler(request));
-		}
-		catch (InvalidRequestException ire) {
-			log.debug("Invalid request : " + ire.getMessage());
-			Renders.badRequest(request, ire.getMessage());
-		}
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.PUBLISHED, notEmptyResponseHandler(request));
 	}
 	
 	public void unpublish(final HttpServerRequest request) {
-		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
-		}
-		catch (InvalidRequestException ire) {
-			log.debug("Invalid request : " + ire.getMessage());
-			Renders.badRequest(request, ire.getMessage());
-		}
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
 	}
 	
 	public void trash(final HttpServerRequest request) {
-		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.TRASH, notEmptyResponseHandler(request));
-		}
-		catch (InvalidRequestException ire) {
-			log.debug("Invalid request : " + ire.getMessage());
-			Renders.badRequest(request, ire.getMessage());
-		}
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.TRASH, notEmptyResponseHandler(request));
 	}
 	
 	public void restore(final HttpServerRequest request) {
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		
+		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+	}
+	
+	protected void extractInfoId(final HttpServerRequest request, final InfoResource info) {
 		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+			info.setInfoId(request.params().get(INFO_ID_PARAMETER));
 		}
 		catch (InvalidRequestException ire) {
 			log.debug("Invalid request : " + ire.getMessage());

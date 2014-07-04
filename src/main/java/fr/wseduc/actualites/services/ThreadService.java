@@ -6,7 +6,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.webutils.Either;
 
 public interface ThreadService {

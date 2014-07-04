@@ -3,30 +3,26 @@ package fr.wseduc.actualites.controllers.helpers;
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
-import java.util.List;
-import java.util.Map;
-
-import org.entcore.common.user.UserInfos;
+import org.entcore.common.service.VisibilityFilter;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
 
+import fr.wseduc.actualites.model.BaseResource;
 import fr.wseduc.actualites.model.InfoResource;
-import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.actualites.model.impl.InfoRequestModel;
 import fr.wseduc.actualites.model.impl.ThreadRequestModel;
 import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.webutils.http.Renders;
-import fr.wseduc.webutils.request.RequestUtils;
 
 public class InfoControllerHelper extends BaseExtractorHelper {
 	
-	private final String THREAD_ID_PARAMETER = "id";
-	private final String INFO_ID_PARAMETER = "infoid";
-	private final String STATE_PARAMETER = "status";
-	private final String VISIBILITY_FILTER_PARAMETER = "filter";
+	private static final String INFO_ID_PARAMETER = "infoid";
+	private static final String STATE_PARAMETER = "status";
+	private static final String VISIBILITY_FILTER_PARAMETER = "filter";
+	
+	private static final VisibilityFilter DEFAULT_VISIBILITY_FILTER = VisibilityFilter.OWNER_AND_SHARED;
 	
 	protected final InfoService infoService;
 	
@@ -35,148 +31,134 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 	}
 	
 	public void listInfos(final HttpServerRequest request) {
-		// User is mandatory
-		extractUserFromRequest(request, new Handler<UserInfos>() {
+		final ThreadResource thread = new ThreadRequestModel();
+		thread.requireUser();
+		
+		extractVisibiltyFilter(request, thread);
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				try {
-					ThreadResource thread = new ThreadRequestModel(
-							user,
-							request.params().get(VISIBILITY_FILTER_PARAMETER)
-						);
-					infoService.list(thread, arrayResponseHandler(request));
-				}
-				catch (InvalidRequestException ire) {
-					log.debug("Invalid request : " + ire.getMessage());
-					Renders.badRequest(request, ire.getMessage());
-				}
+			public void handle(final BaseResource model) {
+				infoService.list(thread, arrayResponseHandler(request));
 			}
 		});
 	}
 	
 	public void listInfosByStatus(final HttpServerRequest request) {
-		// User is mandatory
-		extractUserFromRequest(request, new Handler<UserInfos>() {
+		final ThreadResource thread = new ThreadRequestModel();
+		thread.requireUser();
+		thread.requireStateFilter();
+		
+		extractVisibiltyFilter(request, thread);
+		extractStateFilter(request, thread);
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				try {
-					ThreadResource thread = new ThreadRequestModel(
-							user,
-							request.params().get(VISIBILITY_FILTER_PARAMETER),
-							InfoState.stateFromName(request.params().get(STATE_PARAMETER))
-						);
-					infoService.list(thread, arrayResponseHandler(request));
-				}
-				catch (InvalidRequestException ire) {
-					log.debug("Invalid request : " + ire.getMessage());
-					Renders.badRequest(request, ire.getMessage());
-				}
+			public void handle(final BaseResource model) {
+				infoService.list(thread, arrayResponseHandler(request));
 			}
 		});
 	}
 	
 	public void listThreadInfos(final HttpServerRequest request) {
-		// User is mandatory
-		extractUserFromRequest(request, new Handler<UserInfos>() {
+		final ThreadResource thread = new ThreadRequestModel();
+		thread.requireUser();
+		thread.requireThreadId();
+		
+		extractThreadId(request, thread);
+		extractVisibiltyFilter(request, thread);
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				try {
-					ThreadResource thread = new ThreadRequestModel(
-							request.params().get(THREAD_ID_PARAMETER),
-							user,
-							request.params().get(VISIBILITY_FILTER_PARAMETER)
-						);
-					infoService.list(thread, arrayResponseHandler(request));
-				}
-				catch (InvalidRequestException ire) {
-					log.debug("Invalid request : " + ire.getMessage());
-					Renders.badRequest(request, ire.getMessage());
-				}
+			public void handle(final BaseResource model) {
+				infoService.list(thread, arrayResponseHandler(request));
 			}
 		});
 	}
 	
 	public void listThreadInfosByStatus(final HttpServerRequest request) {
-		// User is mandatory
-		extractUserFromRequest(request, new Handler<UserInfos>() {
+		final ThreadResource thread = new ThreadRequestModel();
+		thread.requireUser();
+		thread.requireThreadId();
+		thread.requireStateFilter();
+		
+		extractThreadId(request, thread);
+		extractVisibiltyFilter(request, thread);
+		extractStateFilter(request, thread);
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				try {
-					ThreadResource thread = new ThreadRequestModel(
-							request.params().get(THREAD_ID_PARAMETER),
-							user,
-							request.params().get(VISIBILITY_FILTER_PARAMETER),
-							InfoState.stateFromName(request.params().get(STATE_PARAMETER))
-						);
-					infoService.list(thread, arrayResponseHandler(request));
-				}
-				catch (InvalidRequestException ire) {
-					log.debug("Invalid request : " + ire.getMessage());
-					Renders.badRequest(request, ire.getMessage());
-				}
+			public void handle(final BaseResource model) {
+				infoService.list(thread, arrayResponseHandler(request));
 			}
 		});
 	}
 	
 	public void create(final HttpServerRequest request) {
-		// User is mandatory
-		ensureExtractUserFromRequest(request, new Handler<UserInfos>() {
+		final InfoResource info = new InfoRequestModel();
+		info.requireUser();
+		info.requireThreadId();
+		info.requireBody();
+		
+		extractThreadId(request, info);
+		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject object) {
-						try {
-							InfoResource info = new InfoRequestModel(
-									user,
-									request.params().get(THREAD_ID_PARAMETER),
-									object
-								);
-							infoService.create(info, notEmptyResponseHandler(request));
-						}
-						catch (InvalidRequestException ire) {
-							log.debug("Invalid request : " + ire.getMessage());
-							Renders.badRequest(request, ire.getMessage());
-						}
-					}
-				});
+			public void handle(final BaseResource model) {
+				infoService.create(info, notEmptyResponseHandler(request));
 			}
 		});
 	}
 	
 	public void update(final HttpServerRequest request) {
-		ensureExtractUserFromRequest(request, new Handler<UserInfos>() {
+		final InfoResource info = new InfoRequestModel();
+		info.requireUser();
+		info.requireThreadId();
+		info.requireInfoId();
+		info.requireBody();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
-			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject object) {
-						try {
-							InfoResource info = new InfoRequestModel(
-									user,
-									request.params().get(THREAD_ID_PARAMETER),
-									request.params().get(INFO_ID_PARAMETER),
-									object
-								);
-							infoService.update(info, notEmptyResponseHandler(request));
-						}
-						catch (InvalidRequestException ire) {
-							log.debug("Invalid request : " + ire.getMessage());
-							Renders.badRequest(request, ire.getMessage());
-						}
-					}
-				});
+			public void handle(final BaseResource model) {
+				infoService.update(info, notEmptyResponseHandler(request));
 			}
 		});
 	}
 	
 	public void delete(final HttpServerRequest request) {
+		final InfoResource info = new InfoRequestModel();
+		info.requireUser();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		extractUserFromRequest(info, request, new Handler<BaseResource>() {
+			@Override
+			public void handle(final BaseResource model) {
+				infoService.delete(info, notEmptyResponseHandler(request));
+			}
+		});
+	}
+	
+	public void comment(final HttpServerRequest request) {
+		final InfoResource info = new InfoRequestModel();
+		info.requireUser();
+		info.requireThreadId();
+		info.requireInfoId();
+		info.requireBody();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
+			@Override
+			public void handle(final BaseResource model) {
+				infoService.addComment(info, notEmptyResponseHandler(request));
+			}
+		});
+	}
+	
+	
+	protected void extractVisibiltyFilter(final HttpServerRequest request, final ThreadResource thread) {
 		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.delete(info, notEmptyResponseHandler(request));
+			thread.setVisibilityFilter(request.params().get(VISIBILITY_FILTER_PARAMETER), DEFAULT_VISIBILITY_FILTER);
 		}
 		catch (InvalidRequestException ire) {
 			log.debug("Invalid request : " + ire.getMessage());
@@ -184,13 +166,19 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		}
 	}
 	
-	public void comment(final HttpServerRequest request) {
+	protected void extractStateFilter(final HttpServerRequest request, final ThreadResource thread) {
 		try {
-			InfoResource info = new InfoRequestModel(
-					request.params().get(THREAD_ID_PARAMETER),
-					request.params().get(INFO_ID_PARAMETER)
-				);
-			infoService.addComment(info, notEmptyResponseHandler(request));
+			thread.setStateFilter(request.params().get(STATE_PARAMETER));
+		}
+		catch (InvalidRequestException ire) {
+			log.debug("Invalid request : " + ire.getMessage());
+			Renders.badRequest(request, ire.getMessage());
+		}
+	}
+	
+	protected void extractInfoId(final HttpServerRequest request, final InfoResource info) {
+		try {
+			info.setInfoId(request.params().get(INFO_ID_PARAMETER));
 		}
 		catch (InvalidRequestException ire) {
 			log.debug("Invalid request : " + ire.getMessage());

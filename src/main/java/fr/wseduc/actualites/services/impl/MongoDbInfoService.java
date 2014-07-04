@@ -1,7 +1,6 @@
 package fr.wseduc.actualites.services.impl;
 
 import static org.entcore.common.mongodb.MongoDbResult.validActionResultHandler;
-import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
 import java.util.ArrayList;
@@ -29,27 +28,25 @@ import fr.wseduc.actualites.model.InfoMode;
 import fr.wseduc.actualites.model.InfoResource;
 import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.ThreadResource;
+import fr.wseduc.actualites.model.ThreadStateVisibility;
 import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.mongodb.MongoQueryBuilder;
 import fr.wseduc.mongodb.MongoUpdateBuilder;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.Either.Right;
 import fr.wseduc.webutils.security.SecuredAction;
 
 public class MongoDbInfoService extends AbstractService implements InfoService {
-
-	protected Map<String, List<InfoState>> viewStatePermissions;
 	
 	public MongoDbInfoService(final String collection) {
 		super(collection);
 	}
 	
-	public void init(Vertx vertx, Container container, RouteMatcher rm, Map<String, SecuredAction> securedActions, final Map<String, List<InfoState>> viewStatePermissions) {
+	public void init(Vertx vertx, Container container, RouteMatcher rm, Map<String, SecuredAction> securedActions) {
+		
 		this.eb = vertx.eventBus();
 		this.mongo = MongoDb.getInstance();
 		this.notification = new TimelineHelper(vertx, eb, container);
-		this.viewStatePermissions = viewStatePermissions;
 	}
 
 	@Override
@@ -157,6 +154,35 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	
 	@Override
 	public void list(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
+		// Prepare ProtectedView Thread list
+		doRequestProtectedViewThreads(thread, new Handler<Boolean>(){
+			@Override
+			public void handle(final Boolean isFilterNecessary) {
+				// Do the List request
+				doListRequest(thread, new Handler<Either<String, JsonArray>>(){
+					@Override
+					public void handle(Either<String, JsonArray> event) {
+						if (event.isRight() && (isFilterNecessary || thread.hasStateFilter())) {
+							// Post-process
+							try {
+								// State Filter
+								filterResultsByStates(event.right().getValue(), thread, handler);
+							}
+							catch (Exception e) {
+								handler.handle(new Either.Left<String, JsonArray>("Malformed response"));
+							}
+						}
+						else {
+							// No filtering needed OR Either is Left
+							handler.handle(event);
+						}
+					}	
+				});
+			}
+		});		
+	}
+	
+	protected void doListRequest(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
 		// Start with Thread if present
 		QueryBuilder query;
 		if (thread.getThreadId() == null) {
@@ -174,31 +200,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		}
 		
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
-		mongo.find(collection, MongoQueryBuilder.build(query), sort, null, validResultsHandler(new Handler<Either<String, JsonArray>>(){
-			@Override
-			public void handle(Either<String, JsonArray> event) {
-				if (event.isRight()) {
-					// Post-process
-					try {
-						// State Filter
-						final JsonArray filteredResults = new JsonArray();
-						if (thread.getStateFilter() == null) {
-							filterResultsByStatesPermissions(event.right().getValue(), filteredResults, thread, handler);
-						}
-						else {
-							filterResultsByStateAndStatesPermissions(event.right().getValue(), filteredResults, thread, handler);
-						}
-						handler.handle(new Either.Right<String, JsonArray>(filteredResults));
-					}
-					catch (Exception e) {
-						handler.handle(new Either.Left<String, JsonArray>("Malformed response"));
-					}
-					return;
-				}
-				handler.handle(event);
-			}	
-		}));
-		
+		mongo.find(collection, MongoQueryBuilder.build(query), sort, null, validResultsHandler(handler));
 	}
 	
 	protected void prepareVisibilityFilteredQuery(final QueryBuilder query, final UserInfos user, final  VisibilityFilter visibilityFilter) {
@@ -246,54 +248,42 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		}
 	}
 	
-	protected void filterResultsByStatesPermissions(final JsonArray results, final JsonArray filteredResults, final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-
+	protected void doRequestProtectedViewThreads(final ThreadResource thread, final Handler<Boolean> handler) {
+		// TODO IMPLEMENT : pre-request the Thread(s) and fill the Thread - View States Map in the ThreadResource object
+		handler.handle(false);
+	}
+	
+	protected void filterResultsByStates(final JsonArray results, final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
+		// TODO IMPLEMENT : filter the results for Security, for each Thread filter the Infos by State with the View States Map in the ThreadResource object
+		
+		final JsonArray filteredResults = new JsonArray();
+		
 		for (Object result : results.toList()) {
 			JsonObject threadResult = (JsonObject) result;
 			
 			if (! threadResult.containsField("infos")) {
+				// Empty Thread
+				filteredResults.add(threadResult);
 				continue;
 			}
 			
-			if (thread.getUser().getUserId().equals(threadResult.getObject("owner").getString("userId"))) {
-				filteredResults.toList().addAll(threadResult.getArray("infos").toList());
-				continue;
-			}
+			JsonArray filteredInfos = new JsonArray();
 			
-			for (Object sharedObject : threadResult.getArray("shared").toList()) {
-				JsonObject shared = (JsonObject) sharedObject;
+			for (Object infoObject : threadResult.getArray("infos").toList()) {
+				JsonObject info = (JsonObject) infoObject;
 				
-				if (thread.getUser().getProfilGroupsIds().contains(shared.getString("groupId"))
-						|| thread.getUser().getUserId().equals(shared.getString("userId"))) {
-					
-					for (Entry<String, List<InfoState>> viewPermission : viewStatePermissions.entrySet()) {
-						if (shared.getBoolean(viewPermission.getKey())) {
-							
-							for (Object infoObject : threadResult.getArray("infos").toList()) {
-								JsonObject info = (JsonObject) infoObject;
-								
-								if (viewPermission.getValue().contains(InfoState.stateFromId(info.getInteger("status")))) {
-									filteredResults.toList().add(info);
-								}
-							}
-						}
-					}
+				// Filter the Info with the StatusFilter
+				if (info.getInteger("status") == thread.getStateFilter().getId()) {
+					filteredInfos.add(info);
 				}
 			}
-		}
-	}
-	
-	protected void filterResultsByStateAndStatesPermissions(final JsonArray results, final JsonArray filteredResults, final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-		
-	}
-	
-	protected void filterResultsByState(final JsonArray filteredResults, final JsonArray infos, final InfoState state) {
-		if (state == null) {
-			filteredResults.toList().addAll(infos.toList());
-		}
-		else {
 			
+			// Add the filtered Thread object to the filtered results
+			threadResult.putArray("infos", filteredInfos);
+			filteredResults.add(threadResult);
 		}
+		
+		handler.handle(new Either.Right<String, JsonArray>(filteredResults));
 	}
 	
 

@@ -1,10 +1,16 @@
 package fr.wseduc.actualites.model;
 
+
 public interface InfoResource extends BaseResource {
 	
 	public String getInfoId();
-
-	public String getThreadId();
+	
+	
+	public void setInfoId(String infoId) throws InvalidRequestException;
+	
+	
+	public InfoResource requireInfoId();
+	
 	
 	public void cleanPersistedObject();
 	

@@ -1,6 +1,7 @@
 package fr.wseduc.actualites.services.impl;
 
-import static org.entcore.common.mongodb.MongoDbResult.*;
+import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
+import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,6 @@ import org.vertx.java.core.json.JsonObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
-import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.actualites.services.ThreadService;
 import fr.wseduc.mongodb.MongoQueryBuilder;
 import fr.wseduc.webutils.Either;

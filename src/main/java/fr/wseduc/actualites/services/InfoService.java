@@ -1,6 +1,5 @@
 package fr.wseduc.actualites.services;
 
-import java.util.List;
 import java.util.Map;
 
 import org.entcore.common.user.UserInfos;
