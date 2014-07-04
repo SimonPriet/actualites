@@ -1,7 +1,11 @@
 package fr.wseduc.actualites.controllers;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -11,8 +15,11 @@ import org.vertx.java.platform.Container;
 import fr.wseduc.actualites.controllers.helpers.InfoControllerHelper;
 import fr.wseduc.actualites.controllers.helpers.StateControllerHelper;
 import fr.wseduc.actualites.controllers.helpers.ThreadControllerHelper;
+import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.services.InfoService;
+import fr.wseduc.actualites.services.ThreadService;
 import fr.wseduc.actualites.services.impl.MongoDbInfoService;
+import fr.wseduc.actualites.services.impl.MongoDbThreadService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
@@ -29,10 +36,19 @@ public class ActualitesController extends BaseController {
 	private final InfoControllerHelper infoHelper;
 	private final StateControllerHelper stateHelper;
 	private final InfoService infoService;
+	private final ThreadService threadService;
 	
-	public ActualitesController(final String collection) {
-		this.infoService = new MongoDbInfoService(collection);
-		this.threadHelper = new ThreadControllerHelper(collection);
+	private final Map<String, List<String>> groupedActions;
+	private final Map<String, List<InfoState>> viewStatePermissions;
+	
+	public ActualitesController(final String collection, final ThreadService threadService, final InfoService infoService) {
+		this.infoService = infoService;
+		this.threadService = threadService;
+		
+		this.groupedActions = new HashMap<String, List<String>>();
+		this.viewStatePermissions = new HashMap<String, List<InfoState>>();
+		
+		this.threadHelper = new ThreadControllerHelper(collection, threadService, groupedActions);
 		this.infoHelper = new InfoControllerHelper(infoService);
 		this.stateHelper = new StateControllerHelper(infoService);
 	}
@@ -43,7 +59,35 @@ public class ActualitesController extends BaseController {
 		this.threadHelper.init(vertx, container, rm, securedActions);
 		this.infoHelper.init(vertx, container, rm, securedActions);
 		this.stateHelper.init(vertx, container, rm, securedActions);
-		((MongoDbInfoService) this.infoService).init(vertx, container, rm, securedActions);
+		
+		((MongoDbInfoService) this.infoService).init(vertx, container, rm, securedActions, viewStatePermissions);
+		((MongoDbThreadService) this.threadService).init(vertx, container, rm, securedActions);
+		
+		loadGroupedActions(securedActions);
+		
+		// Mapping between (groupedActions alias name) and (Viewable Info states)
+		List<InfoState> viewStates = new ArrayList<InfoState>();
+		viewStates.add(InfoState.PUBLISHED);
+		viewStatePermissions.put("thread.view", viewStates);
+		
+		List<InfoState> contributeStates = new ArrayList<InfoState>();
+		contributeStates.add(InfoState.DRAFT);
+		contributeStates.add(InfoState.PENDING);
+		contributeStates.add(InfoState.PUBLISHED);
+		contributeStates.add(InfoState.TRASH);
+		viewStatePermissions.put("thread.contribute", contributeStates);
+		
+		List<InfoState> publishStates = new ArrayList<InfoState>();
+		publishStates.add(InfoState.PENDING);
+		publishStates.add(InfoState.PUBLISHED);
+		viewStatePermissions.put("thread.publish", publishStates);
+		
+		List<InfoState> manageStates = new ArrayList<InfoState>();
+		manageStates.add(InfoState.DRAFT);
+		manageStates.add(InfoState.PENDING);
+		manageStates.add(InfoState.PUBLISHED);
+		manageStates.add(InfoState.TRASH);
+		viewStatePermissions.put("thread.manage", manageStates);
 	}
 
 	@Get("")
@@ -66,7 +110,7 @@ public class ActualitesController extends BaseController {
 	
 	@Get("/threads")
 	@ApiDoc("Get Thread by id.")
-	@SecuredAction("threads.list")
+	@SecuredAction("actualites.view")
 	public void listThreads(final HttpServerRequest request) {
 		threadHelper.listThreads(request);
 	}
@@ -122,24 +166,35 @@ public class ActualitesController extends BaseController {
 		threadHelper.shareThreadRemove(request);
 	}
 	
-	
-	@Get("/thread/:id/infos/:filter")
-	@ApiDoc("Get infos in thread by thread id.")
-	@ResourceFilter("allStatusFilter")
-	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
-	public void getThreadActualites(final HttpServerRequest request) {
-		infoHelper.getThreadActualites(request);
-	}
-	
-	@Get("/thread/:id/infos/:status/:filter")
+	@Get("/infos")
 	@ApiDoc("Get infos in thread by status and by thread id.")
-	@ResourceFilter("statusFilter")
-	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
-	public void getThreadActualitesByStatus(final HttpServerRequest request) {
-		infoHelper.getThreadActualitesByStatus(request);
+	@SecuredAction("actualites.view")
+	public void listInfos(final HttpServerRequest request) {
+		infoHelper.listInfos(request);
 	}
 	
-	@Post("/thread/:id/info/draft")
+	@Get("/infos/:status")
+	@ApiDoc("Get infos in thread by status and by thread id.")
+	@SecuredAction("actualites.view")
+	public void listInfosPublished(final HttpServerRequest request) {
+		infoHelper.listInfosByStatus(request);
+	}
+	
+	@Get("/thread/:id/:filter")
+	@ApiDoc("Get infos in thread by thread id.")
+	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
+	public void listThreadInfos(final HttpServerRequest request) {
+		infoHelper.listThreadInfos(request);
+	}
+	
+	@Get("/thread/:id/:status/:filter")
+	@ApiDoc("Get infos in thread by status and by thread id.")
+	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
+	public void listThreadInfosDraft(final HttpServerRequest request) {
+		infoHelper.listThreadInfosByStatus(request);
+	}
+	
+	@Post("/thread/:id/info")
 	@ApiDoc("Add a new Info")
 	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void createDraft(final HttpServerRequest request) {
@@ -148,6 +203,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/draft")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
+	@ResourceFilter("stateDraft")
 	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void updateDraft(final HttpServerRequest request) {
 		infoHelper.update(request);
@@ -155,6 +211,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/pending")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
+	@ResourceFilter("statePending")
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void updatePending(final HttpServerRequest request) {
 		infoHelper.update(request);
@@ -162,13 +219,15 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/published")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
+	@ResourceFilter("statePublished")
 	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
 	public void updatePublished(final HttpServerRequest request) {
 		infoHelper.update(request);
 	}
 	
-	@Delete("/thread/:id/info/:infoid/delete")
+	@Delete("/thread/:id/info/:infoid")
 	@ApiDoc("Delete : Real delete an Info in thread by thread and by id")
+	@ResourceFilter("stateDraft")
 	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
 	public void delete(final HttpServerRequest request) {
 		infoHelper.delete(request);
@@ -177,6 +236,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/submit")
 	@ApiDoc("Submit : Change an Info to Pending state in thread by thread and by id")
+	@ResourceFilter("stateDraft")
 	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void submit(final HttpServerRequest request) {
 		stateHelper.submit(request);
@@ -184,6 +244,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/unsubmit")
 	@ApiDoc("Cancel Submit : Change an Info to Draft state in thread by thread and by id")
+	@ResourceFilter("statePending")
 	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void unsubmit(final HttpServerRequest request) {
 		stateHelper.unsubmit(request);
@@ -191,6 +252,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/publish")
 	@ApiDoc("Publish : Change an Info to Published state in thread by thread and by id")
+	@ResourceFilter("publish")
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void publish(final HttpServerRequest request) {
 		stateHelper.publish(request);
@@ -198,6 +260,7 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/unpublish")
 	@ApiDoc("Unpublish : Change an Info to Draft state in thread by thread and by id")
+	@ResourceFilter("statePublished")
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void unpublish(final HttpServerRequest request) {
 		stateHelper.unpublish(request);
@@ -205,15 +268,44 @@ public class ActualitesController extends BaseController {
 	
 	@Put("/thread/:id/info/:infoid/thrash")
 	@ApiDoc("Trash : Change an Info to Trash state in thread by thread and by id")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@ResourceFilter("trashMine")
+	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void trash(final HttpServerRequest request) {
 		stateHelper.trash(request);
 	}
 	
 	@Put("/thread/:id/info/:infoid/restore")
 	@ApiDoc("Cancel Trash : Change an Info to Draft state in thread by thread and by id")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@ResourceFilter("restoreMine")
+	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
 	public void restore(final HttpServerRequest request) {
 		stateHelper.restore(request);
+	}
+	
+	@Put("/thread/:id/info/:infoid/comment")
+	@ApiDoc("Cancel Trash : Change an Info to Draft state in thread by thread and by id")
+	@SecuredAction(value = "thread.comment", type = ActionType.RESOURCE)
+	public void comment(final HttpServerRequest request) {
+		infoHelper.comment(request);
+	}
+	
+	protected void loadGroupedActions(Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions) {
+		for(Entry<String, fr.wseduc.webutils.security.SecuredAction> entry : securedActions.entrySet()) {
+			// Only RESOURCE actions
+			if (! entry.getValue().getType().equals(ActionType.RESOURCE)) {
+				continue;
+			}
+			
+			String groupName = entry.getValue().getDisplayName();
+			List<String> actions;
+			if (! groupedActions.containsKey(groupName)){
+				actions = new ArrayList<String>();
+				groupedActions.put(groupName, actions);
+			}
+			else {
+				actions = groupedActions.get(groupName);
+			}
+			actions.add(entry.getValue().getName());
+		}
 	}
 }

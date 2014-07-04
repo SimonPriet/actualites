@@ -9,12 +9,12 @@ import fr.wseduc.actualites.model.ThreadResource;
 
 public class ThreadRequestModel extends AbstractRequestModel implements ThreadResource {
 	
-	private String threadId;
+	private String threadId = null;
 	private InfoState stateFilter = null;
 	private VisibilityFilter visibilityFilter = null;
 	
-	public ThreadRequestModel(final UserInfos user, final String threadId, final String visibilityFilter) throws InvalidRequestException {
-		super(user);
+	public ThreadRequestModel(final UserInfos user, final String visibilityFilter) throws InvalidRequestException {
+		super(user, false);
 		
 		try {
 			this.visibilityFilter = VisibilityFilter.valueOf(visibilityFilter);
@@ -22,6 +22,18 @@ public class ThreadRequestModel extends AbstractRequestModel implements ThreadRe
 		catch (Exception e) {
 			this.visibilityFilter = VisibilityFilter.ALL;
 		}
+	}
+	
+	public ThreadRequestModel(final UserInfos user, final String visibilityFilter, final InfoState stateFilter) throws InvalidRequestException {
+		this(user, visibilityFilter);
+		this.stateFilter = stateFilter;
+		if (stateFilter == null) {
+			throw new InvalidRequestException("Invalid Parameters : StateFilter cannot be null");
+		}
+	}
+	
+	public ThreadRequestModel(final String threadId, final UserInfos user, final String visibilityFilter) throws InvalidRequestException {
+		this(user, visibilityFilter);
 		
 		if (threadId == null) {
 			throw new InvalidRequestException("Invalid Parameters : ThreadId cannot be null");
@@ -30,9 +42,9 @@ public class ThreadRequestModel extends AbstractRequestModel implements ThreadRe
 		this.threadId = threadId;
 	}
 	
-	public ThreadRequestModel(final UserInfos user, final String threadId, final String visibilityFilter, final String stateFilter) throws InvalidRequestException {
-		this(user, threadId, visibilityFilter);
-		this.stateFilter = InfoState.stateFromName(stateFilter);
+	public ThreadRequestModel(final String threadId, final UserInfos user, final String visibilityFilter, final InfoState stateFilter) throws InvalidRequestException {
+		this(threadId, user, visibilityFilter);
+		this.stateFilter = stateFilter;
 		if (stateFilter == null) {
 			throw new InvalidRequestException("Invalid Parameters : StateFilter cannot be null");
 		}

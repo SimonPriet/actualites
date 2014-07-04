@@ -15,16 +15,16 @@ public abstract class AbstractRequestModel {
 		this.body = null;
 	}
 	
-	public AbstractRequestModel(final UserInfos user) throws InvalidRequestException {
-		if (user == null) {
+	public AbstractRequestModel(final UserInfos user, boolean required) throws InvalidRequestException {
+		if (required && user == null) {
 			throw new InvalidRequestException("Missing User in Session");
 		}
 		this.user = user;
 		this.body = null;
 	}
 	
-	public AbstractRequestModel(final UserInfos user, final JsonObject body) throws InvalidRequestException {
-		if (user == null) {
+	public AbstractRequestModel(final UserInfos user, boolean required, final JsonObject body) throws InvalidRequestException {
+		if (required && user == null) {
 			throw new InvalidRequestException("Missing User in Session");
 		}
 		if (body == null) {

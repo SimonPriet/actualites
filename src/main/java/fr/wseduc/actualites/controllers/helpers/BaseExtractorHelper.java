@@ -23,4 +23,8 @@ public class BaseExtractorHelper extends BaseController {
 			}
 		});
 	}
+	
+	protected void extractUserFromRequest(final HttpServerRequest request, final Handler<UserInfos> handler) {
+		UserUtils.getUserInfos(eb, request, handler);
+	}
 }

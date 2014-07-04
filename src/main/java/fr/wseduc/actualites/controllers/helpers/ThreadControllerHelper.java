@@ -1,6 +1,8 @@
 package fr.wseduc.actualites.controllers.helpers;
 
+import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
+import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 import static org.entcore.common.user.UserUtils.getUserInfos;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.entcore.common.mongodb.MongoDbControllerHelper;
+import org.entcore.common.service.VisibilityFilter;
 import org.entcore.common.share.ShareService;
 import org.entcore.common.share.impl.MongoDbShareService;
 import org.entcore.common.user.UserInfos;
@@ -22,6 +25,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
+import fr.wseduc.actualites.services.ThreadService;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
@@ -31,14 +35,17 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 
 	protected final String managedCollection;
 	protected final String type;
+	
+	protected final ThreadService threadService;
 	protected ShareService shareService;
 	
-	public ThreadControllerHelper(String managedCollection) {
-		this(managedCollection, null);
+	public ThreadControllerHelper(String managedCollection, final ThreadService threadService) {
+		this(managedCollection, threadService, null);
 	}
 	
-	public ThreadControllerHelper(String managedCollection, Map<String, List<String>> groupedActions) {
+	public ThreadControllerHelper(String managedCollection, final ThreadService threadService, Map<String, List<String>> groupedActions) {
 		super(managedCollection, groupedActions);
+		this.threadService = threadService;
 		this.managedCollection = managedCollection;
 		this.type = managedCollection.toUpperCase();
 	}
@@ -240,7 +247,34 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 	
 	
 	public void listThreads(final HttpServerRequest request) {
-		list(request);
+		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				String filter = request.params().get("filter");
+				VisibilityFilter v = VisibilityFilter.ALL;
+				if (filter != null) {
+					try {
+						v = VisibilityFilter.valueOf(filter.toUpperCase());
+					} catch (IllegalArgumentException | NullPointerException e) {
+						v = VisibilityFilter.ALL;
+						if (log.isDebugEnabled()) {
+							log.debug("Invalid filter " + filter);
+						}
+					}
+				}
+				threadService.list(v, user, arrayResponseHandler(request));
+			}
+		});
+	}
+	
+	public void retrieveThread(final HttpServerRequest request) {
+		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				String id = request.params().get("id");
+				threadService.retrieve(id, user, notEmptyResponseHandler(request));
+			}
+		});
 	}
 	
 	public void createThread(final HttpServerRequest request) {
@@ -249,10 +283,6 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 	
 	public void updateThread(final HttpServerRequest request) {
 		update(request);
-	}
-	
-	public void retrieveThread(final HttpServerRequest request) {
-		retrieve(request);
 	}
 	
 	public void deleteThread(final HttpServerRequest request) {

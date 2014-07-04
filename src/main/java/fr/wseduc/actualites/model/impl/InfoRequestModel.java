@@ -26,7 +26,7 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 	}
 	
 	public InfoRequestModel(final UserInfos user, final String threadId, final String infoId) throws InvalidRequestException {
-		super(user);
+		super(user, true);
 		
 		if (infoId == null || threadId == null) {
 			throw new InvalidRequestException("Invalid Parameters : InfoId, ThreadId cannot be null");
@@ -37,7 +37,7 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 	}
 	
 	public InfoRequestModel(final UserInfos user, final String threadId, final JsonObject body) throws InvalidRequestException {
-		super(user, body);
+		super(user, true, body);
 		
 		if (threadId == null) {
 			throw new InvalidRequestException("Invalid Parameters : ThreadId cannot be null");

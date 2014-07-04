@@ -3,12 +3,16 @@ package fr.wseduc.actualites.controllers.helpers;
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
+import java.util.List;
+import java.util.Map;
+
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.actualites.model.InfoResource;
+import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.actualites.model.impl.InfoRequestModel;
@@ -30,15 +34,14 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		this.infoService = infoService;
 	}
 	
-	public void getThreadActualites(final HttpServerRequest request) {
-		// User id mandatory
-		ensureExtractUserFromRequest(request, new Handler<UserInfos>() {
+	public void listInfos(final HttpServerRequest request) {
+		// User is mandatory
+		extractUserFromRequest(request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
 				try {
 					ThreadResource thread = new ThreadRequestModel(
 							user,
-							request.params().get(THREAD_ID_PARAMETER),
 							request.params().get(VISIBILITY_FILTER_PARAMETER)
 						);
 					infoService.list(thread, arrayResponseHandler(request));
@@ -51,17 +54,59 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		});
 	}
 	
-	public void getThreadActualitesByStatus(final HttpServerRequest request) {
+	public void listInfosByStatus(final HttpServerRequest request) {
 		// User is mandatory
-		ensureExtractUserFromRequest(request, new Handler<UserInfos>() {
+		extractUserFromRequest(request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
 				try {
 					ThreadResource thread = new ThreadRequestModel(
 							user,
-							request.params().get(THREAD_ID_PARAMETER),
 							request.params().get(VISIBILITY_FILTER_PARAMETER),
-							request.params().get(STATE_PARAMETER)
+							InfoState.stateFromName(request.params().get(STATE_PARAMETER))
+						);
+					infoService.list(thread, arrayResponseHandler(request));
+				}
+				catch (InvalidRequestException ire) {
+					log.debug("Invalid request : " + ire.getMessage());
+					Renders.badRequest(request, ire.getMessage());
+				}
+			}
+		});
+	}
+	
+	public void listThreadInfos(final HttpServerRequest request) {
+		// User is mandatory
+		extractUserFromRequest(request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				try {
+					ThreadResource thread = new ThreadRequestModel(
+							request.params().get(THREAD_ID_PARAMETER),
+							user,
+							request.params().get(VISIBILITY_FILTER_PARAMETER)
+						);
+					infoService.list(thread, arrayResponseHandler(request));
+				}
+				catch (InvalidRequestException ire) {
+					log.debug("Invalid request : " + ire.getMessage());
+					Renders.badRequest(request, ire.getMessage());
+				}
+			}
+		});
+	}
+	
+	public void listThreadInfosByStatus(final HttpServerRequest request) {
+		// User is mandatory
+		extractUserFromRequest(request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				try {
+					ThreadResource thread = new ThreadRequestModel(
+							request.params().get(THREAD_ID_PARAMETER),
+							user,
+							request.params().get(VISIBILITY_FILTER_PARAMETER),
+							InfoState.stateFromName(request.params().get(STATE_PARAMETER))
 						);
 					infoService.list(thread, arrayResponseHandler(request));
 				}
@@ -132,6 +177,20 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 					request.params().get(INFO_ID_PARAMETER)
 				);
 			infoService.delete(info, notEmptyResponseHandler(request));
+		}
+		catch (InvalidRequestException ire) {
+			log.debug("Invalid request : " + ire.getMessage());
+			Renders.badRequest(request, ire.getMessage());
+		}
+	}
+	
+	public void comment(final HttpServerRequest request) {
+		try {
+			InfoResource info = new InfoRequestModel(
+					request.params().get(THREAD_ID_PARAMETER),
+					request.params().get(INFO_ID_PARAMETER)
+				);
+			infoService.addComment(info, notEmptyResponseHandler(request));
 		}
 		catch (InvalidRequestException ire) {
 			log.debug("Invalid request : " + ire.getMessage());
