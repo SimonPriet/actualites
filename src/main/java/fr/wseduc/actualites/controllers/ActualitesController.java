@@ -39,15 +39,11 @@ public class ActualitesController extends BaseController {
 	private final InfoService infoService;
 	private final ThreadService threadService;
 	
-	private final Map<String, List<String>> groupedActions;
-	
 	public ActualitesController(final String collection, final ThreadService threadService, final InfoService infoService) {
 		this.infoService = infoService;
 		this.threadService = threadService;
 		
-		this.groupedActions = new HashMap<String, List<String>>();
-		
-		this.threadHelper = new ThreadControllerHelper(collection, threadService, groupedActions);
+		this.threadHelper = new ThreadControllerHelper(collection, threadService);
 		this.infoHelper = new InfoControllerHelper(infoService);
 		this.stateHelper = new StateControllerHelper(infoService);
 	}
@@ -58,8 +54,6 @@ public class ActualitesController extends BaseController {
 		this.threadHelper.init(vertx, container, rm, securedActions);
 		this.infoHelper.init(vertx, container, rm, securedActions);
 		this.stateHelper.init(vertx, container, rm, securedActions);
-		
-		loadGroupedActions(securedActions);
 		
 		// Init the Services
 		((MongoDbInfoService) this.infoService).init(vertx, container, rm, securedActions);
@@ -263,25 +257,5 @@ public class ActualitesController extends BaseController {
 	@SecuredAction(value = "thread.comment", type = ActionType.RESOURCE)
 	public void comment(final HttpServerRequest request) {
 		infoHelper.comment(request);
-	}
-	
-	protected void loadGroupedActions(Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions) {
-		for(Entry<String, fr.wseduc.webutils.security.SecuredAction> entry : securedActions.entrySet()) {
-			// Only RESOURCE actions
-			if (! entry.getValue().getType().equals(ActionType.RESOURCE)) {
-				continue;
-			}
-			
-			String groupName = entry.getValue().getDisplayName();
-			List<String> actions;
-			if (! groupedActions.containsKey(groupName)){
-				actions = new ArrayList<String>();
-				groupedActions.put(groupName, actions);
-			}
-			else {
-				actions = groupedActions.get(groupName);
-			}
-			actions.add(entry.getValue().getName());
-		}
 	}
 }
