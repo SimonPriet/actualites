@@ -62,4 +62,15 @@ public class BaseExtractorHelper extends BaseController {
 			Renders.badRequest(request, ire.getMessage());
 		}
 	}
+	
+	protected void renderErrorException(final HttpServerRequest request, final Exception e) {
+		log.error(e.getMessage(), e);
+		
+		JsonObject error = new JsonObject();
+		error.putString("class", e.getClass().getName());
+		if (e.getMessage() != null) {
+			error.putString("message", e.getMessage());
+		}
+		Renders.renderError(request, error);
+	}
 }

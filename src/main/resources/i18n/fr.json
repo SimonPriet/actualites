@@ -12,7 +12,9 @@
 
 	"actualites.info.label.author": "Par",
 	"actualites.info.label.publication": ", le",
-	"actualites.info.label.comments.none": "Aucun commentaire",
+	"actualites.info.label.initialDate": ", du",
+	"actualites.info.label.expiration": "au",
+	"actualites.info.label.comments.none": "Afficher les commentaires (aucun commentaire)",
 	"actualites.info.label.comments.many": "Afficher les commentaires",
 	"actualites.info.label.comments.close": "Masquer les commentaires",
 	"actualites.info.label.comments.submit": "Commenter",
@@ -47,8 +49,8 @@
 	"actualites.edition.infos.unpublish": "Dépublier",
 	"actualites.edition.infos.delete": "Supprimer",
 	"actualites.edition.infos.cancel": "Annuler",
-	"actualites.edition.status.0": "Brouillon",
-	"actualites.edition.status.1": "Envoyée pour validation",
+	"actualites.edition.status.0": "(Brouillon)",
+	"actualites.edition.status.1": "(A publier)",
 	"actualites.edition.status.2": "Publiée",
 	"actualites.edition.status.3": "Supprimée",
 	"actualites.edition.infos.loading.submit": "Demande de validation en cours ...",
@@ -57,5 +59,18 @@
 	"actualites.edition.infos.loading.unpublish": "Dépublication en cours ...",
 	"workspace.read": "Voir les actualités",
 	"workspace.contrib": "Contribuer au fil",
-	"workspace.comment": "Commenter les actualités"
+	"workspace.comment": "Commenter les actualités",
+
+	"group.Teacher" : "Tous les enseignants du groupe {0}.",
+	"group.Personnel" : "Tous les personnels du groupe {0}.",
+	"group.Student" : "Tous les élèves du groupe {0}.",
+	"group.Relative" : "Tous les parents du groupe {0}.",
+	"group.school.Teacher" : "Tous les enseignants de l'{0}.",
+	"group.school.Personnel" : "Tous les personnels de l'{0}.",
+	"group.school.Student" : "Tous les élèves de l'{0}.",
+	"group.school.Relative" : "Tous les parents de l'{0}.",
+	"group.class.Teacher" : "Tous les enseignants de la classe {0}.",
+	"group.class.Personnel" : "Tous les personnels de la classe {0}.",
+	"group.class.Student" : "Tous les élèves de la classe {0}.",
+	"group.class.Relative" : "Tous les parents de la classe {0}."
 }

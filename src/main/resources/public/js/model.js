@@ -3,33 +3,31 @@ var ACTUALITES_CONFIGURATION = {
 	applicationName: 'actualites',
 	infosCollectionName: 'infos',
 	threadsCollectionName: 'threads',
-	threadTypes: {
-		latest: 0,
-		mine: 1,
-		trash: 2,
-		pending: 3
-	},
-	threadFolders: {
-		DRAFT: 'drafts',
-		PENDING: 'pending',
-		PUBLISHED: 'published',
-		TRASH: 'trash'
-	},
-	threadFilters: {
-		main: ['published'],
-		edition: ['drafts', 'pending', 'published'],
-		pending: ['pending'],
-		drafts: ['drafts'],
-		trash: ['trash']
-	},
 	infoStatus: {
 		DRAFT: 1,
 		PENDING: 2,
 		PUBLISHED: 3,
 		TRASH: 0
 	},
-	permissions: {
-		contributor: 'org-entcore-workspace-service-WorkspaceService|updateDocument'
+	threadMode: {
+		SUBMIT: 0,
+		DIRECT: 1
+	},
+	threadStatus: {
+		DRAFT: 'draft',
+		PENDING: 'pending',
+		PUBLISHED: 'published',
+		TRASH: 'trash'
+	},
+	threadFilters: {
+		main: ['published'],
+		edition: ['draft', 'pending', 'published'],
+		pending: ['pending'],
+		drafts: ['draft'],
+		trash: ['trash']
+	},
+	threadTypes: {
+		latest: 0
 	},
 	momentFormat: "YYYY-MM-DD HH:mm.ss.SSS"
 };
@@ -45,15 +43,14 @@ function Info(){
 	// content
 }
 
-Info.prototype.load = function(data){
-	var resourceUrl = '/workspace/document/' + this._id;
+Info.prototype.load = function(thread, data){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id;
 	if (data !== undefined) {
-		resourceUrl = '/workspace/document/' + data._id;
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + data._id;
 	}
 
 	http().get(resourceUrl).done(function(content){
 		this.updateData({
-			thread: content.thread,
 			title: content.title,
 			status: content.status,
 			publicationDate: content.publicationDate,
@@ -63,9 +60,12 @@ Info.prototype.load = function(data){
 			content: content.content,
 			loaded: true,
 			action: undefined,
+			comments: content.comments,
 			modified: content.modified || this.modified,
-			owner: content.owner || this.owner,
-			ownerName: content.ownerName || this.ownerName,
+			owner: {
+				userId: content.owner.userId,
+				displayName: content.owner.displayName
+			},
 			_id: content._id || this._id
 		});
 	}.bind(this))
@@ -73,252 +73,101 @@ Info.prototype.load = function(data){
 
 Info.prototype.create = function(thread, data){
 
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info';
+
 	if (data !== undefined) {
 		this.updateData(data);
 	}
 
 	var info = {
-		thread: thread._id,
 		title: this.title,
-		status: this.status,
+		status: ACTUALITES_CONFIGURATION.infoStatus.DRAFT,
 		publicationDate: this.publicationDate,
 		expirationDate: this.expirationDate,
 		content: this.content
 	};
-	var blob = new Blob([JSON.stringify(info)], { type: 'application/json'});
-	var form = new FormData();
-	form.append('blob', blob, info.title + '.json');
-	http().postFile('/workspace/document?application=' + this.getApplicationInfosCollectionTag(), form).done(function(e){
-		http().put('/workspace/documents/move/' + e._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-			this.shareToThread(thread).done(function(){
-				thread.infos.sync();
-			});
-		}.bind(this));
+	http().postJson(resourceUrl, info).done(function(e){
+		thread.infos.sync();
 	}.bind(this));
 }
 
 Info.prototype.save = function(thread){
 
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/' + ActualitesService.statusNameFromId(this.status);
+
 	var info = {
-		_id: this._id,
-		modified: moment().format(ACTUALITES_CONFIGURATION.momentFormat),
-		owner: this.owner,
-		ownerName: this.ownerName,
-		thread: this.thread,
 		title: this.title,
-		status: this.status,
 		publicationDate: this.publicationDate,
 		expirationDate: this.expirationDate,
 		content: this.content
 	};
-	var blob = new Blob([JSON.stringify(info)], { type: 'application/json'});
-	var form = new FormData();
-	form.append('blob', blob, info.title + '.json');
-	http().putFile('/workspace/document/' + this._id, form);
-
-	// Permissions
-	this.shareToThread(thread).done(function(){
-		thread.infos.sync();
-	});
+	http().putJson(resourceUrl, info).done(function(e){
+		this.load(thread);
+	}.bind(this));
 }
 
-Info.prototype.comment = function(commentText){
-	// Post comment
-	return http().post('/workspace/document/' + this._id + '/comment', 'comment=' + commentText);
-}
-
-Info.prototype.remove = function(thread){
-	if(thread.type === ACTUALITES_CONFIGURATION.threadTypes.trash){
-		http().delete('/workspace/document/' + this._id);
-	}
-	else{
-		http().put('/workspace/document/trash/' + this._id);
-	}
-}
-
-Info.prototype.delete = function(thread){
-	http().delete('/workspace/document/' + this._id);
-}
 
 Info.prototype.submit = function(thread){
-	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/submit';	
 	var info = this;
-	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.PENDING + '-' + thread._id).done(function(){
-		info.save(thread);
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
 	}.bind(this));
 }
 
 Info.prototype.unsubmit = function(thread){
-	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/unsubmit';	
 	var info = this;
-	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-		info.save(thread);
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
 	}.bind(this));
 }
 
 Info.prototype.publish = function(thread){
-	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/publish';	
 	var info = this;
-	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.PUBLISHED + '-' + thread._id).done(function(){
-		info.save(thread);
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
 	}.bind(this));
 }
 
 Info.prototype.unpublish = function(thread){
-	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/unpublish';	
 	var info = this;
-	http().put('/workspace/documents/move/' + info._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.DRAFT + '-' + thread._id).done(function(){
-		info.save(thread);
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
 	}.bind(this));
 }
 
-Info.prototype.shareToThreadContributors = function(thread){
-	var deferred = $.Deferred();
 
-	if (! this.isShareable()) {
-		return deferred.resolve().promise();
-	}
-
+Info.prototype.trash = function(thread){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/trash';	
 	var info = this;
-	var permissions = model.workspaceService.getContributorsForResource(thread);
-	model.workspaceService.getFullPermissionsForActorsForResource(permissions, this).done(function(){
-		info.updatePermissions(permissions).done(function(){
-			deferred.resolve();
-		});
-	});
-
-	return deferred.promise();
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
+	}.bind(this));
 }
 
-Info.prototype.shareToThread = function(thread){
-	var deferred = $.Deferred();
-
-	if (! this.isShareable()) {
-		return deferred.resolve().promise();
-	}
-
+Info.prototype.restore = function(thread){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/restore';	
 	var info = this;
-	var permissions = model.workspaceService.getManagersForResource(thread);
-	model.workspaceService.getFullPermissionsForActorsForResource(permissions, this).done(function(){
-		if (thread.hasPermissions()){
-			permissions = _.union(permissions, thread.shared);
-		}
-		info.updatePermissions(permissions).done(function(){
-			deferred.resolve();
-		});
-	});
-
-	return deferred.promise();
+	http().put(resourceUrl).done(function(){
+		info.load(thread);
+	}.bind(this));
 }
 
-Info.prototype.hasPermissions = function(){
-	if (this.shared === undefined || this.shared.length === 0) {
-		return false;
-	}
-	return true;
+Info.prototype.delete = function(thread){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id;
+	http().delete(resourceUrl);
 }
 
-Info.prototype.isShareable = function(){
-	return this.owner === model.me.userId;
-}
 
-Info.prototype.clearPermissions = function(){
-	var deferred = $.Deferred();
-
-	if ((! this.isShareable()) || (! this.hasPermissions())) {
-		return deferred.resolve().promise();
-	}
-
-	// Remove all permissions
-	var count = this.shared.length;
-	var that = this;
-	_.each(this.shared, function(permission){
-		var data = undefined;
-        if(permission.userId !== undefined) {
-        	data = { userId: permission.userId };
-        }
-        else if (permission.groupId !== undefined) {
-        	data = { groupId: permission.groupId };
-        }
-
-        if (data !== undefined) {
-        	http().put('/workspace/share/remove/' + that._id, http().serialize(data)).done(function(){
-        		count--;
-	        	if (count <= 0) {
-	        		deferred.resolve();
-	        	}	
-        	});
-        }
-    });
-
-    return deferred.promise();
-}
-
-Info.prototype.addPermissions = function(permissions){
-	var deferred = $.Deferred();
-
-	if ((! this.isShareable()) || permissions === undefined || permissions.length === 0) {
-		return deferred.resolve().promise();
-	}
-
-	// Add all permissions
-	var count = permissions.length;
-	var that = this;
-	_.each(permissions, function(permission){
-		// Prepare data
-		var data = {};
-		data.actions = [];
-		_.each(permission, function(value, key){
-			if (key === 'userId') {
-				data.userId = value;
-			}
-			else if (key === 'groupId') {
-				data.groupId = value;
-			}
-			else {
-				data.actions.push(key);
-			}
-		});
-
-		// User cannot share with self
-		if (data.userId === model.me.userId) {
-			count--;
-			if (count <= 0) {
-        		deferred.resolve();
-        	}	
-		}
-		else {
-			http().put('/workspace/share/json/' + that._id, http().serialize(data)).done(function(){
-				count--;
-	        	if (count <= 0) {
-	        		deferred.resolve();
-	        	}	
-			});
-		}
-	});
-
-	return deferred.promise();
-}
-
-Info.prototype.updatePermissions = function(permissions) {
-	var deferred = $.Deferred();
-
+Info.prototype.comment = function(thread, commentText){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/comment';
 	var info = this;
-	this.clearPermissions().done(function(){
-		info.addPermissions(permissions).done(function(){
-			deferred.resolve();
-		});
-	});
-
-	return deferred.promise();
-}
-
-Info.prototype.getApplicationInfosCollectionTag = function(){
-	return ACTUALITES_CONFIGURATION.applicationName + '-' + ACTUALITES_CONFIGURATION.infosCollectionName;
+	http().postJson(resourceUrl, commentText).done(function(){
+		info.load(thread);
+	}.bind(this));
 }
 
 
@@ -328,7 +177,7 @@ function Thread(){
 	// type (optionnal, for static threads)
 	// title
 	// icon
-	// color
+	// mode
 	// order
 	// published
 }
@@ -349,8 +198,8 @@ Thread.prototype.load = function(data){
 		this.updateData({
 			title: content.title,
 			icon: content.icon,
-			color: content.color,
 			order: content.order,
+			mode: content.mode,
 			loaded: true,
 			modified: content.modified || this.modified,
 			owner: content.owner || this.owner,
@@ -365,24 +214,17 @@ Thread.prototype.load = function(data){
 Thread.prototype.save = function(){
 
 	var that = this;
-	var thread = {
-		_id: this._id,
-		modified: moment().format(ACTUALITES_CONFIGURATION.momentFormat),
-		owner: this.owner,
-		ownerName: this.ownerName,
+	var data = {
 		title: this.title,
 		icon: this.icon,
-		color: this.color
+		order: this.order,
+		mode : this.mode !== undefined ? this.mode : ACTUALITES_CONFIGURATION.threadMode.SUBMIT
 	};
-	var blob = new Blob([JSON.stringify(thread)], { type: 'application/json'});
-	http().putJson('/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id, thread).done(function(e){
-		that.trigger('change');
-	});
 
-	// Permissions
-	//this.shareToThread(thread).done(function(){
-	//	thread.infos.sync();
-	//});
+	http().putJson('/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id, data).done(function(e){
+		that.trigger('change');
+		model.threads.sync();
+	});
 }
 
 Thread.prototype.create = function(data){
@@ -394,84 +236,67 @@ Thread.prototype.create = function(data){
 
 	var thread = {
 		title: this.title,
-	};
-	/*
 		icon: this.icon,
-		color: this.color
-	};*/
+		order: this.order,
+		mode : this.mode !== undefined ? this.mode : ACTUALITES_CONFIGURATION.threadMode.SUBMIT
+	};
+	
 	var blob = new Blob([JSON.stringify(thread)], { type: 'application/json'});
 	http().postJson('/' + ACTUALITES_CONFIGURATION.applicationName + '/threads', thread).done(function(e){
 		that.trigger('change');
+		model.threads.sync();
 	}.bind(this));
 }
 
-Thread.prototype.loadInfos = function(filters){
-	var thread = this;
-
-	// Resources depending on Thread type and filters
-	var resourceUrls = [];
+Thread.prototype.loadPublicInfos = function(){
+	var resourceUrl;
 	if (this.type === ACTUALITES_CONFIGURATION.threadTypes.latest) {
-		resourceUrls.push('/workspace/documents' + '?application=' + this.getApplicationInfosCollectionTag());
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/infos/public/ALL';
 	}
 	else {
-		_.each(filters, function(filter){
-			resourceUrls.push('/workspace/documents/' + filter + '-' + thread._id + '?application=' + thread.getApplicationInfosCollectionTag());
-		});
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/infos/thread/' + this._id + '/public/ALL';
 	}
+
+	this.loadInfosInternal(resourceUrl);
+}
+
+Thread.prototype.loadAllInfos = function(statusFilter){
+	var resourceUrl;
+	if (statusFilter === undefined) {
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/ALL';
+	}
+	else {
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/' + statusFilter + '/ALL';
+	}
+
+	this.loadInfosInternal(resourceUrl);
+}
+
+
+Thread.prototype.loadInfosInternal = function(resourceUrl){
+	var that = this;
 
 	// Bind infos collection
 	this.collection(Info, {
-		behaviours: 'workspace',
+		behaviours: ACTUALITES_CONFIGURATION.applicationName,
 		sync: function(){
 			var collection = this;
-			var iterations = resourceUrls.length;
 			this.all = [];
-			_.each(resourceUrls, function(resourceUrl){
-				http().get(resourceUrl).done(function(data){
-					collection.addRange(_.filter(data, function(doc){
-						// Select Json objects
-						var ok = doc.metadata['content-type'] === 'application/json';
-
-						// Filter on folders
-						if (filters !== undefined && _.isString(doc.folder)) {
-							return (ok && (_.indexOf(filters, doc.folder.split('-')[0]) !== -1));
-						}
-						return ok;
-					}));
-					iterations--;
-					if (iterations <= 0){
-						collection.trigger('sync');
-					}
-				})
-			});
-		},
-		remove: function(){
-			var collection = this;
-			this.selection().forEach(function(info){
-				if(_.isString(info.folder) && (info.folder.split('-')[0] === ACTUALITES_CONFIGURATION.threadFolders.TRASH)) {
-					http().delete('/workspace/document/' + info._id).done(function(){
-						collection.sync();
+			http().get(resourceUrl).done(function(data){
+				// Prepare data
+				_.each(data, function(thread){
+					_.each(thread.infos, function(info){
+						info.thread = thread._id;
 					});
-				}
-				else{
-					http().put('/workspace/documents/move/' + e._id + '/' + ACTUALITES_CONFIGURATION.threadFolders.TRASH + '-' + thread._id).done(function(){
-						collection.sync();
-					});
-				}
+					collection.addRange(thread.infos);
+				});
+				collection.trigger('sync');
 			});
-			this.removeSelection();
 		}
 	});
 
 	// Trigger loading of infos
 	this.infos.sync();
-}
-
-Thread.prototype.hasPermissions = function(){
-	if (this.shared === undefined || this.shared.length === 0) {
-		return false;
-	}
-	return true;
 }
 
 Thread.prototype.hasPublishedInfo = function(info){
@@ -485,61 +310,6 @@ Thread.prototype.pushPublishedInfo = function(info){
 	else {
 		this.published[info._id] = moment().format();
 	}
-}
-
-Thread.prototype.getApplicationInfosCollectionTag = function(){
-	return ACTUALITES_CONFIGURATION.applicationName + '-' + ACTUALITES_CONFIGURATION.infosCollectionName;
-}
-
-
-/* Workspace Service */
-WorkspaceService = function(){	
-}
-
-WorkspaceService.prototype.getFullPermissionsForActorsForResource = function(permissions, resource){
-	var deferred = $.Deferred();
-
-	http().get('/workspace/share/json/' + resource._id).done(function(data){
-		_.each(data.actions, function(action){
-			_.each(action.name, function(name){
-				_.each(permissions, function(permission){
-					if (permission[name] === undefined) {
-						permission[name] = true;
-					}
-				});
-			});
-		});
-		deferred.resolve();
-	});
-	return deferred.promise();
-}
-
-WorkspaceService.prototype.getManagersForResource = function(resource){
-	return ([{userId: resource.owner}]);
-}
-
-WorkspaceService.prototype.isManagersForResource = function(actor, resource){
-	return (actor === resource.owner);
-}
-
-WorkspaceService.prototype.getContributorsForResource = function(resource){
-	var actors = [{userId: resource.owner}];
-
-	if (resource.shared === undefined) {
-		return actors;
-	}
-
-	_.each(resource.shared, function(share){
-		if (share[ACTUALITES_CONFIGURATION.permissions.contributor] === true) {
-			if (share['userId'] !== undefined) {
-				actors.push({userId: share['userId']});
-			}
-			else if (share['groupId'] !== undefined) {
-				actors.push({groupId: share['groupId']});
-			}
-		}
-	});
-	return actors;
 }
 
 
@@ -559,8 +329,31 @@ ActualitesService.prototype.loadThreadsCollection = function(model) {
 			http().get(resourceUrl).done(function(data){
 				collection.addRange(data);
 				collection.trigger('sync');
-			})
+			});
 		}
+	});
+}
+
+ActualitesService.prototype.statusNameFromId = function(statusId) {
+	if (statusId === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
+		return ACTUALITES_CONFIGURATION.threadStatus.DRAFT;
+	}
+	else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PENDING) {
+		return ACTUALITES_CONFIGURATION.threadStatus.PENDING;
+	}
+	else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED) {
+		return ACTUALITES_CONFIGURATION.threadStatus.PUBLISHED;
+	}
+	else {
+		return undefined;
+	}
+}
+
+ActualitesService.prototype.loadLatestThread = function(model) {
+	model.latestThread = new Thread();
+	model.latestThread.build({
+		type: ACTUALITES_CONFIGURATION.threadTypes.latest,
+		title: ACTUALITES_CONFIGURATION.threadTypes.latest
 	});
 }
 
@@ -570,18 +363,7 @@ model.build = function(){
 
 	model.me.workflow.load([ACTUALITES_CONFIGURATION.applicationName]);
 	this.makeModels([Info, Thread]);
-	// this.makePermanent(Thread);
-	// Info is not using the Permanent System
 
 	this.actualitesService = new ActualitesService();
-	this.workspaceService = new WorkspaceService();
-
 	this.actualitesService.loadThreadsCollection(this);
-	/*
-	this.latestThread = new Thread();
-	this.latestThread.build({
-		type: ACTUALITES_CONFIGURATION.threadTypes.latest,
-		title: ACTUALITES_CONFIGURATION.threadTypes.latest
-	});
-	*/
 };

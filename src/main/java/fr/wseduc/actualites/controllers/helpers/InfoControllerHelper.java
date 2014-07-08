@@ -6,6 +6,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 import org.entcore.common.service.VisibilityFilter;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.actualites.model.BaseResource;
 import fr.wseduc.actualites.model.InfoResource;
@@ -30,7 +31,7 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		this.infoService = infoService;
 	}
 	
-	public void listInfos(final HttpServerRequest request) {
+	public void listPublicInfos(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
 		thread.requireUser();
 		
@@ -38,22 +39,32 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.list(thread, arrayResponseHandler(request));
+				try {
+					infoService.listPublic(thread, arrayResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
 	
-	public void listInfosByStatus(final HttpServerRequest request) {
+	public void listThreadPublicInfos(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
 		thread.requireUser();
-		thread.requireStateFilter();
+		thread.requireThreadId();
 		
+		extractThreadId(request, thread);
 		extractVisibiltyFilter(request, thread);
-		extractStateFilter(request, thread);
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.list(thread, arrayResponseHandler(request));
+				try {
+					infoService.listPublic(thread, arrayResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -68,7 +79,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.list(thread, arrayResponseHandler(request));
+				try {
+					infoService.list(thread, arrayResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -85,7 +101,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.list(thread, arrayResponseHandler(request));
+				try {
+					infoService.list(thread, arrayResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -100,7 +121,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.create(info, notEmptyResponseHandler(request));
+				try {
+					infoService.create(info, notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -117,7 +143,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.update(info, notEmptyResponseHandler(request));
+				try {
+					infoService.update(info, notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -133,7 +164,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.delete(info, notEmptyResponseHandler(request));
+				try {
+					infoService.delete(info, notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}
@@ -150,7 +186,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
-				infoService.addComment(info, notEmptyResponseHandler(request));
+				try {
+					infoService.addComment(info, notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
 			}
 		});
 	}

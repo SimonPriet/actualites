@@ -13,7 +13,6 @@ import fr.wseduc.webutils.http.Renders;
 
 public class StateControllerHelper extends BaseExtractorHelper {
 	
-	private final String THREAD_ID_PARAMETER = "id";
 	private final String INFO_ID_PARAMETER = "infoid";
 	
 	protected final InfoService infoService;
@@ -30,7 +29,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.PENDING, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.PENDING, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void unsubmit(final HttpServerRequest request) {
@@ -41,7 +45,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void publish(final HttpServerRequest request) {
@@ -52,7 +61,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.PUBLISHED, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.PUBLISHED, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void unpublish(final HttpServerRequest request) {
@@ -63,7 +77,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void trash(final HttpServerRequest request) {
@@ -74,7 +93,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.TRASH, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.TRASH, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void restore(final HttpServerRequest request) {
@@ -85,7 +109,12 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		
-		infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		try {
+			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	protected void extractInfoId(final HttpServerRequest request, final InfoResource info) {

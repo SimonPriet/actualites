@@ -51,9 +51,10 @@ public abstract class AbstractRequestModel implements BaseResource {
 	
 	@Override
 	public void setBody(JsonObject body) throws InvalidRequestException {
-		if (requireBody && body == null) {
+		if (requireBody && (body == null)) {
 			throw new InvalidRequestException("Invalid Request : Request body is null");
 		}
+		this.body = body;
 	}
 	
 	

@@ -3,28 +3,27 @@ function ActualitesAbstractController($scope, template, route){
 
     this.initialize = this.initialize || function(){
         // to be overriden
-    }
+    };
 
     // Thread display
     $scope.hasCurrentThread = function(){
         return ($scope.currentThread instanceof Thread);
-    }
+    };
 
     // Info display
     $scope.isInfoPublished = function(info) {
         return info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-    }
+    };
 
     $scope.isInfoVisible = function(info) {
-        var visibility = true;
         if (info.hasPublicationDate) {
-            visibility = (moment().unix() > moment(info.publicationDate).unix());
+            return (moment().unix() > moment(info.publicationDate).unix());
         }
         if (info.hasExpirationDate) {
-            visibility = (moment().unix() < moment(info.expirationDate).unix());
+            return (moment().unix() < moment(info.expirationDate).unix());
         }
-        return (visibility && $scope.isInfoPublished(info));
-    }
+        return $scope.isInfoPublished(info);
+    };
 
     $scope.formatDate = function(date){
         var momentDate = moment(date);
@@ -41,8 +40,8 @@ function ActualitesAbstractController($scope, template, route){
         return (info.comments !== undefined && info.comments.length > 0);
     };
 
-    $scope.getInfoCommentsStatus = function(info){
-        if ($scope.currentInfo === info) {
+    $scope.getInfoCommentsStatus = function(info, showComments){
+        if (showComments) {
             return 'close';
         }
         if ($scope.hasInfoComments(info)) {
@@ -51,22 +50,18 @@ function ActualitesAbstractController($scope, template, route){
         return 'none';
     };
 
-    $scope.switchInfoComments = function(info){
-        template.close('comments');
-        $scope.newComment = {};
-
-        if ($scope.currentInfo !== info){
-            // Show
-            $scope.currentInfo = info;
-            template.open('comments', 'info-comments');
-        }
-        else {
-            // Hide
-            $scope.currentInfo = {};
-        }
-    };
-
     $scope.hasCurrentInfo = function(){
         return ($scope.currentInfo instanceof Info);
     };
+
+	$scope.loadNextThreads = function(){
+		_.first(model.threads.mixed.rest($scope.loadedThreadsNumber), $scope.loadThreadsIncrement).forEach(function(thread){
+			thread.open();
+			thread.on('change', function(){
+				$scope.$apply('threads');
+			})
+		});
+
+		$scope.loadedThreadsNumber += $scope.loadThreadsIncrement;
+	};
 }

@@ -7,6 +7,7 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 
 	private final String ID_FIELD = "_id";
 	private final String STATE_FIELD = "status";
+	private final String COMMENTS_FIELD = "comments";
 	
 	private String infoId;
 	
@@ -37,7 +38,7 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 	
 	@Override
 	public boolean isProtectedField(final String field) {
-		return (ID_FIELD.equals(field) || STATE_FIELD.equals(field));
+		return (ID_FIELD.equals(field) || STATE_FIELD.equals(field) || COMMENTS_FIELD.equals(field));
 	}
 	
 	@Override
@@ -47,6 +48,9 @@ public class InfoRequestModel extends AbstractRequestModel implements InfoResour
 		}
 		if (getBody().containsField(STATE_FIELD)) {
 			getBody().removeField(STATE_FIELD);
+		}
+		if (getBody().containsField(COMMENTS_FIELD)) {
+			getBody().removeField(COMMENTS_FIELD);
 		}
 	}
 

@@ -18,6 +18,7 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.VoidHandler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
@@ -84,12 +85,13 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 			badRequest(request);
 			return;
 		}
-		RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+		request.expectMultiPart(true);
+		request.endHandler(new VoidHandler() {
 			@Override
-			public void handle(JsonObject object) {
-				final JsonArray a = object.getArray("actions");
-				final String groupId = object.getString("groupId");
-				final String userId = object.getString("userId");
+			protected void handle() {
+				final List<String> a = request.formAttributes().getAll("actions");
+				final String groupId = request.formAttributes().get("groupId");
+				final String userId = request.formAttributes().get("userId");
 				if (a == null || a.size() == 0) {
 					badRequest(request);
 					return;
@@ -145,13 +147,13 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 			badRequest(request);
 			return;
 		}
-
-		RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+		request.expectMultiPart(true);
+		request.endHandler(new VoidHandler() {
 			@Override
-			public void handle(JsonObject object) {
-				final JsonArray a = object.getArray("actions");
-				final String groupId = object.getString("groupId");
-				final String userId = object.getString("userId");
+			protected void handle() {
+				final List<String> a = request.formAttributes().getAll("actions");
+				final String groupId = request.formAttributes().get("groupId");
+				final String userId = request.formAttributes().get("userId");
 				if (a == null || a.size() == 0) {
 					badRequest(request);
 					return;

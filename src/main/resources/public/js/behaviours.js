@@ -3,11 +3,17 @@ var actualitesBehaviours = {
 		view: {
 			right: 'fr.wseduc.actualites.controllers.ActualitesController|getThread'
 		},
-		open: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|getThreadActualites'
-		},
-		contribute: {
+		contrib: {
 			right: 'fr.wseduc.actualites.controllers.ActualitesController|createDraft'
+		},
+		updateDraft: {
+			right: 'fr.wseduc.actualites.controllers.ActualitesController|updateDraft'
+		},
+		updatePending: {
+			right: 'fr.wseduc.actualites.controllers.ActualitesController|updatePending'
+		},
+		updatePublished: {
+			right: 'fr.wseduc.actualites.controllers.ActualitesController|updatePublished'
 		},
 		submit: {
 			right: 'fr.wseduc.actualites.controllers.ActualitesController|submit'
@@ -54,13 +60,7 @@ Behaviours.register('actualites', {
 		}
 
 		for(var behaviour in actualitesBehaviours.resources){
-			// debug
-			console.log('behaviour: ' + behaviour);
-			// /debug
 			if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId){
-				// debug
-				console.log('accepted: ' + behaviour);
-				// /debug
 				if(resource.myRights[behaviour] !== undefined){
 					resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
 				}

@@ -24,7 +24,7 @@
 	<div ng-if="currentThread._id">
 		<behaviour name="share" resource="currentThread">
 			<lightbox show="display.showPanel" on-close="currentThread = {}; display.showPanel = false;">
-				<share-panel app-prefix="actualites" resources="currentThread">
+				<share-panel app-prefix="'actualites'" resources="currentThread">
 				</share-panel>
 			</lightbox>
 		</behaviour>

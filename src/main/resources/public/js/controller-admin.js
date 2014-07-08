@@ -17,14 +17,11 @@ function ActualitesAdminController($injector, $scope, template, route){
 
         // Default display
         model.threads.on('sync', function(){
-            $scope.threads.forEach(function(thread){
-                thread.load();
-                thread.on('change', function(){
-                    $scope.$apply("threads");
-                });
-            });
+            $scope.$apply("threads");
             $scope.showThreads();
         });
+
+        // $scope.$apply("threads");
     }
 
     $scope.showThreads = function(){

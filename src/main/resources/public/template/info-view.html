@@ -1,0 +1,66 @@
+<div class="row">
+	<h1 class="cell upper-title"><span translate content="actualites.edition.status.[[info.status]]" ng-if="info.status < 2" class="warning-text">&nbsp;</span>[[info.title]]</h1>
+</div>
+<div class="row" ng-if="info.expirationDate">
+	<label class="cell" translate content="actualites.info.label.author"></label>
+	<a ng-href="/userbook/annuaire#[[info.owner]]"><span class="cell info-metadata">&nbsp;[[info.ownerName]]</span></a>
+	<label class="cell" translate content="actualites.info.label.initialDate"></label>
+	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]&nbsp;</span>
+	<label class="cell" translate content="actualites.info.label.expiration"></label>
+	<span class="cell info-metadata">&nbsp;[[formatDate(info.expirationDate)]]</span>
+</div>
+
+<div class="row" ng-if="!info.expirationDate">
+	<label class="cell" translate content="actualites.info.label.author"></label>
+	<a ng-href="/userbook/annuaire#[[info.owner]]"><span class="cell info-metadata">&nbsp;[[info.ownerName]]</span></a>
+	<label class="cell" translate content="actualites.info.label.publication"></label>
+	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]</span>
+</div>
+
+<div class="row"></div>
+<div class="row vertical-spacing" bind-html="info.content">
+</div>
+<div class="row">
+	<div class="cell right-magnet" ng-if="info.loaded">
+		<!-- Actions -->
+		<behaviour name="submit" resource="info">
+			<button ng-click="submitInfo(info)" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
+		</behaviour>
+		<behaviour name="unsubmit" resource="info">
+			<button ng-click="unsubmitInfo(info)" ng-if="isInfoSubmited(info)" translate content="actualites.edition.infos.unsubmit"></button>
+		</behaviour>
+		<behaviour name="publish" resource="info">
+			<button ng-click="publishInfo(info)" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
+		</behaviour>
+		<behaviour name="unpublish" resource="info">
+			<button ng-click="unpublishInfo(info)" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
+		</behaviour>
+		<behaviour name="contrib" resource="info">
+			<button ng-click="createInfo(info)" ng-if="isInfoEditable(info)" translate content="actualites.edition.infos.edit"></button>
+		</behaviour>
+		<behaviour name="trash" resource="info">
+			<button ng-click="trashInfo(info)" ng-if="isInfoTrashable(info)" translate content="actualites.edition.infos.publish"></button>
+		</behaviour>
+		<behaviour name="restore" resource="info">
+			<button ng-click="restoreInfo(info)" ng-if="isInfoRestorable(info)" translate content="actualites.edition.infos.unpublish"></button>
+		</behaviour>
+		<behaviour name="delete" resource="info">
+			<button ng-click="deleteInfo(info)" ng-if="isInfoDeletable(info)" translate content="actualites.edition.infos.delete"></button>
+		</behaviour>
+	</div>
+
+	<!-- Loaders -->
+	<button ng-if="! info.loaded" translate content="actualites.edition.infos.loading.[[info.action]]" disabled class="right-magnet">
+		<i class="loading"></i>
+	</button>
+	<a class="cell" ng-click="showComments = !showComments">
+		<div class="cell" translate content="actualites.info.label.comments.[[getInfoCommentsStatus(info, showComments)]]"></div>
+		<div class="cell" ng-if="hasInfoComments(info) && !showComments">&nbsp;([[info.comments.length]])</div>
+	</a>
+</div>
+
+<div class="row"></div>
+<div class="row" ng-if="showComments">
+	<div class="cell twelve" ng-include="template.containers.comments"></div>
+</div>
+<div class="row"></div>

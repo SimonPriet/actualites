@@ -1,0 +1,28 @@
+<div class="row">
+	<label class="three cell">Titre</label>
+	<input ng-model="currentInfo.title" type="text" class="cell" />
+</div>
+
+<div class="row">
+	<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> Date de publication</label>
+	<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
+</div>
+
+
+<div class="row">
+	<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> Date d'expiration</label>
+	<date-picker ng-model="currentInfo.expirationDate" ng-change="showDate = true"></date-picker>
+</div>
+<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
+	<label class="cell">&nbsp;</label>
+</div>
+
+<div class="row">
+	<html-editor ng-model="currentInfo.content"></html-editor>
+</div>
+
+<div class="row">
+	<button ng-click="deleteInfo(currentInfo)" ng-if="currentInfo._id !=== undefined" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
+	<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
+	<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
+</div>

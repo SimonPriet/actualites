@@ -95,21 +95,21 @@ public class ActualitesController extends BaseController {
 	
 	@Get("/thread/:id")
 	@ApiDoc("Get Thread by id.")
-	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
 	public void getThread(final HttpServerRequest request) {
 		threadHelper.retrieveThread(request);
 	}
 
 	@Put("/thread/:id")
 	@ApiDoc("Update thread by id.")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void updateThread(final HttpServerRequest request) {
 		threadHelper.updateThread(request);
 	}
 	
 	@Delete("/thread/:id")
 	@ApiDoc("Delete thread by id.")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void deleteThread(final HttpServerRequest request) {
 		threadHelper.deleteThread(request);
 	}
@@ -117,56 +117,56 @@ public class ActualitesController extends BaseController {
 	
 	@Get("/share/json/:id")
 	@ApiDoc("Share thread by id.")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void shareThread(final HttpServerRequest request) {
 		threadHelper.shareThread(request);
 	}
 	
 	@Put("/share/json/:id")
 	@ApiDoc("Share thread by id.")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void shareThreadSubmit(final HttpServerRequest request) {
 		threadHelper.shareThreadSubmit(request);
 	}
 	
 	@Put("/share/remove/:id")
 	@ApiDoc("Remove Share by id.")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void shareThreadRemove(final HttpServerRequest request) {
 		threadHelper.shareThreadRemove(request);
 	}
 	
-	@Get("/infos")
+	@Get("/infos/public/:filter")
 	@ApiDoc("Get infos in thread by status and by thread id.")
 	@SecuredAction("actualites.view")
-	public void listInfos(final HttpServerRequest request) {
-		infoHelper.listInfos(request);
+	public void listPublicInfos(final HttpServerRequest request) {
+		infoHelper.listPublicInfos(request);
 	}
 	
-	@Get("/infos/:status")
+	@Get("/infos/thread/:id/public/:filter")
 	@ApiDoc("Get infos in thread by status and by thread id.")
 	@SecuredAction("actualites.view")
-	public void listInfosPublished(final HttpServerRequest request) {
-		infoHelper.listInfosByStatus(request);
+	public void listThreadPublicInfos(final HttpServerRequest request) {
+		infoHelper.listThreadPublicInfos(request);
 	}
 	
 	@Get("/thread/:id/:filter")
 	@ApiDoc("Get infos in thread by thread id.")
-	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void listThreadInfos(final HttpServerRequest request) {
 		infoHelper.listThreadInfos(request);
 	}
 	
 	@Get("/thread/:id/:status/:filter")
 	@ApiDoc("Get infos in thread by status and by thread id.")
-	@SecuredAction(value = "thread.view", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void listThreadInfosDraft(final HttpServerRequest request) {
 		infoHelper.listThreadInfosByStatus(request);
 	}
 	
 	@Post("/thread/:id/info")
 	@ApiDoc("Add a new Info")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void createDraft(final HttpServerRequest request) {
 		infoHelper.create(request);
 	}
@@ -174,7 +174,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/draft")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
 	@ResourceFilter("stateDraft")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void updateDraft(final HttpServerRequest request) {
 		infoHelper.update(request);
 	}
@@ -190,7 +190,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/published")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
 	@ResourceFilter("statePublished")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void updatePublished(final HttpServerRequest request) {
 		infoHelper.update(request);
 	}
@@ -198,7 +198,7 @@ public class ActualitesController extends BaseController {
 	@Delete("/thread/:id/info/:infoid")
 	@ApiDoc("Delete : Real delete an Info in thread by thread and by id")
 	@ResourceFilter("stateDraft")
-	@SecuredAction(value = "thread.manage", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void delete(final HttpServerRequest request) {
 		infoHelper.delete(request);
 	}
@@ -207,7 +207,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/submit")
 	@ApiDoc("Submit : Change an Info to Pending state in thread by thread and by id")
 	@ResourceFilter("stateDraft")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void submit(final HttpServerRequest request) {
 		stateHelper.submit(request);
 	}
@@ -215,7 +215,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/unsubmit")
 	@ApiDoc("Cancel Submit : Change an Info to Draft state in thread by thread and by id")
 	@ResourceFilter("statePending")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void unsubmit(final HttpServerRequest request) {
 		stateHelper.unsubmit(request);
 	}
@@ -239,7 +239,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/thrash")
 	@ApiDoc("Trash : Change an Info to Trash state in thread by thread and by id")
 	@ResourceFilter("trashMine")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void trash(final HttpServerRequest request) {
 		stateHelper.trash(request);
 	}
@@ -247,7 +247,7 @@ public class ActualitesController extends BaseController {
 	@Put("/thread/:id/info/:infoid/restore")
 	@ApiDoc("Cancel Trash : Change an Info to Draft state in thread by thread and by id")
 	@ResourceFilter("restoreMine")
-	@SecuredAction(value = "thread.contribute", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void restore(final HttpServerRequest request) {
 		stateHelper.restore(request);
 	}

@@ -3,7 +3,9 @@ package fr.wseduc.actualites.services.impl;
 import static org.entcore.common.mongodb.MongoDbResult.validActionResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -182,6 +184,30 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		});		
 	}
 	
+	@Override
+	public void listPublic(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
+		// Do the List request
+		doListRequest(thread, new Handler<Either<String, JsonArray>>(){
+			@Override
+			public void handle(Either<String, JsonArray> event) {
+				if (event.isRight()) {
+					// Post-process
+					try {
+						// State Filter
+						filterResultsPublic(event.right().getValue(), handler);
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonArray>("Malformed response"));
+					}
+				}
+				else {
+					// No filtering needed OR Either is Left
+					handler.handle(event);
+				}
+			}	
+		});
+	}
+	
 	protected void doListRequest(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
 		// Start with Thread if present
 		QueryBuilder query;
@@ -286,6 +312,47 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		handler.handle(new Either.Right<String, JsonArray>(filteredResults));
 	}
 	
+	protected void filterResultsPublic(final JsonArray results, final Handler<Either<String, JsonArray>> handler) {
+		// TODO IMPLEMENT : filter the results for Security, for each Thread filter the Infos by State with the View States Map in the ThreadResource object
+		
+		final JsonArray filteredResults = new JsonArray();
+		final Date now = new Date();
+		
+		for (Object result : results.toList()) {
+			JsonObject threadResult = (JsonObject) result;
+			
+			if (! threadResult.containsField("infos")) {
+				// Empty Thread
+				filteredResults.add(threadResult);
+				continue;
+			}
+			
+			JsonArray filteredInfos = new JsonArray();
+			
+			for (Object infoObject : threadResult.getArray("infos").toList()) {
+				JsonObject info = (JsonObject) infoObject;
+				
+				// Filter the Info with the StatusFilter
+				try {
+					if (info.getInteger("status") == InfoState.PUBLISHED.getId()
+							&& (info.getString("publicationDate") == null || now.after(MongoDb.parseDate(info.getString("publicationDate"))))
+							&& (info.getString("expirationDate") == null || now.before(MongoDb.parseDate(info.getString("expirationDate"))))) {
+						filteredInfos.add(info);
+					}
+				}
+				catch (ParseException pe) {
+					// log.error("Wrong Date format for publicationDate / expirationDate");
+				}
+			}
+			
+			// Add the filtered Thread object to the filtered results
+			threadResult.putArray("infos", filteredInfos);
+			filteredResults.add(threadResult);
+		}
+		
+		handler.handle(new Either.Right<String, JsonArray>(filteredResults));
+	}
+	
 
 	@Override
 	public void canDoByState(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final InfoState state, final Handler<Boolean> handler) {
@@ -319,6 +386,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		final QueryBuilder query = QueryBuilder.start();
 		prepareIsSharedQuery(query, user, threadId, sharedMethod);
 		
+		DBObject[] orsArray = new DBObject[statesAndModes.size()];
 		List<DBObject> ors = new ArrayList<DBObject>(statesAndModes.size());
 		for(Entry<InfoMode, InfoState> entry : statesAndModes.entrySet()) {
 			DBObject infoMatch = new BasicDBObject();
@@ -329,7 +397,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 					QueryBuilder.start("infos").elemMatch(infoMatch).get()
 					).get());
 		}
-		query.or((DBObject[]) ors.toArray());
+		query.or(ors.toArray(orsArray));
 		
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}

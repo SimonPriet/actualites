@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{#i18n}}actualites.title{{/i18n}}</title>
+	<title>{{#i18n}}actualites.title.edition{{/i18n}}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
@@ -12,11 +12,15 @@
 </head>
 <body ng-controller="ActualitesEditionController">
 <portal>
-
+	<h1>Modifier les actualités</h1>
 	<div class="cell four">
-		<h1>Actualités</h1>
-		<nav class="vertical stamps">
-			<div ng-include="template.containers.threadsList"></div>
+		<nav class="vertical">
+		    <ul>
+			 	<li ng-repeat="thread in threads.all">
+			    	<a ng-class="{selected: thread === currentThread}" ng-click="selectThread(thread)">[[thread.title]]</a>
+			  	</li>
+			</ul>
+			<a class="classic-link" href="/actualites">Voir les actualités</a>
 		</nav>
 	</div>
 
@@ -24,16 +28,15 @@
 	<div class="cell eight" ng-if="hasCurrentThread()">
 
 		<!-- Thread actions -->
-		<nav class="contextual-buttons">
-			<div class="row action-buttons">
-				<behaviour name="edit" resource="currentThread" class="cell">
-					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
-				</behaviour>
-				<behaviour name="share" resource="currentThread" class="cell">
-					<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
-				</behaviour>
-			</div>
-		</nav>
+		<div class="row">
+			<!--<behaviour name="contrib" resource="currentThread" class="cell">-->
+				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+			<!--</behaviour>-->
+			<behaviour name="share" resource="currentThread" class="right-magnet">
+				<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
+			</behaviour>
+		</div>
+		<hr class="solid"/>
 
 		<!-- Thread infos -->
 		<div id="actualites.container.threads" ng-include="template.containers.thread">

@@ -1,13 +1,7 @@
-<div class="row info-full">
+<article class="row reduce-block-six">
 	<div class="row">
 		<label class="three cell">Titre</label>
 		<input ng-model="currentInfo.title" type="text" class="cell" />
-
-		<div class="toggle right-magnet" ng-class="{ on: isInfoPublished(currentInfo), off: (! isInfoPublished(currentInfo)) }">
-			<button></button>
-			<span translate content="actualites.edition.status.[[currentInfo.status]]"></span>
-		</div>
-
 	</div>
 
 	<div class="row">
@@ -34,6 +28,7 @@
 
 		<button ng-click="deleteInfo(currentInfo)" ng-if="currentInfo._id !=== undefined" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
 		<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
-		<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
+		<button ng-click="cancelEditInfo();template.open('thread', 'infos-list');" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
 	</div>
-</div>
+	<div class="row"></div>
+</article>
