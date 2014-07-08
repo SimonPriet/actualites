@@ -1,26 +1,27 @@
 package fr.wseduc.actualites;
 
-import fr.wseduc.actualites.controllers.ActionFilter;
+import org.entcore.common.http.BaseServer;
+
 import fr.wseduc.actualites.controllers.ActualitesController;
-import fr.wseduc.webutils.Server;
-import fr.wseduc.webutils.request.filter.SecurityHandler;
+import fr.wseduc.actualites.filters.ActualitesFilter;
+import fr.wseduc.actualites.services.InfoService;
+import fr.wseduc.actualites.services.ThreadService;
+import fr.wseduc.actualites.services.impl.MongoDbInfoService;
+import fr.wseduc.actualites.services.impl.MongoDbThreadService;
 
-public class Actualites extends Server {
+public class Actualites extends BaseServer {
 
+	protected final String COLLECTION = "actualites.threads";
+	
 	@Override
 	public void start() {
+		
+		final InfoService infoService = new MongoDbInfoService(COLLECTION);
+		final ThreadService threadService = new MongoDbThreadService(COLLECTION);
+		
+		setResourceProvider(new ActualitesFilter(COLLECTION, infoService));
 		super.start();
-
-		ActualitesController controller = new ActualitesController(vertx, container, rm, securedActions);
-		controller.get("", "view");
-		controller.get("/edit", "viewEdit");
-		controller.get("/admin", "viewAdmin");
-		controller.get("", "publish");
-		controller.get("", "unpublish");
-
-		SecurityHandler.addFilter(
-				new ActionFilter(controller.securedUriBinding(), container.config(), vertx)
-		);
+		addController(new ActualitesController(COLLECTION, threadService, infoService));
 	}
 
 }

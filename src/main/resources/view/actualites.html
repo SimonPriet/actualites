@@ -6,13 +6,13 @@
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
-	<script src="/actualites/public/js/controller-edition.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
 	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
-<body ng-controller="ActualitesEditionController">
+<body ng-controller="ActualitesController">
 <portal>
 
+	<!-- Threads panel -->
 	<div class="cell four">
 		<h1>Actualités</h1>
 		<nav class="vertical stamps">
@@ -20,14 +20,16 @@
 		</nav>
 	</div>
 
-	<!-- Thread panel -->
-	<div class="cell eight" ng-if="hasCurrentThread()">
+	<!-- Infos panel -->
+	<div class="cell eight">
 
 		<!-- Thread actions -->
-		<nav class="contextual-buttons">
+		<nav class="contextual-buttons" ng-if="hasCurrentThread()">
 			<div class="row action-buttons">
-				<behaviour name="edit" resource="currentThread" class="cell">
+				<behaviour name="contrib" resource="currentThread" class="cell">
 					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+					<select ng-model="threadFilter" ng-options="tFilter.value as tFilter.label for tFilter in threadFilters" ng-change="refreshThread()">
+					</select>
 				</behaviour>
 				<behaviour name="share" resource="currentThread" class="cell">
 					<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
@@ -44,7 +46,7 @@
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
 			<lightbox show="display.showPanel" on-close="cancelShareThread(); display.showPanel = false;">
-				<share-panel resources="currentThread"></share-panel>
+				<share-panel app-prefix="'actualites'" resources="currentThread"></share-panel>
 			</lightbox>
 		</behaviour>
 	</div>

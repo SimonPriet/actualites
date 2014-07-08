@@ -1,34 +1,39 @@
 /* Admin Controller */
-function ActualitesAdminController($injector, $scope, template, route){
+function ActualitesAdminController($scope, template, route){
 
     this.initialize = function(){
+
+        $scope.appPrefix = 'actualites';
 
         // Dependencies
         $scope.template = template;
 
         // Threads
-        $scope.threads = model.threads.mixed;
+        $scope.threads = model.threads;
 
         // Variables
         $scope.currentThread = {};
         $scope.display = {showPanel: false};
 
         // Default display
-        model.threads.on('mixed.sync', function(){
-            $scope.threads.forEach(function(thread){
-                thread.open();
-                thread.on('change', function(){
-                    $scope.$apply("threads");
-                });
-            });
+        model.threads.on('sync', function(){
+            $scope.$apply("threads");
             $scope.showThreads();
         });
+
+        // $scope.$apply("threads");
     }
+
+    // Thread display
+    $scope.hasCurrentThread = function(){
+        return (($scope.currentThread instanceof Thread) && ($scope.currentThread.type !== ACTUALITES_CONFIGURATION.threadTypes.latest));
+    };
 
     $scope.showThreads = function(){
         template.open('threads', 'threads-view');
     }
 
+    // Thread edition
     $scope.createThread = function(thread){
         if (thread === undefined) {
             $scope.currentThread = new Thread();
@@ -65,47 +70,16 @@ function ActualitesAdminController($injector, $scope, template, route){
 		$scope.currentThread = thread;
 	}
 
-    $injector.invoke(ActualitesAbstractController, this, {
-        $scope: $scope,
-        template: template,
-        route: route
-    });
-
-    this.initialize();
-}
-/*
-module.directive('sharePanelPlus', function($compile){
-    return {
-        scope: {
-            resources: '=',
-            appPrefix: '='
-        },
-        restrict: 'E',
-        templateUrl: '/' + ACTUALITES_CONFIGURATION.applicationName + '/public/template/share-panel-plus.html',
-        link: function($scope, $element, $attributes){
-
+    // Util
+    $scope.formatDate = function(date){
+        var momentDate = moment(date);
+        if (momentDate.isValid()) {
+            return momentDate.lang('fr').format('dddd DD MMM YYYY');
         }
-    }
-});
-
-function ShareActualites($injector, $rootScope, $scope, ui, _, lang){
-
-    this.initialize = function(){
-        var actionsConfiguration = {};
-
-        http().get('/' + infraPrefix + '/public/json/sharing-rights.json').done(function(config){
-            actionsConfiguration = config;
-        });
-    }
-
-    $injector.invoke(Share, this, {
-        $rootScope: $rootScope,
-        $scope: $scope,
-        ui: ui,
-        _: _,
-        lang: lang
-    });
+        else {
+            return moment(date, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
+        }
+    };
 
     this.initialize();
 }
-*/
