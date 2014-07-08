@@ -46,9 +46,10 @@ Info.prototype.load = function(thread, data){
 	if (data !== undefined) {
 		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + data._id;
 	}
+	var that = this;
 
 	http().get(resourceUrl).done(function(content){
-		this.updateData({
+		that.updateData({
 			title: content.title,
 			status: content.status,
 			publicationDate: content.publicationDate,
@@ -66,6 +67,7 @@ Info.prototype.load = function(thread, data){
 			},
 			_id: content._id || this._id
 		});
+		that.trigger('change');
 	}.bind(this))
 }
 
@@ -86,7 +88,7 @@ Info.prototype.create = function(thread, data){
 	};
 	http().postJson(resourceUrl, info).done(function(e){
 		thread.infos.sync();
-	}.bind(this));
+	}.bind(thread));
 }
 
 Info.prototype.save = function(thread){
@@ -101,7 +103,7 @@ Info.prototype.save = function(thread){
 	};
 	http().putJson(resourceUrl, info).done(function(e){
 		this.load(thread);
-	}.bind(this));
+	});
 }
 
 
@@ -110,7 +112,7 @@ Info.prototype.submit = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 Info.prototype.unsubmit = function(thread){
@@ -118,7 +120,7 @@ Info.prototype.unsubmit = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 Info.prototype.publish = function(thread){
@@ -126,7 +128,7 @@ Info.prototype.publish = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 Info.prototype.unpublish = function(thread){
@@ -134,7 +136,7 @@ Info.prototype.unpublish = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 
@@ -143,7 +145,7 @@ Info.prototype.trash = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 Info.prototype.restore = function(thread){
@@ -151,12 +153,14 @@ Info.prototype.restore = function(thread){
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
-	}.bind(this));
+	});
 }
 
 Info.prototype.delete = function(thread){
 	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id;
-	http().delete(resourceUrl);
+	http().delete(resourceUrl).done(function(){
+		thread.infos.sync();
+	});
 }
 
 
@@ -261,10 +265,10 @@ Thread.prototype.loadPublicInfos = function(){
 Thread.prototype.loadAllInfos = function(statusFilter){
 	var resourceUrl;
 	if (statusFilter === undefined) {
-		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/ALL';
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/infos/ALL';
 	}
 	else {
-		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/' + statusFilter + '/ALL';
+		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id + '/infos/' + statusFilter + '/ALL';
 	}
 
 	this.loadInfosInternal(resourceUrl);
@@ -283,11 +287,13 @@ Thread.prototype.loadInfosInternal = function(resourceUrl){
 			http().get(resourceUrl).done(function(data){
 				// Prepare data
 				_.each(data, function(thread){
-					_.each(thread.infos, function(info){
-						info.thread = thread._id;
-						info.loaded = true;
-					});
-					collection.addRange(thread.infos);
+					if (thread.infos !== undefined) {
+						_.each(thread.infos, function(info){
+							info.thread = thread._id;
+							info.loaded = true;
+						});
+						collection.addRange(thread.infos);
+					}
 				});
 				collection.trigger('sync');
 			});

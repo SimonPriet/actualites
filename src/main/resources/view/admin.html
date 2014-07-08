@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>{{#i18n}}actualites.title.edition{{/i18n}}</title>
+	<title>{{#i18n}}actualites.title.admin{{/i18n}}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
-	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller-admin.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
 	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
@@ -14,7 +13,7 @@
 <admin-portal>
 	<div class="row">
 			<h1 translate content="actualites.threads.title.admin"></h1>
-			<a href="/actualites/edit" translate content="actualites.links.admin.edition" class="admin-edit-link"></a>
+			<a href="/actualites" translate content="actualites.links.admin.main" class="admin-edit-link"></a>
 	</div>
 
 	<div ng-include="template.containers.threads">

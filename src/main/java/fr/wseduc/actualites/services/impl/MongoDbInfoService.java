@@ -1,6 +1,7 @@
 package fr.wseduc.actualites.services.impl;
 
 import static org.entcore.common.mongodb.MongoDbResult.validActionResultHandler;
+import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
 import java.text.ParseException;
@@ -36,6 +37,7 @@ import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.mongodb.MongoQueryBuilder;
 import fr.wseduc.mongodb.MongoUpdateBuilder;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.Either.Right;
 import fr.wseduc.webutils.security.SecuredAction;
 
 public class MongoDbInfoService extends AbstractService implements InfoService {
@@ -75,8 +77,38 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 	@Override
 	public void retrieve(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
-		// Not implemented
-		handler.handle(new Either.Left<String, JsonObject>("Not implemented"));
+		// Prepare Query
+		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
+				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
+		
+		// Projection
+		JsonObject idMatch = new JsonObject();
+		idMatch.putString("_id", info.getInfoId());
+		JsonObject elemMatch = new JsonObject();
+		elemMatch.putObject("$elemMatch", idMatch);
+		JsonObject projection = new JsonObject();
+		projection.putObject("infos", elemMatch);
+		
+		mongo.findOne(collection,  MongoQueryBuilder.build(query), validResultHandler(new Handler<Either<String, JsonObject>>(){
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				if (event.isRight()) {
+					try {
+						// Extract info
+						JsonObject thread = event.right().getValue();
+						JsonArray infos = thread.getArray("infos");
+						JsonObject extractedInfo = infos.get(0);
+						handler.handle(new Either.Right<String, JsonObject>(extractedInfo));
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonObject>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
+					}
+				}
+				else {
+					handler.handle(event);
+				}
+			}
+		}));
 	}
 
 	@Override
@@ -171,7 +203,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 								filterResultsByStates(event.right().getValue(), thread, handler);
 							}
 							catch (Exception e) {
-								handler.handle(new Either.Left<String, JsonArray>("Malformed response"));
+								handler.handle(new Either.Left<String, JsonArray>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
 							}
 						}
 						else {

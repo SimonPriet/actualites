@@ -10,6 +10,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.actualites.model.BaseResource;
 import fr.wseduc.actualites.model.InfoResource;
+import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.actualites.model.impl.InfoRequestModel;
@@ -109,6 +110,21 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 				}
 			}
 		});
+	}
+	
+	public void retrieve(final HttpServerRequest request) {
+		final InfoResource info = new InfoRequestModel();
+		info.requireThreadId();
+		info.requireInfoId();
+		
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+		try {
+			infoService.retrieve(info, notEmptyResponseHandler(request));
+		}
+		catch (Exception e) {
+			renderErrorException(request, e);
+		}
 	}
 	
 	public void create(final HttpServerRequest request) {

@@ -21,7 +21,7 @@
 <div class="row vertical-spacing" bind-html="info.content">
 </div>
 <div class="row">
-	<div class="cell right-magnet" ng-if="info.loaded">
+	<div class="cell right-magnet" ng-if="info.loaded && hasCurrentThread()">
 		<!-- Actions -->
 		<behaviour name="submit" resource="info">
 			<button ng-click="submitInfo(info)" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
