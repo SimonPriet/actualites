@@ -32,6 +32,10 @@
 			<!--<behaviour name="contrib" resource="currentThread" class="cell">-->
 				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
 			<!--</behaviour>-->
+
+			<select ng-model="threadFilter" ng-options="tFilter.value as tFilter.label for tFilter in threadFilters" ng-change="showInfos()">
+			</select>
+
 			<behaviour name="share" resource="currentThread" class="right-magnet">
 				<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
 			</behaviour>

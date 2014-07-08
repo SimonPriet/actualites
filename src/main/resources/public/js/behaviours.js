@@ -55,6 +55,7 @@ var actualitesBehaviours = {
 Behaviours.register('actualites', {
 	behaviours: actualitesBehaviours,
 	resource: function(resource){
+		console.log("Behaviours.resource call");
 		if(!resource.myRights){
 			resource.myRights = {};
 		}
@@ -77,6 +78,7 @@ Behaviours.register('actualites', {
 		return resource;
 	},
 	workflow: function(){
+		console.log("Behaviours.workflow call");
 		var workflow = { };
 		var actualitesWorkflow = actualitesBehaviours.workflow;
 		for(var prop in actualitesWorkflow){
@@ -88,6 +90,6 @@ Behaviours.register('actualites', {
 		return workflow;
 	},
 	resourceRights: function(){
-		return ['view', 'contribute', 'publish', 'manage']
+		return ['read', 'contrib', 'publish', 'manager', 'comment']
 	}
 });

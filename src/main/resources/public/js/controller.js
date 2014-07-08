@@ -7,7 +7,7 @@ function ActualitesAbstractController($scope, template, route){
 
     // Thread display
     $scope.hasCurrentThread = function(){
-        return ($scope.currentThread instanceof Thread);
+        return (($scope.currentThread instanceof Thread) && ($scope.currentThread.type !== ACTUALITES_CONFIGURATION.threadTypes.latest));
     };
 
     // Info display

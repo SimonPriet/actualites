@@ -13,30 +13,34 @@ function ActualitesEditionController($injector, $scope, template, route){
         route({
             viewThread: function(param){
                 $scope.selectThread(new Thread({_id: param.threadId}));
-                $scope.currentThread.open();
             }
         });
 
-        // Dependencies
+        // Model
         $scope.template = template;
 		$scope.me = model.me;
-		template.open('threadsList', 'threads-list');
-		template.open('comments', 'info-comments');
-		template.open('infoEdit', 'info-edit');
-		template.open('infoView', 'info-view');
-		$scope.newComment = {};
-
-        // Threads
         $scope.threads = model.threads;
+        $scope.threadFilters = [
+            {label: "public", value: ACTUALITES_CONFIGURATION.threadFilters.PUBLIC},
+            {label: "all", value: ACTUALITES_CONFIGURATION.threadFilters.ALL}
+        ]
+
+        // Defaults
 		$scope.loadThreadsIncrement = 10;
+        $scope.threadFilter = ACTUALITES_CONFIGURATION.threadFilters.PUBLIC;
 
         // Variables
         $scope.infos = {};
         $scope.currentThread = {};
         $scope.currentInfo = {};
+        $scope.newComment = {};
         $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
         // View initialization
+        template.open('threadsList', 'threads-list');
+        template.open('comments', 'info-comments');
+        template.open('infoEdit', 'info-edit');
+        template.open('infoView', 'info-view');
         model.actualitesService.loadLatestThread(model);
 		$scope.selectThread(model.latestThread);
 
@@ -59,7 +63,7 @@ function ActualitesEditionController($injector, $scope, template, route){
 
     $scope.showInfos = function(){
         // Load infos
-        if ($scope.currentThread.type === ACTUALITES_CONFIGURATION.threadTypes.latest) {
+        if ($scope.threadFilter === ACTUALITES_CONFIGURATION.threadFilters.PUBLIC) {
             $scope.currentThread.loadPublicInfos();
         }
         else {

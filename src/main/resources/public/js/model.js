@@ -20,11 +20,9 @@ var ACTUALITES_CONFIGURATION = {
 		TRASH: 'trash'
 	},
 	threadFilters: {
-		main: ['published'],
-		edition: ['draft', 'pending', 'published'],
-		pending: ['pending'],
-		drafts: ['draft'],
-		trash: ['trash']
+		PUBLIC: 0,
+		ALL: 1,
+		STATES: 2
 	},
 	threadTypes: {
 		latest: 0
@@ -287,6 +285,7 @@ Thread.prototype.loadInfosInternal = function(resourceUrl){
 				_.each(data, function(thread){
 					_.each(thread.infos, function(info){
 						info.thread = thread._id;
+						info.loaded = true;
 					});
 					collection.addRange(thread.infos);
 				});

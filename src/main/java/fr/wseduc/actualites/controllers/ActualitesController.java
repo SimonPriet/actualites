@@ -145,7 +145,7 @@ public class ActualitesController extends BaseController {
 	
 	@Get("/infos/thread/:id/public/:filter")
 	@ApiDoc("Get infos in thread by status and by thread id.")
-	@SecuredAction("actualites.view")
+	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
 	public void listThreadPublicInfos(final HttpServerRequest request) {
 		infoHelper.listThreadPublicInfos(request);
 	}

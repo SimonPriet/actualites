@@ -237,15 +237,11 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		}
 		switch (visibilityFilter) {
 			case OWNER:
-				query.put("infos").elemMatch(
-						QueryBuilder.start("owner.userId").is(user.getUserId()).get()
-				);
+				QueryBuilder.start("owner.userId").is(user.getUserId()).get();
 				break;
 			case OWNER_AND_SHARED:
 				query.or(
-						QueryBuilder.start("infos").elemMatch(
-								QueryBuilder.start("owner.userId").is(user.getUserId()).get()
-						).get(),
+						QueryBuilder.start("owner.userId").is(user.getUserId()).get(),
 						QueryBuilder.start("shared").elemMatch(
 								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
 						).get());
@@ -284,8 +280,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		
 		final JsonArray filteredResults = new JsonArray();
 		
-		for (Object result : results.toList()) {
-			JsonObject threadResult = (JsonObject) result;
+		for (int threadIndex = 0; threadIndex < results.size(); threadIndex++) {
+			JsonObject threadResult = results.get(threadIndex);
 			
 			if (! threadResult.containsField("infos")) {
 				// Empty Thread
@@ -294,9 +290,10 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			}
 			
 			JsonArray filteredInfos = new JsonArray();
+			JsonArray infos = threadResult.getArray("infos");
 			
-			for (Object infoObject : threadResult.getArray("infos").toList()) {
-				JsonObject info = (JsonObject) infoObject;
+			for (int infoIndex = 0; infoIndex < infos.size(); infoIndex++) {
+				JsonObject info = infos.get(infoIndex);
 				
 				// Filter the Info with the StatusFilter
 				if (info.getInteger("status") == thread.getStateFilter().getId()) {
@@ -318,8 +315,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		final JsonArray filteredResults = new JsonArray();
 		final Date now = new Date();
 		
-		for (Object result : results.toList()) {
-			JsonObject threadResult = (JsonObject) result;
+		for (int threadIndex = 0; threadIndex < results.size(); threadIndex++) {
+			JsonObject threadResult = results.get(threadIndex);
 			
 			if (! threadResult.containsField("infos")) {
 				// Empty Thread
@@ -328,9 +325,10 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			}
 			
 			JsonArray filteredInfos = new JsonArray();
+			JsonArray infos = threadResult.getArray("infos");
 			
-			for (Object infoObject : threadResult.getArray("infos").toList()) {
-				JsonObject info = (JsonObject) infoObject;
+			for (int infoIndex = 0; infoIndex < infos.size(); infoIndex++) {
+				JsonObject info = infos.get(infoIndex);
 				
 				// Filter the Info with the StatusFilter
 				try {

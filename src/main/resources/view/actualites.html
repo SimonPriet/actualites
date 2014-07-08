@@ -28,6 +28,8 @@
 			<div class="row action-buttons">
 				<behaviour name="edit" resource="currentThread" class="cell">
 					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+					<select ng-model="threadFilter" ng-options="tFilter.value as tFilter.label for tFilter in threadFilters" ng-change="showInfos()">
+					</select>
 				</behaviour>
 				<behaviour name="share" resource="currentThread" class="cell">
 					<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
