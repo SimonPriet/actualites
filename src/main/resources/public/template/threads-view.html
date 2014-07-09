@@ -3,20 +3,19 @@
 	<table class="twelve">
 		<thead>
 			<tr>
+				<th><input type="checkbox" ng-model="display.selectAllThreads" /></th>
 				<th class="six">Libelle</th>
-				<th class="one">Ordre</th>
-
 				<th class="one">Image</th>
 				<th class="four"></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="thread in threads.all">
+				<td><input type="checkbox" ng-model="thread.selected" /></td>
 				<td ng-if="currentThread !== thread">[[thread.title]]</td>
 				<td ng-if="currentThread === thread">
 					<input translate attr="placeholder" placeholder="actualites.edition.thread.field.title.placeholder" ng-model="currentThread.title" type="text"/>
 				</td>
-				<td>[[thread.order]]</td>
 
 				<td>
 					<image-select ng-model="thread.icon" default="/img/illustrations/info.png" ng-change="thread.save()" class="twelve cell"></image-select>

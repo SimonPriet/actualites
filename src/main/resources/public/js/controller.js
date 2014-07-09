@@ -5,8 +5,7 @@ routes.define(function($routeProvider){
         })
 });
 
-/* Main Controller */
-function ActualitesController($scope, template, route){
+function ActualitesController($scope, template, route, model){
 
     this.initialize = function(){
 
@@ -30,9 +29,9 @@ function ActualitesController($scope, template, route){
         $scope.threadFilter = ACTUALITES_CONFIGURATION.threadFilters.PUBLIC;
 
         // Variables
-        $scope.infos = {};
+        $scope.infos = model.latestThread.infos;
         $scope.currentThread = {};
-        $scope.currentInfo = {};
+        $scope.currentInfo = new Info();
         $scope.newComment = {};
         $scope.display = {showPanel: false, emptyThread: false, showCommentsPanel: false, showComments: false};
 
@@ -41,7 +40,6 @@ function ActualitesController($scope, template, route){
         template.open('comments', 'info-comments');
         template.open('infoEdit', 'info-edit');
         template.open('infoView', 'info-view');
-        model.actualitesService.loadLatestThread(model);
 
         // Default display : Latest Thread
         $scope.selectLatestThread();
@@ -162,7 +160,7 @@ function ActualitesController($scope, template, route){
             // Info creation
             $scope.currentInfo = new Info();
             $scope.currentInfo.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-            template.open('thread', 'info-create-form')
+            template.open('thread', 'info-create')
         }
         else {
             // Info edition
@@ -170,25 +168,15 @@ function ActualitesController($scope, template, route){
         }
     };
 
-    $scope.saveInfo = function(info){
-        if (info._id === undefined) {
-            // Info creation
-            var newInfo = new Info();
-            newInfo.create($scope.currentThread, info);
-            template.open('thread', 'infos-list');
-        }
-        else {
-            // Info edition
-            info.save($scope.currentThread);
-        }
-
-        $scope.cancelEditInfo();
-    }
-
-    $scope.cancelEditInfo = function(){
-        $scope.currentInfo = undefined;
+    $scope.saveInfo = function(){
+    	template.open('thread', 'infos-list');
+		$scope.currentInfo.save();
     };
 
+    $scope.cancelEditInfo = function(){
+		template.open('thread', 'infos-list');
+        $scope.currentInfo = undefined;
+    };
 
     /* Info Publication */
     $scope.isInfoPublishable = function(info) {

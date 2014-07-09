@@ -29,6 +29,19 @@
 		</behaviour>
 	</div>
 
+	<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
+		<div class="toggle block-container">
+			<div class="row">
+				<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
+				<button
+						ng-if="threads.selection().length === 1"
+						ng-click="editSelectedThread()"
+						>
+					<i18n>edit</i18n>
+				</button>
+			</div>
+		</div>
+	</section>
 </admin-portal>
 
 </body>

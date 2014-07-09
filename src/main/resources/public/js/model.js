@@ -27,7 +27,21 @@ var ACTUALITES_CONFIGURATION = {
 	threadTypes: {
 		latest: 0
 	},
-	momentFormat: "YYYY-MM-DD HH:mm.ss.SSS"
+	momentFormat: "YYYY-MM-DD HH:mm.ss.SSS",
+	statusNameFromId: function(statusId) {
+		if (statusId === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
+			return ACTUALITES_CONFIGURATION.threadStatus.DRAFT;
+		}
+		else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PENDING) {
+			return ACTUALITES_CONFIGURATION.threadStatus.PENDING;
+		}
+		else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED) {
+			return ACTUALITES_CONFIGURATION.threadStatus.PUBLISHED;
+		}
+		else {
+			return undefined;
+		}
+	}
 };
 
 
@@ -71,40 +85,33 @@ Info.prototype.load = function(thread, data){
 	}.bind(this))
 }
 
-Info.prototype.create = function(thread, data){
+Info.prototype.create = function(){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(e){
+		model.latestThread.infos.sync();
+	}.bind(this));
+}
 
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info';
+Info.prototype.saveModifications = function(){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ActualitesService.statusNameFromId(this.status);
 
-	if (data !== undefined) {
-		this.updateData(data);
+	var info = {
+		title: this.title,
+		publicationDate: this.publicationDate,
+		expirationDate: this.expirationDate,
+		content: this.content
+	};
+	http().putJson(resourceUrl, info);
+};
+
+Info.prototype.save = function(){
+	if(this._id){
+		this.saveModifications();
 	}
-
-	var info = {
-		title: this.title,
-		status: ACTUALITES_CONFIGURATION.infoStatus.DRAFT,
-		publicationDate: this.publicationDate,
-		expirationDate: this.expirationDate,
-		content: this.content
-	};
-	http().postJson(resourceUrl, info).done(function(e){
-		thread.infos.sync();
-	}.bind(thread));
-}
-
-Info.prototype.save = function(thread){
-
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/' + ActualitesService.statusNameFromId(this.status);
-
-	var info = {
-		title: this.title,
-		publicationDate: this.publicationDate,
-		expirationDate: this.expirationDate,
-		content: this.content
-	};
-	http().putJson(resourceUrl, info).done(function(e){
-		this.load(thread);
-	});
-}
+	else{
+		this.create();
+	}
+};
 
 
 Info.prototype.submit = function(thread){
@@ -184,10 +191,6 @@ function Thread(){
 	// published
 }
 
-Thread.prototype.build = function(data){
-	this.updateData(data);
-}
-
 Thread.prototype.load = function(data){
 	
 	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id;
@@ -211,7 +214,7 @@ Thread.prototype.load = function(data){
 
 		that.trigger('change');
 	}.bind(this))
-}
+};
 
 Thread.prototype.save = function(){
 
@@ -230,8 +233,6 @@ Thread.prototype.save = function(){
 }
 
 Thread.prototype.create = function(data){
-	
-	var that = this;
 	if (data !== undefined) {
 		this.updateData(data);
 	}
@@ -242,10 +243,9 @@ Thread.prototype.create = function(data){
 		order: this.order,
 		mode : this.mode !== undefined ? this.mode : ACTUALITES_CONFIGURATION.threadMode.SUBMIT
 	};
-	
-	var blob = new Blob([JSON.stringify(thread)], { type: 'application/json'});
-	http().postJson('/' + ACTUALITES_CONFIGURATION.applicationName + '/threads', thread).done(function(e){
-		that.trigger('change');
+
+	http().postJson('/actualites/threads', thread).done(function(e){
+		this.trigger('change');
 		model.threads.sync();
 	}.bind(this));
 }
@@ -315,60 +315,37 @@ Thread.prototype.pushPublishedInfo = function(info){
 	else {
 		this.published[info._id] = moment().format();
 	}
-}
+};
 
+Thread.prototype.remove = function(){
+	http().delete('/actualites/thread/' + this._id);
+};
 
-ActualitesService = function() {
+model.build = function(){
 
-}
+	model.me.workflow.load(['actualites']);
+	this.makeModels([Info, Thread]);
 
-ActualitesService.prototype.loadThreadsCollection = function(model) {
-
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/threads';
-	
-	model.collection(Thread, {
-		behaviours: ACTUALITES_CONFIGURATION.applicationName,
-		sync: function(){
-			this.all = [];
-			var collection = this;
-			http().get(resourceUrl).done(function(data){
-				collection.addRange(data);
-				collection.trigger('sync');
-			});
-		}
-	});
-}
-
-ActualitesService.prototype.statusNameFromId = function(statusId) {
-	if (statusId === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
-		return ACTUALITES_CONFIGURATION.threadStatus.DRAFT;
-	}
-	else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PENDING) {
-		return ACTUALITES_CONFIGURATION.threadStatus.PENDING;
-	}
-	else if (statusId === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED) {
-		return ACTUALITES_CONFIGURATION.threadStatus.PUBLISHED;
-	}
-	else {
-		return undefined;
-	}
-}
-
-ActualitesService.prototype.loadLatestThread = function(model) {
-	model.latestThread = new Thread();
-	model.latestThread.build({
+	this.latestThread = new Thread({
 		type: ACTUALITES_CONFIGURATION.threadTypes.latest,
 		title: ACTUALITES_CONFIGURATION.threadTypes.latest
 	});
-}
 
+	this.collection(Thread, {
+		behaviours: 'actualites',
+		sync: function(){
+			this.all = [];
+			http().get('/actualites/threads').done(function(data){
+				this.addRange(data);
+				this.trigger('sync');
+			}.bind(this));
+		},
+		removeSelection: function(){
+			this.selection().forEach(function(thread){
+				thread.remove();
+			});
 
-/* Model Build */
-model.build = function(){
-
-	model.me.workflow.load([ACTUALITES_CONFIGURATION.applicationName]);
-	this.makeModels([Info, Thread]);
-
-	this.actualitesService = new ActualitesService();
-	this.actualitesService.loadThreadsCollection(this);
+			Collection.prototype.removeSelection.call(this);
+		}
+	});
 };

@@ -4,6 +4,11 @@
 </div>
 
 <div class="row">
+	<label>Catégorie</label>
+	<select ng-options="category.title for category in threads.all"></select>
+</div>
+
+<div class="row">
 	<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> Date de publication</label>
 	<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
 </div>

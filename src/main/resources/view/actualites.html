@@ -12,37 +12,18 @@
 <body ng-controller="ActualitesController">
 <portal>
 
-	<!-- Threads panel -->
-	<div class="cell four">
-		<h1>Actualités</h1>
-		<nav class="vertical stamps">
-			<div ng-include="template.containers.threadsList"></div>
-		</nav>
-	</div>
-
-	<!-- Infos panel -->
-	<div class="cell eight">
-
-		<!-- Thread actions -->
-		<nav class="contextual-buttons" ng-if="hasCurrentThread()">
+	<h1>Actualités</h1>
+	<div class="row">
+		<nav class="contextual-buttons">
 			<div class="row action-buttons">
-				<behaviour name="contrib" resource="currentThread" class="cell">
-					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
-					<select ng-model="threadFilter" ng-options="tFilter.value as tFilter.label for tFilter in threadFilters" ng-change="refreshThread()">
-					</select>
-				</behaviour>
-				<behaviour name="share" resource="currentThread" class="cell">
-					<button ng-click="shareThread()" translate content="actualites.edition.thread.share"></button>
-				</behaviour>
+				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
 			</div>
 		</nav>
 
-		<!-- Thread infos -->
 		<div id="actualites.container.threads" ng-include="template.containers.thread">
 		</div>
 	</div>
 
-	<!-- Lightbox : Thread share -->
 	<div ng-if="hasCurrentThread()">
 		<behaviour name="share" resource="currentThread">
 			<lightbox show="display.showPanel" on-close="cancelShareThread(); display.showPanel = false;">
