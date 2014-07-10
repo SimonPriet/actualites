@@ -40,16 +40,11 @@ function ActualitesController($scope, template, route, model){
         template.open('comments', 'info-comments');
         template.open('infoEdit', 'info-edit');
         template.open('infoView', 'info-view');
+		template.open('filters', 'filters');
 
         // Default display : Latest Thread
         $scope.selectLatestThread();
-
-        // Listeners
-        model.threads.on('sync', function(){
-            $scope.$apply("threads");
-        });
     };
-
 
     /* Thread display */
     $scope.selectThread = function(thread){

@@ -2,9 +2,9 @@
 	<h2 translate content="actualites.thread.empty"></h2>
 </div>
 
+<container template="filters"></container>
+
 <article class="row reduce-block-six" ng-repeat="info in infos.all">
-
-
 	<div ng-if="currentInfo !== info">
 		<div ng-include="template.containers.infoView"></div>
 	</div>
@@ -13,5 +13,4 @@
 	</div>
 
 	<div class="row"></div>
-
 </article>

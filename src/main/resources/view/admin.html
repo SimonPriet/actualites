@@ -16,29 +16,31 @@
 			<a href="/actualites" translate content="actualites.links.admin.main" class="admin-edit-link"></a>
 	</div>
 
-	<div ng-include="template.containers.threads">
-	</div>
+	<container template="main"></container>
 
 	<!-- Lightbox : Thread share -->
-	<div ng-if="currentThread._id">
-		<behaviour name="share" resource="currentThread">
-			<lightbox show="display.showPanel" on-close="currentThread = {}; display.showPanel = false;">
-				<share-panel app-prefix="'actualites'" resources="currentThread">
-				</share-panel>
-			</lightbox>
-		</behaviour>
-	</div>
+	<behaviour name="share" resource="threads.selection()">
+		<lightbox show="display.showPanel" on-close="display.showPanel = false;">
+			<share-panel app-prefix="'actualites'" resources="threads.selection()"></share-panel>
+		</lightbox>
+	</behaviour>
 
 	<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
 		<div class="toggle block-container">
 			<div class="row">
-				<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
 				<button
 						ng-if="threads.selection().length === 1"
 						ng-click="editSelectedThread()"
 						>
 					<i18n>edit</i18n>
 				</button>
+				<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
+
+				<behaviour name="share" resource="threads.selection()" class="cell">
+					<button ng-click="display.showPanel = true">
+						<i18n>share</i18n>
+					</button>
+				</behaviour>
 			</div>
 		</div>
 	</section>

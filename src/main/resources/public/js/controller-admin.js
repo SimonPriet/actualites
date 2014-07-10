@@ -1,5 +1,5 @@
 /* Admin Controller */
-function ActualitesAdminController($scope, template, route){
+function ActualitesAdminController($scope, template, route, model){
 
     this.initialize = function(){
 
@@ -7,6 +7,7 @@ function ActualitesAdminController($scope, template, route){
 
         // Dependencies
         $scope.template = template;
+		template.open('main', 'threads-view');
 
         // Threads
         $scope.threads = model.threads;
@@ -14,61 +15,43 @@ function ActualitesAdminController($scope, template, route){
         // Variables
         $scope.currentThread = {};
         $scope.display = {showPanel: false};
-
-        // Default display
-        model.threads.on('sync', function(){
-            $scope.$apply("threads");
-            $scope.showThreads();
-        });
-
-        // $scope.$apply("threads");
-    }
+    };
 
     // Thread display
     $scope.hasCurrentThread = function(){
         return (($scope.currentThread instanceof Thread) && ($scope.currentThread.type !== ACTUALITES_CONFIGURATION.threadTypes.latest));
     };
 
-    $scope.showThreads = function(){
-        template.open('threads', 'threads-view');
-    }
+	$scope.newThreadView = function(){
+		$scope.currentThread = new Thread();
+		template.open('main', 'thread-edit')
+	};
 
-    // Thread edition
-    $scope.createThread = function(thread){
-        if (thread === undefined) {
-            $scope.currentThread = new Thread();
-        }
-        else {
-            $scope.currentThread = thread;
-        }
-        template.open('threads', 'thread-edit-form');
-    }
+	$scope.editSelectedThread = function(){
+		$scope.currentThread = model.threads.selection()[0];
+		model.threads.deselectAll();
+		template.open('main', 'thread-edit');
+	};
+
+	$scope.switchAllThreads = function(){
+		if($scope.display.selectAllThreads){
+			model.threads.selectAll();
+		}
+		else{
+			model.threads.deselectAll();
+		}
+	}
 
     $scope.saveThread = function(){
-        if ($scope.currentThread._id === undefined) {
-            var newThread = new Thread();
-            newThread.create($scope.currentThread);
-        }
-        else {
-            $scope.currentThread.save();
-        }
-
-        $scope.cancelEditThread();
-    }
-
-    $scope.cancelEditThread = function(){
-        $scope.currentThread = {};
-        $scope.showThreads();
-    }
-
-    $scope.shareThread = function(thread){
-        $scope.currentThread = thread;
-        $scope.display.showPanel = true;
+       	$scope.currentThread.save();
+        template.open('main', 'threads-view');
+		$scope.currentThread = undefined;
     };
 
-	$scope.editThread = function(thread){
-		$scope.currentThread = thread;
-	}
+    $scope.cancelEditThread = function(){
+        $scope.currentThread = undefined;
+		template.open('main', 'threads-view');
+    };
 
     // Util
     $scope.formatDate = function(date){

@@ -1,12 +1,15 @@
 <div class="cell twelve list-view">
-	<!-- Threads table -->
+	<div class="contextual-buttons">
+		<div class="action-buttons">
+			<button ng-click="newThreadView()">Nouvelle catégorie</button>
+		</div>
+	</div>
 	<table class="twelve">
 		<thead>
 			<tr>
-				<th><input type="checkbox" ng-model="display.selectAllThreads" /></th>
-				<th class="six">Libelle</th>
+				<th><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" /></th>
+				<th class="six">Titre</th>
 				<th class="one">Image</th>
-				<th class="four"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -18,24 +21,9 @@
 				</td>
 
 				<td>
-					<image-select ng-model="thread.icon" default="/img/illustrations/info.png" ng-change="thread.save()" class="twelve cell"></image-select>
+					<img skin-src="/img/illustrations/info.png" ng-if="!thread.icon" class="seven cell" />
+					<img ng-src="[[thread.icon]]" ng-if="thread.icon" class="seven cell" />
 				</td>
-				<td>
-					<button ng-click="editThread(thread)" translate content="actualites.edition.thread.edit" class="right-magnet" ng-if="currentThread !== thread"></button>
-					<button ng-click="saveThread()" translate content="actualites.edition.thread.save" class="right-magnet" ng-if="currentThread === thread"></button>
-					<button ng-click="cancelEditThread()" translate content="actualites.edition.thread.cancel" class="right-magnet cancel" ng-if="currentThread === thread"></button>
-					<behaviour name="share" resource="thread" class="right-magnet">
-						<button ng-click="shareThread(thread)" translate content="actualites.edition.thread.manage" ng-if="currentThread !== thread"></button>
-					</behaviour>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="text" placeholder="Titre du fil d'actualités" ng-model="currentThread.title" ng-if="!currentThread._id" />
-				</td>
-				<td></td>
-				<td style="height: 35px">&nbsp;</td>
-				<td><button ng-click="saveThread()" class="right-magnet" ng-if="!currentThread._id">Créer</button></td>
 			</tr>
 		</tbody>
 	</table>
