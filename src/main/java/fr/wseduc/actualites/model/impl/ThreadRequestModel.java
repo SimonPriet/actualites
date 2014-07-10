@@ -46,6 +46,12 @@ public class ThreadRequestModel extends AbstractRequestModel implements ThreadRe
 	}
 	
 	@Override
+	public void setVisibilityFilter(final VisibilityFilter visibilityFilter) {
+		this.visibilityFilter = visibilityFilter;
+	}
+	
+	
+	@Override
 	public void setStateFilter(String stateFilter) throws InvalidRequestException {
 		this.stateFilter = InfoState.stateFromName(stateFilter);
 		if (requireStateFilter && this.stateFilter == null) {

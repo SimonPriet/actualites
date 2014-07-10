@@ -39,13 +39,7 @@ public class MongoDbThreadService extends AbstractService implements ThreadServi
 		
 		// Projection
 		JsonObject projection = new JsonObject();
-		projection.putNumber("title", 1);
-		projection.putNumber("icon", 1);
-		projection.putNumber("order", 1);
-		projection.putNumber("owner", 1);
-		projection.putNumber("mode", 1);
-		projection.putNumber("shared", 1);
-		projection.putNumber("visibilty", 1);
+		projection.putNumber("infos", 0);
 		
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
 		mongo.find(collection, MongoQueryBuilder.build(query), sort, projection, validResultsHandler(handler));
@@ -61,53 +55,8 @@ public class MongoDbThreadService extends AbstractService implements ThreadServi
 		
 		// Projection
 		JsonObject projection = new JsonObject();
-		projection.putNumber("title", 1);
-		projection.putNumber("icon", 1);
-		projection.putNumber("order", 1);
-		projection.putNumber("owner", 1);
-		projection.putNumber("mode", 1);
-		projection.putNumber("shared", 1);
-		projection.putNumber("visibilty", 1);
+		projection.putNumber("infos", 0);
 		
 		mongo.findOne(collection,  MongoQueryBuilder.build(builder), projection, validResultHandler(handler));
-	}
-	
-	protected void prepareVisibilityFilteredQuery(final QueryBuilder query, final UserInfos user, final  VisibilityFilter visibilityFilter) {
-		List<DBObject> groups = new ArrayList<>();
-		groups.add(QueryBuilder.start("userId").is(user.getUserId()).get());
-		for (String gpId: user.getProfilGroupsIds()) {
-			groups.add(QueryBuilder.start("groupId").is(gpId).get());
-		}
-		switch (visibilityFilter) {
-			case OWNER:
-				query.put("owner.userId").is(user.getUserId());
-				break;
-			case OWNER_AND_SHARED:
-				query.or(
-						QueryBuilder.start("owner.userId").is(user.getUserId()).get(),
-						QueryBuilder.start("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
-						).get());
-				break;
-			case SHARED:
-				query.put("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get());
-				break;
-			case PROTECTED:
-				query.put("visibility").is(VisibilityFilter.PROTECTED.name());
-				break;
-			case PUBLIC:
-				query.put("visibility").is(VisibilityFilter.PUBLIC.name());
-				break;
-			default:
-				query.or(
-						QueryBuilder.start("visibility").is(VisibilityFilter.PUBLIC.name()).get(),
-						QueryBuilder.start("visibility").is(VisibilityFilter.PROTECTED.name()).get(),
-						QueryBuilder.start("owner.userId").is(user.getUserId()).get(),
-						QueryBuilder.start("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
-						).get());
-				break;
-		}
 	}
 }

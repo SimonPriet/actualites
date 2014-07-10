@@ -32,36 +32,15 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		this.infoService = infoService;
 	}
 	
-	public void listPublicInfos(final HttpServerRequest request) {
+	public void listInfos(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
-		thread.requireUser();
 		
 		extractVisibiltyFilter(request, thread);
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
 				try {
-					infoService.listPublic(thread, arrayResponseHandler(request));
-				}
-				catch (Exception e) {
-					renderErrorException(request, e);
-				}
-			}
-		});
-	}
-	
-	public void listThreadPublicInfos(final HttpServerRequest request) {
-		final ThreadResource thread = new ThreadRequestModel();
-		thread.requireUser();
-		thread.requireThreadId();
-		
-		extractThreadId(request, thread);
-		extractVisibiltyFilter(request, thread);
-		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
-			@Override
-			public void handle(final BaseResource model) {
-				try {
-					infoService.listPublic(thread, arrayResponseHandler(request));
+					infoService.list(thread, arrayResponseHandler(request));
 				}
 				catch (Exception e) {
 					renderErrorException(request, e);
@@ -75,8 +54,8 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		thread.requireUser();
 		thread.requireThreadId();
 		
+		thread.setVisibilityFilter(DEFAULT_VISIBILITY_FILTER);
 		extractThreadId(request, thread);
-		extractVisibiltyFilter(request, thread);
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {

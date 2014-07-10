@@ -136,33 +136,23 @@ public class ActualitesController extends BaseController {
 		threadHelper.shareThreadRemove(request);
 	}
 	
-	@Get("/infos/public/:filter")
+	
+	@Get("/infos/:filter")
 	@ApiDoc("Get infos in thread by status and by thread id.")
 	@SecuredAction("actualites.view")
-	public void listPublicInfos(final HttpServerRequest request) {
-		infoHelper.listPublicInfos(request);
+	public void listInfos(final HttpServerRequest request) {
+		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
+		infoHelper.listInfos(request);
 	}
 	
-	@Get("/infos/thread/:id/public/:filter")
-	@ApiDoc("Get infos in thread by status and by thread id.")
-	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
-	public void listThreadPublicInfos(final HttpServerRequest request) {
-		infoHelper.listThreadPublicInfos(request);
-	}
-	
-	@Get("/thread/:id/infos/:filter")
+	@Get("/thread/:id/infos")
 	@ApiDoc("Get infos in thread by thread id.")
-	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
 	public void listThreadInfos(final HttpServerRequest request) {
+		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		infoHelper.listThreadInfos(request);
 	}
-	
-	@Get("/thread/:id/infos/:status/:filter")
-	@ApiDoc("Get infos in thread by status and by thread id.")
-	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
-	public void listThreadInfosDraft(final HttpServerRequest request) {
-		infoHelper.listThreadInfosByStatus(request);
-	}
+
 	
 	@Post("/thread/:id/info")
 	@ApiDoc("Add a new Info")

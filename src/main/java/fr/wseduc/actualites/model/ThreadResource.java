@@ -17,6 +17,8 @@ public interface ThreadResource extends BaseResource {
 	
 	public void setStateFilter(InfoState state) throws InvalidRequestException;
 	
+	public void setVisibilityFilter(VisibilityFilter visibilityFilter);
+	
 	
 	public ThreadResource requireVisibiliyFilter();
 	

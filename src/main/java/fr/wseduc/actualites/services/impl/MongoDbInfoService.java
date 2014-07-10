@@ -188,59 +188,6 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	
 	@Override
 	public void list(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-		// Prepare ProtectedView Thread list
-		doRequestProtectedViewThreads(thread, new Handler<Boolean>(){
-			@Override
-			public void handle(final Boolean isFilterNecessary) {
-				// Do the List request
-				doListRequest(thread, new Handler<Either<String, JsonArray>>(){
-					@Override
-					public void handle(Either<String, JsonArray> event) {
-						if (event.isRight() && (isFilterNecessary || thread.hasStateFilter())) {
-							// Post-process
-							try {
-								// State Filter
-								filterResultsByStates(event.right().getValue(), thread, handler);
-							}
-							catch (Exception e) {
-								handler.handle(new Either.Left<String, JsonArray>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
-							}
-						}
-						else {
-							// No filtering needed OR Either is Left
-							handler.handle(event);
-						}
-					}	
-				});
-			}
-		});		
-	}
-	
-	@Override
-	public void listPublic(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-		// Do the List request
-		doListRequest(thread, new Handler<Either<String, JsonArray>>(){
-			@Override
-			public void handle(Either<String, JsonArray> event) {
-				if (event.isRight()) {
-					// Post-process
-					try {
-						// State Filter
-						filterResultsPublic(event.right().getValue(), handler);
-					}
-					catch (Exception e) {
-						handler.handle(new Either.Left<String, JsonArray>("Malformed response"));
-					}
-				}
-				else {
-					// No filtering needed OR Either is Left
-					handler.handle(event);
-				}
-			}	
-		});
-	}
-	
-	protected void doListRequest(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
 		// Start with Thread if present
 		QueryBuilder query;
 		if (thread.getThreadId() == null) {
@@ -257,130 +204,12 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			preparePublicVisibleQuery(query);
 		}
 		
+		// Projection
+		JsonObject projection = new JsonObject();
+		projection.putNumber("infos", 1);
+		
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
-		mongo.find(collection, MongoQueryBuilder.build(query), sort, null, validResultsHandler(handler));
-	}
-	
-	protected void prepareVisibilityFilteredQuery(final QueryBuilder query, final UserInfos user, final  VisibilityFilter visibilityFilter) {
-		List<DBObject> groups = new ArrayList<>();
-		groups.add(QueryBuilder.start("userId").is(user.getUserId()).get());
-		for (String gpId: user.getProfilGroupsIds()) {
-			groups.add(QueryBuilder.start("groupId").is(gpId).get());
-		}
-		switch (visibilityFilter) {
-			case OWNER:
-				QueryBuilder.start("owner.userId").is(user.getUserId()).get();
-				break;
-			case OWNER_AND_SHARED:
-				query.or(
-						QueryBuilder.start("owner.userId").is(user.getUserId()).get(),
-						QueryBuilder.start("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
-						).get());
-				break;
-			case SHARED:
-				query.put("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get());
-				break;
-			case PROTECTED:
-				query.put("visibility").is(VisibilityFilter.PROTECTED.name());
-				break;
-			case PUBLIC:
-				query.put("visibility").is(VisibilityFilter.PUBLIC.name());
-				break;
-			default:
-				query.or(
-						QueryBuilder.start("visibility").is(VisibilityFilter.PUBLIC.name()).get(),
-						QueryBuilder.start("visibility").is(VisibilityFilter.PROTECTED.name()).get(),
-						QueryBuilder.start("infos").elemMatch(
-								QueryBuilder.start("owner.userId").is(user.getUserId()).get()
-						).get(),
-						QueryBuilder.start("shared").elemMatch(
-								new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()
-						).get());
-				break;
-		}
-	}
-	
-	protected void doRequestProtectedViewThreads(final ThreadResource thread, final Handler<Boolean> handler) {
-		// TODO IMPLEMENT : pre-request the Thread(s) and fill the Thread - View States Map in the ThreadResource object
-		handler.handle(false);
-	}
-	
-	protected void filterResultsByStates(final JsonArray results, final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
-		// TODO IMPLEMENT : filter the results for Security, for each Thread filter the Infos by State with the View States Map in the ThreadResource object
-		
-		final JsonArray filteredResults = new JsonArray();
-		
-		for (int threadIndex = 0; threadIndex < results.size(); threadIndex++) {
-			JsonObject threadResult = results.get(threadIndex);
-			
-			if (! threadResult.containsField("infos")) {
-				// Empty Thread
-				filteredResults.add(threadResult);
-				continue;
-			}
-			
-			JsonArray filteredInfos = new JsonArray();
-			JsonArray infos = threadResult.getArray("infos");
-			
-			for (int infoIndex = 0; infoIndex < infos.size(); infoIndex++) {
-				JsonObject info = infos.get(infoIndex);
-				
-				// Filter the Info with the StatusFilter
-				if (info.getInteger("status") == thread.getStateFilter().getId()) {
-					filteredInfos.add(info);
-				}
-			}
-			
-			// Add the filtered Thread object to the filtered results
-			threadResult.putArray("infos", filteredInfos);
-			filteredResults.add(threadResult);
-		}
-		
-		handler.handle(new Either.Right<String, JsonArray>(filteredResults));
-	}
-	
-	protected void filterResultsPublic(final JsonArray results, final Handler<Either<String, JsonArray>> handler) {
-		// TODO IMPLEMENT : filter the results for Security, for each Thread filter the Infos by State with the View States Map in the ThreadResource object
-		
-		final JsonArray filteredResults = new JsonArray();
-		final Date now = new Date();
-		
-		for (int threadIndex = 0; threadIndex < results.size(); threadIndex++) {
-			JsonObject threadResult = results.get(threadIndex);
-			
-			if (! threadResult.containsField("infos")) {
-				// Empty Thread
-				filteredResults.add(threadResult);
-				continue;
-			}
-			
-			JsonArray filteredInfos = new JsonArray();
-			JsonArray infos = threadResult.getArray("infos");
-			
-			for (int infoIndex = 0; infoIndex < infos.size(); infoIndex++) {
-				JsonObject info = infos.get(infoIndex);
-				
-				// Filter the Info with the StatusFilter
-				try {
-					if (info.getInteger("status") == InfoState.PUBLISHED.getId()
-							&& (info.getString("publicationDate") == null || now.after(MongoDb.parseDate(info.getString("publicationDate"))))
-							&& (info.getString("expirationDate") == null || now.before(MongoDb.parseDate(info.getString("expirationDate"))))) {
-						filteredInfos.add(info);
-					}
-				}
-				catch (ParseException pe) {
-					// log.error("Wrong Date format for publicationDate / expirationDate");
-				}
-			}
-			
-			// Add the filtered Thread object to the filtered results
-			threadResult.putArray("infos", filteredInfos);
-			filteredResults.add(threadResult);
-		}
-		
-		handler.handle(new Either.Right<String, JsonArray>(filteredResults));
+		mongo.find(collection, MongoQueryBuilder.build(query), sort, projection, validResultsHandler(handler));
 	}
 	
 
