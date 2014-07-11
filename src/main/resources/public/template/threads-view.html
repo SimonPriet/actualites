@@ -7,7 +7,7 @@
 	<table class="twelve">
 		<thead>
 			<tr>
-				<th><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" /></th>
+				<th class="one"><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" /></th>
 				<th class="six">Titre</th>
 				<th class="one">Image</th>
 			</tr>
@@ -22,7 +22,7 @@
 
 				<td>
 					<img skin-src="/img/illustrations/info.png" ng-if="!thread.icon" class="seven cell" />
-					<img ng-src="[[thread.icon]]" ng-if="thread.icon" class="seven cell" />
+					<img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" class="seven cell" />
 				</td>
 			</tr>
 		</tbody>

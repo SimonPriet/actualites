@@ -4,11 +4,6 @@
 </div>
 
 <div class="row">
-	<label>Catégorie</label>
-	<select ng-options="category.title for category in threads.all"></select>
-</div>
-
-<div class="row">
 	<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> Date de publication</label>
 	<date-picker ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker>
 </div>
@@ -27,7 +22,6 @@
 </div>
 
 <div class="row">
-	<button ng-click="deleteInfo(currentInfo)" ng-if="currentInfo._id !=== undefined" translate content="actualites.edition.infos.delete" class="right-magnet"></button>
 	<button ng-click="saveInfo(currentInfo)" translate content="actualites.edition.infos.save" class="right-magnet"></button>
 	<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
 </div>

@@ -1,49 +1,49 @@
 var actualitesBehaviours = {
 	resources: {
 		view: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|getThread'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|getThread'
 		},
 		contrib: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|createDraft'
+			right: 'fr-wseduc.actualites-controllers-ActualitesController|createDraft'
 		},
 		updateDraft: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|updateDraft'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|updateDraft'
 		},
 		updatePending: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|updatePending'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|updatePending'
 		},
 		updatePublished: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|updatePublished'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|updatePublished'
 		},
 		submit: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|submit'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|submit'
 		},
 		unsubmit: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|unsubmit'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|unsubmit'
 		},
 		publish: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|publish'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|publish'
 		},
 		unpublish: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|unpublish'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|unpublish'
 		},
 		editThread: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|updateThread'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|updateThread'
 		},
 		deleteThread: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|deleteThread'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|deleteThread'
 		},
 		share: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|shareThread'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|shareThread'
 		},
 		trash: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|trash'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|trash'
 		},
 		restore: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|restore'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|restore'
 		},
 		delete: {
-			right: 'fr.wseduc.actualites.controllers.ActualitesController|delete'
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|delete'
 		}
 	},
 	workflow: {
@@ -56,12 +56,16 @@ Behaviours.register('actualites', {
 	behaviours: actualitesBehaviours,
 	resource: function(resource){
 		console.log("Behaviours.resource call");
+		var rightsContainer = resource;
+		if(resource.thread){
+			rightsContainer = resource.thread;
+		}
 		if(!resource.myRights){
 			resource.myRights = {};
 		}
 
 		for(var behaviour in actualitesBehaviours.resources){
-			if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId){
+			if(model.me.hasRight(rightsContainer, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId){
 				if(resource.myRights[behaviour] !== undefined){
 					resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
 				}
@@ -70,11 +74,6 @@ Behaviours.register('actualites', {
 				}
 			}
 		}
-		/*
-		if(model.me.userId === resource.owner.userId){
-			resource.myRights.manage = actualitesBehaviours.resources[behaviour];
-		}
-		*/
 		return resource;
 	},
 	workflow: function(){

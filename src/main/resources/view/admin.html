@@ -19,11 +19,11 @@
 	<container template="main"></container>
 
 	<!-- Lightbox : Thread share -->
-	<behaviour name="share" resource="threads.selection()">
+	<div ng-if="display.showPanel">
 		<lightbox show="display.showPanel" on-close="display.showPanel = false;">
 			<share-panel app-prefix="'actualites'" resources="threads.selection()"></share-panel>
 		</lightbox>
-	</behaviour>
+	</div>
 
 	<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
 		<div class="toggle block-container">

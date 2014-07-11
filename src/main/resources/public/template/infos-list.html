@@ -4,13 +4,29 @@
 
 <container template="filters"></container>
 
-<article class="row reduce-block-six" ng-repeat="info in infos.all">
-	<div ng-if="currentInfo !== info">
-		<div ng-include="template.containers.infoView"></div>
-	</div>
-	<div ng-if="currentInfo === info">
-		<div ng-include="template.containers.infoEdit"></div>
+<div ng-repeat="info in infos.all">
+	<div class="row vertical-spacing"></div>
+	<div ng-if="display['show' + info.status] && (!thread || thread === info.thread)" class="illustrated-article">
+		<div class="illustration" ng-click="openThread(info.thread)">
+			<div class="image">
+				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />
+				<img skin-src="/img/illustrations/info.png" ng-if="!info.thread.icon" />
+			</div>
+			<legend>
+				<strong>[[info.thread.title]]</strong>
+			</legend>
+		</div>
+		<article class="illustrated-text">
+			<div ng-if="currentInfo !== info">
+				<div ng-include="template.containers.infoView"></div>
+			</div>
+			<div ng-if="currentInfo === info">
+				<div ng-include="template.containers.infoEdit"></div>
+			</div>
+
+			<div class="row"></div>
+		</article>
 	</div>
 
-	<div class="row"></div>
-</article>
+</div>
+

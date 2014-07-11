@@ -1,12 +1,12 @@
 <article class="row reduce-block-six">
 	<div class="row">
 		<label class="three cell">Titre</label>
-		<input ng-model="currentInfo.title" type="text" class="cell" />
+		<input ng-model="currentInfo.title" type="text" class="nine cell" />
 	</div>
 
 	<div class="row">
 		<label class="three cell">Catégorie</label>
-		<select ng-options="category as category.title for category in threads.all" ng-model="currentInfo.thread" class="cell"></select>
+		<select ng-options="category as category.title for category in threads.all" ng-model="currentInfo.thread" class="nine cell"></select>
 	</div>
 
 
@@ -25,9 +25,7 @@
 	</div>
 
 	<div class="row">
-		<article>
-			<html-editor ng-model="currentInfo.content"></html-editor>
-		</article>
+		<html-editor ng-model="currentInfo.content"></html-editor>
 	</div>
 
 	<div class="row">

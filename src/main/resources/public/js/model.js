@@ -44,56 +44,31 @@ var ACTUALITES_CONFIGURATION = {
 	}
 };
 
+function Comment(){
 
-/* Info */
-function Info(){
-	// thread (thread._id)
-	// title
-	// status
-	// publicationDate
-	// expirationDate
-	// content
 }
 
-Info.prototype.load = function(thread, data){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id;
-	if (data !== undefined) {
-		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + data._id;
+function Info(data){
+	if(!data || !data.thread){
+		this.thread = model.threads.first();
 	}
-	var that = this;
 
-	http().get(resourceUrl).done(function(content){
-		that.updateData({
-			title: content.title,
-			status: content.status,
-			publicationDate: content.publicationDate,
-			hasPublicationDate: content.publicationDate === undefined ? false : true,
-			expirationDate: content.expirationDate,
-			hasExpirationDate: content.expirationDate === undefined ? false : true,
-			content: content.content,
-			loaded: true,
-			action: undefined,
-			comments: content.comments,
-			modified: content.modified || this.modified,
-			owner: {
-				userId: content.owner.userId,
-				displayName: content.owner.displayName
-			},
-			_id: content._id || this._id
-		});
-		that.trigger('change');
-	}.bind(this))
+	this.collection(Comment);
+	if(data && data.comments){
+		this.comments.load(data.comments);
+	}
+
 }
 
 Info.prototype.create = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(e){
-		model.latestThread.infos.sync();
+		model.infos.sync();
 	}.bind(this));
 }
 
 Info.prototype.saveModifications = function(){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ActualitesService.statusNameFromId(this.status);
+var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
 
 	var info = {
 		title: this.title,
@@ -115,18 +90,22 @@ Info.prototype.save = function(){
 
 
 Info.prototype.submit = function(){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit');
 };
 
 Info.prototype.unsubmit = function(thread){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit');
 };
 
 Info.prototype.publish = function(thread){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish');
 };
 
 Info.prototype.unpublish = function(thread){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish');
 }
 
@@ -148,24 +127,22 @@ Info.prototype.restore = function(thread){
 }
 
 Info.prototype.delete = function(thread){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id;
-	http().delete(resourceUrl).done(function(){
-		thread.infos.sync();
+	http().delete('/actualites/thread/' + this.thread._id + '/info/' + this._id).done(function(){
+		model.infos.sync();
 	});
 }
 
 
-Info.prototype.comment = function(thread, commentText){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/comment';
-	var info = this;
-	http().postJson(resourceUrl, commentText).done(function(){
-		info.load(thread);
-	}.bind(this));
-}
+Info.prototype.comment = function(commentText){
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/comment', { comment: commentText });
+	this.comments.push(new Comment({
+		author: model.me.userId,
+		authorName: model.me.username,
+		comment: commentText,
+		posted: moment()
+	}));
+};
 
-
-
-/* Thread */
 function Thread(){
 	// type (optionnal, for static threads)
 	// title
@@ -176,10 +153,9 @@ function Thread(){
 }
 
 Thread.prototype.load = function(data){
-	
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this._id;
+	var resourceUrl = '/actualites/thread/' + this._id;
 	if (data !== undefined) {
-		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + data._id;
+		resourceUrl = '/actualites/thread/' + data._id;
 	}
 
 	var that = this;
@@ -214,7 +190,7 @@ Thread.prototype.toJSON = function(){
 		title: this.title,
 		icon: this.icon
 	}
-}
+};
 
 Thread.prototype.saveModifications = function(){
 	this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
@@ -233,7 +209,7 @@ Thread.prototype.save = function(){
 Thread.prototype.loadPublicInfos = function(){
 	var resourceUrl;
 	if (this.type === ACTUALITES_CONFIGURATION.threadTypes.latest) {
-		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/infos/public/ALL';
+		resourceUrl = '/actualites/infos/ALL';
 	}
 	else {
 		resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/infos/thread/' + this._id + '/public/ALL';
@@ -252,37 +228,7 @@ Thread.prototype.loadAllInfos = function(statusFilter){
 	}
 
 	this.loadInfosInternal(resourceUrl);
-}
-
-
-Thread.prototype.loadInfosInternal = function(resourceUrl){
-	var that = this;
-
-	// Bind infos collection
-	this.collection(Info, {
-		behaviours: ACTUALITES_CONFIGURATION.applicationName,
-		sync: function(){
-			var collection = this;
-			this.all = [];
-			http().get(resourceUrl).done(function(data){
-				// Prepare data
-				_.each(data, function(thread){
-					if (thread.infos !== undefined) {
-						_.each(thread.infos, function(info){
-							info.thread = thread._id;
-							info.loaded = true;
-						});
-						collection.addRange(thread.infos);
-					}
-				});
-				collection.trigger('sync');
-			});
-		}
-	});
-
-	// Trigger loading of infos
-	this.infos.sync();
-}
+};
 
 Thread.prototype.hasPublishedInfo = function(info){
 	return (this.published[info._id] !== undefined);
@@ -304,7 +250,7 @@ Thread.prototype.remove = function(){
 model.build = function(){
 
 	model.me.workflow.load(['actualites']);
-	this.makeModels([Info, Thread]);
+	this.makeModels([Info, Thread, Comment]);
 
 	this.latestThread = new Thread({
 		type: ACTUALITES_CONFIGURATION.threadTypes.latest,
@@ -328,4 +274,27 @@ model.build = function(){
 			Collection.prototype.removeSelection.call(this);
 		}
 	});
+
+	this.collection(Info, {
+		sync: function(){
+			http().get('/actualites/infos/all').done(function(data){
+				var that = this;
+				data.forEach(function(thread){
+					var infos = _.filter(thread.infos, function(info){
+						return info.status > 1 || info.owner.userId === model.me.userId;
+					});
+					if (!infos || !infos.length) {
+						return;
+					}
+
+					infos.forEach(function(info){
+						info.thread = model.threads.findWhere({ _id: thread._id });
+					});
+					that.addRange(infos);
+				});
+				this.trigger('sync');
+			}.bind(this))
+		},
+		behaviours: 'actualites'
+	})
 };

@@ -7,29 +7,25 @@
 	<script src="/actualites/public/js/model.js" type="text/javascript"></script>
 	<script src="/actualites/public/js/controller.js" type="text/javascript"></script>
 	<script type="text/ng-actualites" id="empty"></script>
-	<link rel="stylesheet" type="text/css" href="/actualites/public/css/actualites.css" />
 </head>
 <body ng-controller="ActualitesController">
 <portal>
 
-	<h1>Actualités</h1>
+
 	<div class="row">
-		<nav class="contextual-buttons">
+		<h1 style="width:165px" class="cell">Actualités</h1>
+		<nav class="contextual-buttons six cell">
 			<div class="row action-buttons">
 				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
 			</div>
 		</nav>
 
-		<div id="actualites.container.threads" ng-include="template.containers.thread">
+		<div ng-if="thread" class="row">
+			<h2>[[thread.title]]</h2>
+			<a ng-click="closeThread()">Afficher toutes les actualités</a>
 		</div>
-	</div>
 
-	<div ng-if="hasCurrentThread()">
-		<behaviour name="share" resource="currentThread">
-			<lightbox show="display.showPanel" on-close="cancelShareThread(); display.showPanel = false;">
-				<share-panel app-prefix="'actualites'" resources="currentThread"></share-panel>
-			</lightbox>
-		</behaviour>
+		<container template="main"></container>
 	</div>
 
 </portal>
