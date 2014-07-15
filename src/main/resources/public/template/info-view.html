@@ -10,7 +10,7 @@
 	<h2>Supprimer l'actualité</h2>
 	<p>Voulez-vous vraiment supprimer cette actualité ?</p>
 	<div class="row">
-		<button ng-click="info.remove();display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
+		<button ng-click="info.delete();display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
 		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="display.showConfirmRemove = false" />
 	</div>
 </lightbox>
@@ -50,10 +50,10 @@
 		</behaviour>
 	</div>
 	<div class="cell" ng-if="isInfoUnpublishable(info)">
-		<a ng-click="commentInfo = info" ng-if="commentInfo !== info">Afficher les commentaires</a>
-		<a ng-click="commentInfo = undefined" ng-if="commentInfo === info">Masquer les commentaires</a>
+		<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">Afficher les commentaires</a>
+		<a ng-click="display.commentInfo = undefined" ng-if="display.commentInfo === info">Masquer les commentaires</a>
 	</div>
-	<div class="row" ng-if="info.showComments">
+	<div class="row" ng-if="display.commentInfo === info">
 		<div class="cell twelve" ng-include="template.containers.comments"></div>
 	</div>
 	<div class="row"></div>
