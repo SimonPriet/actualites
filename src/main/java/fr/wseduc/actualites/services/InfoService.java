@@ -33,5 +33,7 @@ public interface InfoService {
 	
 	public void canDoMineByState(UserInfos user, String threadId, String infoId, String sharedMethod, InfoState state, Handler<Boolean> handler);
 	
+	public void canDoSharedOrMineByState(UserInfos user, String threadId, String infoId, String sharedMethod, InfoState state, Handler<Boolean> handler);
+	
 	public void canDoByStatesAndModes(UserInfos user, String threadId, String infoId, String sharedMethod, Map<InfoMode, InfoState> statesAndModes, Handler<Boolean> handler);
 }

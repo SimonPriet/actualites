@@ -89,7 +89,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		JsonObject projection = new JsonObject();
 		projection.putObject("infos", elemMatch);
 		
-		mongo.findOne(collection,  MongoQueryBuilder.build(query), validResultHandler(new Handler<Either<String, JsonObject>>(){
+		mongo.findOne(collection,  MongoQueryBuilder.build(query), projection, validResultHandler(new Handler<Either<String, JsonObject>>(){
 			@Override
 			public void handle(Either<String, JsonObject> event) {
 				if (event.isRight()) {
@@ -236,6 +236,31 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		infoMatch.put("status", state.getId());
 		infoMatch.put("owner.userId", user.getUserId());
 		query.put("infos").elemMatch(infoMatch);
+		
+		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
+	}
+	
+	@Override
+	public void canDoSharedOrMineByState(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final InfoState state, final Handler<Boolean> handler) {
+		final QueryBuilder query = QueryBuilder.start();
+		
+		// Shared
+		final QueryBuilder sharedQuery = QueryBuilder.start();
+		prepareIsSharedQuery(sharedQuery, user, threadId, sharedMethod);
+		DBObject infoMatch = new BasicDBObject();
+		infoMatch.put("_id", infoId);
+		infoMatch.put("status", state.getId());
+		sharedQuery.put("infos").elemMatch(infoMatch);
+		
+		// Mine
+		final QueryBuilder mineQuery = QueryBuilder.start();
+		DBObject mineMatch = new BasicDBObject();
+		mineMatch.put("_id", infoId);
+		mineMatch.put("status", state.getId());
+		mineMatch.put("owner.userId", user.getUserId());
+		mineQuery.put("infos").elemMatch(mineMatch);
+		
+		query.or(sharedQuery.get(), mineQuery.get());
 		
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
