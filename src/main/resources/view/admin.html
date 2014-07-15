@@ -28,12 +28,15 @@
 	<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
 		<div class="toggle block-container">
 			<div class="row">
-				<button
-						ng-if="threads.selection().length === 1"
-						ng-click="editSelectedThread()"
-						>
-					<i18n>edit</i18n>
-				</button>
+				<behaviour name="editThread" resource="threads.selection()" class="cell">
+					<button
+							ng-if="threads.selection().length === 1"
+							ng-click="editSelectedThread()"
+							>
+						<i18n>edit</i18n>
+					</button>
+				</behaviour>
+
 				<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
 
 				<behaviour name="share" resource="threads.selection()" class="cell">
