@@ -279,6 +279,7 @@ model.build = function(){
 		sync: function(){
 			http().get('/actualites/infos/all').done(function(data){
 				var that = this;
+				this.all = [];
 				data.forEach(function(thread){
 					var infos = _.filter(thread.infos, function(info){
 						return info.status > 1 || info.owner.userId === model.me.userId;

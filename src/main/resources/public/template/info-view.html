@@ -10,7 +10,7 @@
 	<h2>Supprimer l'actualité</h2>
 	<p>Voulez-vous vraiment supprimer cette actualité ?</p>
 	<div class="row">
-		<button ng-click="info.delete()" class="right-magnet">Supprimer</button>
+		<button ng-click="info.remove();display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
 		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="display.showConfirmRemove = false" />
 	</div>
 </lightbox>
