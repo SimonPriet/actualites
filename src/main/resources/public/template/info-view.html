@@ -50,8 +50,8 @@
 		</behaviour>
 	</div>
 	<div class="cell" ng-if="isInfoUnpublishable(info)">
-		<a ng-click="info.showComments = true" ng-if="!info.showComments">Afficher les commentaires</a>
-		<a ng-click="info.showComments = false" ng-if="info.showComments">Masquer les commentaires</a>
+		<a ng-click="commentInfo = info" ng-if="commentInfo !== info">Afficher les commentaires</a>
+		<a ng-click="commentInfo = undefined" ng-if="commentInfo === info">Masquer les commentaires</a>
 	</div>
 	<div class="row" ng-if="info.showComments">
 		<div class="cell twelve" ng-include="template.containers.comments"></div>
