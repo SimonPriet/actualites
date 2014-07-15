@@ -49,7 +49,7 @@
 			<button ng-click="info.unpublish()" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
 		</behaviour>
 	</div>
-	<div class="cell">
+	<div class="cell" ng-if="isInfoUnpublishable(info)">
 		<a ng-click="info.showComments = true" ng-if="!info.showComments">Afficher les commentaires</a>
 		<a ng-click="info.showComments = false" ng-if="info.showComments">Masquer les commentaires</a>
 	</div>
