@@ -64,13 +64,29 @@ function ActualitesController($scope, template, route, model){
     };
 
     $scope.isInfoVisible = function(info) {
-        if (info.hasPublicationDate) {
-            return (moment().unix() > moment(info.publicationDate).unix());
+        // Selected Filters
+        if (! $scope.display['show' + info.status]) {
+           return false;
         }
-        if (info.hasExpirationDate) {
-            return (moment().unix() < moment(info.expirationDate).unix());
+        // Selected Thread
+        if ($scope.thread && $scope.thread !== info.thread) {
+           return false;
         }
-        return $scope.isInfoPublished(info);
+
+        // For Published Infos, enforce publication and expiration dates if the user has not 'contrib' permission
+        if (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED && (info.myRights.contrib === undefined)) {
+            if (info.publicationDate !== undefined && info.publicationDate !== null) {
+                if (moment().unix() < moment(info.publicationDate).unix()) {
+                    return false;
+                }
+            }
+            if (info.expirationDate !== undefined && info.expirationDate !== null) {
+                if (moment().unix() > moment(info.expirationDate).unix()) {
+                    return false;
+                }
+            }
+        }
+        return true;
     };
 
 
@@ -161,7 +177,13 @@ function ActualitesController($scope, template, route, model){
 
     /* Util */
     $scope.formatDate = function(date){
-        return moment(date).format('D MMMM YYYY');
+        var momentDate = moment(date);
+        if (momentDate.isValid()) {
+            return momentDate.lang('fr').format('dddd DD MMM YYYY');
+        }
+        else {
+            return moment(date, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
+        }
     };
 
     this.initialize();

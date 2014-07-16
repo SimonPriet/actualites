@@ -6,7 +6,7 @@
 
 <div ng-repeat="info in infos.all">
 	<div class="row vertical-spacing"></div>
-	<div ng-if="display['show' + info.status] && (!thread || thread === info.thread)" class="illustrated-article">
+	<div ng-if="isInfoVisible(info)" class="illustrated-article">
 		<div class="illustration" ng-click="openThread(info.thread)">
 			<div class="image">
 				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />

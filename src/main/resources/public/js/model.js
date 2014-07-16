@@ -60,6 +60,15 @@ function Info(data){
 
 }
 
+Info.prototype.toJSON = function(){
+	return {
+		title: this.title,
+		publicationDate: this.hasPublicationDate ? this.publicationDate : null,
+		expirationDate: this.hasExpirationDate ? this.expirationDate : null,
+		content: this.content
+	};
+}
+
 Info.prototype.create = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(e){
@@ -68,15 +77,8 @@ Info.prototype.create = function(){
 }
 
 Info.prototype.saveModifications = function(){
-var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
-
-	var info = {
-		title: this.title,
-		publicationDate: this.publicationDate,
-		expirationDate: this.expirationDate,
-		content: this.content
-	};
-	http().putJson(resourceUrl, info);
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
+	http().putJson(resourceUrl, this);
 };
 
 Info.prototype.save = function(){
@@ -94,39 +96,39 @@ Info.prototype.submit = function(){
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit');
 };
 
-Info.prototype.unsubmit = function(thread){
+Info.prototype.unsubmit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit');
 };
 
-Info.prototype.publish = function(thread){
+Info.prototype.publish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish');
 };
 
-Info.prototype.unpublish = function(thread){
+Info.prototype.unpublish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
 	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish');
 }
 
 
-Info.prototype.trash = function(thread){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/trash';	
+Info.prototype.trash = function(){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/trash';	
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
 	});
 }
 
-Info.prototype.restore = function(thread){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + thread._id + '/info/' + this._id + '/restore';	
+Info.prototype.restore = function(){
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/restore';	
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
 	});
 }
 
-Info.prototype.delete = function(thread){
+Info.prototype.delete = function(){
 	http().delete('/actualites/thread/' + this.thread._id + '/info/' + this._id).done(function(){
 		model.infos.sync();
 	});
@@ -290,6 +292,14 @@ model.build = function(){
 
 					infos.forEach(function(info){
 						info.thread = model.threads.findWhere({ _id: thread._id });
+
+						if (info.publicationDate) {
+							info.hasPublicationDate = true;
+						}
+
+						if (info.expirationDate) {
+							info.hasExpirationDate = true;
+						}
 					});
 					that.addRange(infos);
 				});

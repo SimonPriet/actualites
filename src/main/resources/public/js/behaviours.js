@@ -44,6 +44,9 @@ var actualitesBehaviours = {
 		},
 		delete: {
 			right: 'fr-wseduc-actualites-controllers-ActualitesController|delete'
+		},
+		comment: {
+			right: 'fr-wseduc-actualites-controllers-ActualitesController|comment'
 		}
 	},
 	workflow: {
@@ -55,7 +58,6 @@ var actualitesBehaviours = {
 Behaviours.register('actualites', {
 	behaviours: actualitesBehaviours,
 	resource: function(resource){
-		console.log("Behaviours.resource call");
 		var rightsContainer = resource;
 		if(resource.thread){
 			rightsContainer = resource.thread;
@@ -77,7 +79,6 @@ Behaviours.register('actualites', {
 		return resource;
 	},
 	workflow: function(){
-		console.log("Behaviours.workflow call");
 		var workflow = { };
 		var actualitesWorkflow = actualitesBehaviours.workflow;
 		for(var prop in actualitesWorkflow){

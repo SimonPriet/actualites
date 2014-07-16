@@ -78,7 +78,7 @@ public class StateControllerHelper extends BaseExtractorHelper {
 		extractInfoId(request, info);
 		
 		try {
-			infoService.changeState(info, InfoState.DRAFT, notEmptyResponseHandler(request));
+			infoService.changeState(info, InfoState.PENDING, notEmptyResponseHandler(request));
 		}
 		catch (Exception e) {
 			renderErrorException(request, e);
