@@ -89,18 +89,12 @@ public class ThreadControllerHelper extends MongoDbControllerHelper {
 		request.endHandler(new VoidHandler() {
 			@Override
 			protected void handle() {
-				final List<String> a = request.formAttributes().getAll("actions");
+				final List<String> actions = request.formAttributes().getAll("actions");
 				final String groupId = request.formAttributes().get("groupId");
 				final String userId = request.formAttributes().get("userId");
-				if (a == null || a.size() == 0) {
+				if (actions == null || actions.size() == 0) {
 					badRequest(request);
 					return;
-				}
-				final List<String> actions = new ArrayList<>();
-				for (Object o: a) {
-					if (o != null && o instanceof String) {
-						actions.add(o.toString());
-					}
 				}
 				getUserInfos(eb, request, new Handler<UserInfos>() {
 					@Override

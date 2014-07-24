@@ -56,7 +56,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	@Override
 	public void create(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
 		// Prepare Info object
-		ObjectId newId = new ObjectId();
+		final ObjectId newId = new ObjectId();
 		JsonObject now = MongoDb.now();
 		info.cleanPersistedObject();
 		info.getBody().putString("_id", newId.toStringMongod())
@@ -72,7 +72,30 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		modifier.push("infos", info.getBody());
 		
 		// Execute query
-		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
+		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(new Handler<Either<String, JsonObject>>(){
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				if (event.isRight()) {
+					try {
+						if (event.right().getValue().getNumber("number").intValue() == 1) {
+							// Respond with created info Id
+							JsonObject created = new JsonObject();
+							created.putString("_id", newId.toStringMongod());
+							handler.handle(new Either.Right<String, JsonObject>(created));
+						}
+						else {
+							handler.handle(new Either.Left<String, JsonObject>("Thread not found"));
+						}
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonObject>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
+					}
+				}
+				else {
+					handler.handle(event);
+				}
+			}
+		}));
 	}
 
 	@Override
