@@ -3,16 +3,12 @@ package fr.wseduc.actualites.services.impl;
 import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.entcore.common.service.VisibilityFilter;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 
 import fr.wseduc.actualites.services.ThreadService;

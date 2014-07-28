@@ -4,24 +4,18 @@ import static org.entcore.common.mongodb.MongoDbResult.validActionResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
-import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.service.VisibilityFilter;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -31,26 +25,16 @@ import fr.wseduc.actualites.model.InfoMode;
 import fr.wseduc.actualites.model.InfoResource;
 import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.ThreadResource;
-import fr.wseduc.actualites.model.ThreadStateVisibility;
 import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.mongodb.MongoDb;
 import fr.wseduc.mongodb.MongoQueryBuilder;
 import fr.wseduc.mongodb.MongoUpdateBuilder;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.Either.Right;
-import fr.wseduc.webutils.security.SecuredAction;
 
 public class MongoDbInfoService extends AbstractService implements InfoService {
 	
 	public MongoDbInfoService(final String collection) {
 		super(collection);
-	}
-	
-	public void init(Vertx vertx, Container container, RouteMatcher rm, Map<String, SecuredAction> securedActions) {
-		
-		this.eb = vertx.eventBus();
-		this.mongo = MongoDb.getInstance();
-		this.notification = new TimelineHelper(vertx, eb, container);
 	}
 
 	@Override

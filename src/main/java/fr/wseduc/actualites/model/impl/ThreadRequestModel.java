@@ -1,15 +1,10 @@
 package fr.wseduc.actualites.model.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.entcore.common.service.VisibilityFilter;
 
 import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
-import fr.wseduc.actualites.model.ThreadStateVisibility;
 
 public class ThreadRequestModel extends AbstractRequestModel implements ThreadResource {
 	

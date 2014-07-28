@@ -1,7 +1,5 @@
 package fr.wseduc.actualites.model;
 
-import java.util.List;
-
 import org.entcore.common.service.VisibilityFilter;
 
 public interface ThreadResource extends BaseResource {

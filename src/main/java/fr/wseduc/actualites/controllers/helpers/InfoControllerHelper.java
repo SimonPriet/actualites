@@ -6,11 +6,9 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 import org.entcore.common.service.VisibilityFilter;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.actualites.model.BaseResource;
 import fr.wseduc.actualites.model.InfoResource;
-import fr.wseduc.actualites.model.InfoState;
 import fr.wseduc.actualites.model.InvalidRequestException;
 import fr.wseduc.actualites.model.ThreadResource;
 import fr.wseduc.actualites.model.impl.InfoRequestModel;
