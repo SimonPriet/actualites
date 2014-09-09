@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-	<meta charset="UTF-8">
-	<title></title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="row line drop-down-filters">
+	<p ng-click="showFilters = !showFilters">
+		<span class="small-arrow" ng-class="{ 'right-arrow': !showFilters, 'bottom-arrow': showFilters }"></span> Filtrer
+	</p>
+	<div class="wrapper" ng-class="{ hide: !showFilters }">
+		<ul>
+			<li ng-class="{ selected: display.show3 }">
+				<label>
+					<i class="published type"></i>
+					<input type="checkbox" ng-model="display.show3" />
+					<p><i18n>filters.published</i18n></p>
+				</label>
+			</li>
+			<li ng-class="{ selected: display.show1 }">
+				<label>
+					<i class="draft type"></i>
+					<input type="checkbox" ng-model="display.show1" />
+					<p><i18n>filters.drafts</i18n></p>
+				</label>
+			</li>
+			<li ng-class="{ selected: display.show2 }">
+				<label>
+					<i class="submitted type"></i>
+					<input type="checkbox" ng-model="display.show2" />
+					<p><i18n>filters.submitted</i18n></p>
+				</label>
+			</li>
+		</ul>
+	</div>
+</div>
