@@ -14,12 +14,13 @@
 
 	<div class="row">
 		<h1 style="width:165px" class="cell">Actualités</h1>
-		<nav class="contextual-buttons six cell">
-			<div class="row action-buttons">
-				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
-			</div>
-		</nav>
-
+		<behaviour name="publish" resource="threads">
+			<nav class="contextual-buttons six cell">
+				<div class="row action-buttons">
+					<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+				</div>
+			</nav>
+		</behaviour>
 		<div ng-if="thread" class="row">
 			<h2>[[thread.title]]</h2>
 			<a ng-click="closeThread()">Afficher toutes les actualités</a>
