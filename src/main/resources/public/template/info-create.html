@@ -6,7 +6,7 @@
 
 	<div class="row">
 		<label class="three cell">Catégorie</label>
-		<select ng-options="category as category.title for category in threads.all" ng-model="currentInfo.thread" class="nine cell"></select>
+		<select ng-options="category as category.title for category in threads.filter(checkThreadsRightsFilter)" ng-model="currentInfo.thread" class="nine cell"></select>
 	</div>
 
 

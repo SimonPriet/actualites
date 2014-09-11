@@ -186,5 +186,9 @@ function ActualitesController($scope, template, route, model){
         }
     };
 
+    $scope.checkThreadsRightsFilter = function(category){
+    	return category.myRights.submit !== undefined;
+	};
+
     this.initialize();
 }
