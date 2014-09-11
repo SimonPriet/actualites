@@ -189,6 +189,16 @@ function ActualitesController($scope, template, route, model){
     $scope.checkThreadsRightsFilter = function(category){
     	return category.myRights.submit !== undefined;
 	};
+	
+	$scope.checkThreadsContribRight = function(){
+		var right = false;
+		$scope.threads.forEach(function(item){
+			if(item.myRights.submit){
+				right = true;
+			}
+		});
+		return right;
+	};
 
     this.initialize();
 }
