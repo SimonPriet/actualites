@@ -27,7 +27,7 @@ var ACTUALITES_CONFIGURATION = {
 	threadTypes: {
 		latest: 0
 	},
-	momentFormat: "YYYY-MM-DD HH:mm.ss.SSS",
+	momentFormat: "YYYY-MM-DDTHH:mm:ss.SSSZ",
 	statusNameFromId: function(statusId) {
 		if (statusId === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
 			return ACTUALITES_CONFIGURATION.threadStatus.DRAFT;

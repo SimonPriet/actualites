@@ -177,13 +177,13 @@ function ActualitesController($scope, template, route, model){
 
     /* Util */
     $scope.formatDate = function(date){
-        var momentDate = moment(date);
-        if (momentDate.isValid()) {
-            return momentDate.lang('fr').format('dddd DD MMM YYYY');
-        }
-        else {
-            return moment(date, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
-        }
+    	var momentDate;
+		if (date instanceof Object) {
+			momentDate = moment(date.$date);
+		} else {
+			momentDate = moment(date);
+		}
+		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
     };
 
     $scope.checkThreadsRightsFilter = function(category){
