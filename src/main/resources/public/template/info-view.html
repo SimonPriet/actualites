@@ -36,16 +36,16 @@
 <hr class="row"></div>
 <div class="row">
 	<div class="right-magnet cell">
-		<behaviour name="submit" resource="info" class="cell">
+		<behaviour name="submit" resource="info.thread" class="cell">
 			<button ng-click="info.submit()" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
 		</behaviour>
-		<behaviour name="unsubmit" resource="info" class="cell">
+		<behaviour name="unsubmit" resource="info.thread" class="cell">
 			<button ng-click="info.unsubmit()" ng-if="isInfoSubmitted(info)" translate content="actualites.edition.infos.unsubmit"></button>
 		</behaviour>
-		<behaviour name="publish" resource="info" class="cell">
+		<behaviour name="publish" resource="info.thread" class="cell">
 			<button ng-click="info.publish()" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
 		</behaviour>
-		<behaviour name="unpublish" resource="info" class="cell">
+		<behaviour name="unpublish" resource="info.thread" class="cell">
 			<button ng-click="info.unpublish()" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
 		</behaviour>
 	</div>
