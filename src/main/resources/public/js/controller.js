@@ -149,6 +149,20 @@ function ActualitesController($scope, template, route, model){
         return info && info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING;
     };
 
+    $scope.getState = function(info){
+    	if(info.owner.userId === model.me.userId){
+	    	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
+	    		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate).unix())){
+	    			return "actualites.edition.status.4" ;
+	    		}
+	    	}
+	    	return "actualites.edition.status." + info.status;
+    	}
+		else{
+			return "actualites.edition.status.empty";
+		}
+    };
+
     /* Info Delete */
     $scope.isInfoDeletable = function(info) {
         return info && info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
