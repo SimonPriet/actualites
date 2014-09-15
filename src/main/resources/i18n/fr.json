@@ -61,6 +61,7 @@
 	"thread.publish": "Publier",
 	"thread.manager": "Gestion",
 	"thread.comment": "Commenter",
+	"thread.list.view": "Gestion des catégories",
 
 	"group.Teacher" : "Tous les enseignants du groupe {0}.",
 	"group.Personnel" : "Tous les personnels du groupe {0}.",

@@ -25,6 +25,36 @@
 					<img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" class="seven cell" />
 				</td>
 			</tr>
+			
+			<!-- Lightbox : Thread share -->
+			<div ng-if="display.showPanel">
+				<lightbox show="display.showPanel" on-close="display.showPanel = false;">
+					<share-panel app-prefix="'actualites'" resources="threads.selection()"></share-panel>
+				</lightbox>
+			</div>
+		
+			<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
+				<div class="toggle block-container">
+					<div class="row">
+						<behaviour name="editThread" resource="threads.selection()" class="cell">
+							<button
+									ng-if="threads.selection().length === 1"
+									ng-click="editSelectedThread()"
+									>
+								<i18n>edit</i18n>
+							</button>
+						</behaviour>
+		
+						<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
+		
+						<behaviour name="share" resource="threads.selection()" class="cell">
+							<button ng-click="display.showPanel = true">
+								<i18n>share</i18n>
+							</button>
+						</behaviour>
+					</div>
+				</div>
+			</section>
 		</tbody>
 	</table>
 

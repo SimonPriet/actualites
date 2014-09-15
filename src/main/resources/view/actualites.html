@@ -14,11 +14,12 @@
 
 	<div class="row">
 		<h1 style="width:165px" class="cell">Actualités</h1>
-		<nav class="contextual-buttons six cell" ng-if="checkThreadsContribRight()">
-			<div class="row action-buttons">
-				<button ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+		<div class="row contextual-buttons ng-scope">
+			<div class="action-buttons" >
+				<button ng-if="checkThreadsContribRight()" ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+				<button ng-if="checkThreadsAdminRight()" ng-click="threadsView()" translate content="thread.list.view"></button>
 			</div>
-		</nav>
+		</div>
 		<div ng-if="thread" class="row">
 			<h2>[[thread.title]]</h2>
 			<a ng-click="closeThread()">Afficher toutes les actualités</a>

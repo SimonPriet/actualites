@@ -35,8 +35,12 @@ function ActualitesController($scope, template, route, model){
 			showComments: false,
 			show3: true
 		};
+        
+        $scope.appPrefix = 'actualites';
+        $scope.currentThread = {};
 
         // View initialization
+		template.open('threadsView', 'threads-view');
         template.open('comments', 'info-comments');
         template.open('infoEdit', 'info-edit');
         template.open('infoView', 'info-view');
@@ -174,6 +178,46 @@ function ActualitesController($scope, template, route, model){
 		$scope.newComment = new Comment();
 
     };
+    
+    // Threads
+    $scope.threadsView = function(){
+		template.open('main', 'threads-view');
+	};
+	
+    $scope.hasCurrentThread = function(){
+        return (($scope.currentThread instanceof Thread) && ($scope.currentThread.type !== ACTUALITES_CONFIGURATION.threadTypes.latest));
+    };
+
+	$scope.newThreadView = function(){
+		$scope.currentThread = new Thread();
+		template.open('main', 'thread-edit')
+	};
+
+	$scope.editSelectedThread = function(){
+		$scope.currentThread = model.threads.selection()[0];
+		model.threads.deselectAll();
+		template.open('main', 'thread-edit');
+	};
+
+	$scope.switchAllThreads = function(){
+		if($scope.display.selectAllThreads){
+			model.threads.selectAll();
+		}
+		else{
+			model.threads.deselectAll();
+		}
+	}
+
+    $scope.saveThread = function(){
+       	$scope.currentThread.save();
+        template.open('main', 'threads-view');
+		$scope.currentThread = undefined;
+    };
+
+    $scope.cancelEditThread = function(){
+        $scope.currentThread = undefined;
+		template.open('main', 'threads-view');
+    };
 
     /* Util */
     $scope.formatDate = function(date){
@@ -199,6 +243,10 @@ function ActualitesController($scope, template, route, model){
 		});
 		return right;
 	};
+	
+	$scope.checkThreadsAdminRight = function(){
+		return model.me.workflow.actualites.admin;
+	}
 
     this.initialize();
 }
