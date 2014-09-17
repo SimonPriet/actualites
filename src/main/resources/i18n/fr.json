@@ -77,8 +77,8 @@
 	"group.class.Personnel" : "Tous les personnels de la classe {0}.",
 	"group.class.Student" : "Tous les élèves de la classe {0}.",
 	"group.class.Relative" : "Tous les parents de la classe {0}.",
-	"filters.published": "Publiés",
+	"filters.published": "Publiées",
 	"filters.drafts": "Brouillons",
-	"filters.submitted": "Soumis",
+	"filters.submitted": "Soumises",
 	"actualites.links.admin.main": "Accéder à l'application"
 }
