@@ -53,6 +53,7 @@
 	"actualites.edition.status.2": "(A publier) ",
 	"actualites.edition.status.3": "(Publiée) ",
 	"actualites.edition.status.4": "(A venir) ",
+	"actualites.edition.status.5": "(Expirée) ",
 	"actualites.edition.status.empty": "",
 	"actualites.edition.infos.loading.submit": "Demande de validation en cours ...",
 	"actualites.edition.infos.loading.unsubmit": "Annulation de la demande en cours ...",

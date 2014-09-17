@@ -152,7 +152,12 @@ function ActualitesController($scope, template, route, model){
     $scope.getState = function(info){
     	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
     		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate).unix())){
+    			// label (A venir)
     			return "actualites.edition.status.4" ;
+    		}
+    		if(info.expirationDate && (moment().unix() > moment(info.expirationDate).unix())){
+    			// label (Expiree)
+    			return "actualites.edition.status.5" ;
     		}
     		if(info.owner.userId !== model.me.userId){
     			return "actualites.edition.status.empty";
