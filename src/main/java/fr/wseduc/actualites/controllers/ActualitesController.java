@@ -43,7 +43,7 @@ public class ActualitesController extends BaseController {
 		
 		this.threadHelper = new ThreadControllerHelper(collection, threadService);
 		this.infoHelper = new InfoControllerHelper(infoService);
-		this.stateHelper = new StateControllerHelper(infoService);
+		this.stateHelper = new StateControllerHelper(infoService, threadService);
 	}
 	
 	@Override

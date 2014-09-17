@@ -65,7 +65,8 @@ Info.prototype.toJSON = function(){
 		title: this.title,
 		publicationDate: this.hasPublicationDate ? this.publicationDate : null,
 		expirationDate: this.hasExpirationDate ? this.expirationDate : null,
-		content: this.content
+		content: this.content,
+		owner: this.owner
 	};
 }
 
@@ -93,22 +94,22 @@ Info.prototype.save = function(){
 
 Info.prototype.submit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit', this);
 };
 
 Info.prototype.unsubmit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', this);
 };
 
 Info.prototype.publish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', this);
 };
 
 Info.prototype.unpublish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	http().put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', this);
 }
 
 
