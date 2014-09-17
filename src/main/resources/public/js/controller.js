@@ -150,17 +150,15 @@ function ActualitesController($scope, template, route, model){
     };
 
     $scope.getState = function(info){
-    	if(info.owner.userId === model.me.userId){
-	    	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
-	    		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate).unix())){
-	    			return "actualites.edition.status.4" ;
-	    		}
-	    	}
-	    	return "actualites.edition.status." + info.status;
+    	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
+    		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate).unix())){
+    			return "actualites.edition.status.4" ;
+    		}
+    		if(info.owner.userId !== model.me.userId){
+    			return "actualites.edition.status.empty";
+    		}
     	}
-		else{
-			return "actualites.edition.status.empty";
-		}
+    	return "actualites.edition.status." + info.status;
     };
 
     /* Info Delete */
