@@ -113,6 +113,21 @@ function ActualitesController($scope, template, route, model){
 	$scope.editInfo = function(info){
 		$scope.currentInfo = info;
 	};
+	
+    $scope.showDeleteInfo = function(info) {
+    	$scope.currentInfo = info;
+    	$scope.display.showConfirmRemove = true;
+    }
+    
+    $scope.cancelDeleteInfo = function() {
+    	$scope.currentInfo = undefined;
+    	$scope.display.showConfirmRemove = false;
+    }
+    
+    $scope.deleteInfo = function() {
+    	$scope.currentInfo.delete();
+    	$scope.display.showConfirmRemove = false;
+    }
 
     $scope.saveInfo = function(){
     	template.open('main', 'infos-list');

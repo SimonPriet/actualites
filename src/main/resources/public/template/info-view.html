@@ -1,17 +1,17 @@
 <div class="row">
-	<h1 class="cell upper-title"><span translate content="[[getState(info)]]" class="warning-text">&nbsp;</span>[[info.title]]</h1>
+	<h1 class="cell upper-title"><span translate content="getState(info)" class="warning-text">&nbsp;</span>[[info.title]]</h1>
 	<div class="right-magnet cell" ng-if="info.status === 1">
 		<behaviour name="contrib" resource="info">
-			<a ng-click="editInfo(info)">modifier</a> ou <a ng-click="display.showConfirmRemove = true">supprimer</a>
+			<a ng-click="editInfo(info)">modifier</a> ou <a ng-click="showDeleteInfo(info)">supprimer</a>
 		</behaviour>
 	</div>
 </div>
-<lightbox show="display.showConfirmRemove" on-close="display.showConfirmRemove = false">
+<lightbox show="display.showConfirmRemove" on-close="cancelDeleteInfo()">
 	<h2>Supprimer l'actualité</h2>
 	<p>Voulez-vous vraiment supprimer cette actualité ?</p>
 	<div class="row">
-		<button ng-click="info.delete();display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
-		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="display.showConfirmRemove = false" />
+		<button ng-click="deleteInfo()" class="right-magnet">Supprimer</button>
+		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelDeleteInfo()" />
 	</div>
 </lightbox>
 <div class="row lower-title" ng-if="info.expirationDate">
