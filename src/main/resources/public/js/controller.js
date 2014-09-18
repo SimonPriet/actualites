@@ -33,6 +33,8 @@ function ActualitesController($scope, template, route, model){
 			emptyThread: false,
 			showCommentsPanel: false,
 			showComments: false,
+			show1: true,
+			show2: true,
 			show3: true
 		};
         
