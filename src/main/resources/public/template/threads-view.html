@@ -8,14 +8,14 @@
 	<table class="twelve">
 		<thead>
 			<tr>
-				<th class="one"><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" /></th>
+				<th class="one"><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" ng-if="hasRightsOnAllThreads()" /></th>
 				<th class="six">Titre</th>
 				<th class="one">Image</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="thread in threads.all">
-				<td><input type="checkbox" ng-model="thread.selected" /></td>
+				<td><input type="checkbox" ng-model="thread.selected" ng-if="hasRightsOnThread(thread)" /></td>
 				<td ng-if="currentThread !== thread">[[thread.title]]</td>
 				<td ng-if="currentThread === thread">
 					<input translate attr="placeholder" placeholder="actualites.edition.thread.field.title.placeholder" ng-model="currentThread.title" type="text"/>
@@ -45,9 +45,13 @@
 								<i18n>edit</i18n>
 							</button>
 						</behaviour>
-		
-						<button ng-click="threads.removeSelection()"><i18n>remove</i18n></button>
-		
+						<behaviour name="deleteThread" resource="threads.selection()" class="cell">
+							<button 
+									ng-click="threads.removeSelection()"
+									>
+								<i18n>remove</i18n>
+							</button>
+						</behaviour>
 						<behaviour name="share" resource="threads.selection()" class="cell">
 							<button ng-click="display.showPanel = true">
 								<i18n>share</i18n>

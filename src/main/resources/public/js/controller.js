@@ -235,7 +235,11 @@ function ActualitesController($scope, template, route, model){
 
 	$scope.switchAllThreads = function(){
 		if($scope.display.selectAllThreads){
-			model.threads.selectAll();
+			model.threads.forEach(function(item){
+				if($scope.hasRightsOnThread(item)){
+					item.selected = true;
+				}
+			});
 		}
 		else{
 			model.threads.deselectAll();
@@ -268,7 +272,7 @@ function ActualitesController($scope, template, route, model){
     	return category.myRights.submit !== undefined;
 	};
 	
-	$scope.checkThreadsContribRight = function(){
+	$scope.checkThreadsSubmitRight = function(){
 		var right = false;
 		$scope.threads.forEach(function(item){
 			if(item.myRights.submit){
@@ -281,6 +285,24 @@ function ActualitesController($scope, template, route, model){
 	$scope.checkThreadsAdminRight = function(){
 		return model.me.workflow.actualites.admin;
 	}
+	
+	$scope.hasRightsOnAllThreads = function(){
+		var right = false;
+		$scope.threads.forEach(function(item){
+			if(item.myRights.editThread || item.myRights.deleteThread || item.myRights.share){
+				right = true;
+			}
+		});
+		return right;
+	};
+	
+	$scope.hasRightsOnThread = function(thread){
+		var right = false;
+		if(thread.myRights.editThread || thread.myRights.deleteThread || thread.myRights.share){
+			right = true;
+		}
+		return right;
+	};
 
     this.initialize();
 }
