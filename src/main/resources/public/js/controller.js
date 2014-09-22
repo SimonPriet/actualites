@@ -92,6 +92,14 @@ function ActualitesController($scope, template, route, model){
                 }
             }
         }
+        
+        if(info.owner.userId !== model.me.userId 
+        		&& info.thread.owner.userId !== model.me.userId 
+        		&& info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING 
+        		&& info.thread.myRights.publish === undefined
+          ){
+        	return false;
+        }
         return true;
     };
 
