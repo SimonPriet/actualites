@@ -103,6 +103,9 @@ function ActualitesController($scope, template, route, model){
         return true;
     };
 
+    $scope.openMainPage = function(){
+		template.open('main', 'infos-list');
+	}
 
     /* Info Edition */
     $scope.infoExists = function(info) {
