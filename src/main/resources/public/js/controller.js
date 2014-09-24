@@ -1,6 +1,6 @@
 routes.define(function($routeProvider){
     $routeProvider
-        .when('/thread/:threadId', {
+        .when('/view/thread/:threadId', {
             action: 'viewThread'
         })
 });
@@ -8,9 +8,26 @@ routes.define(function($routeProvider){
 function ActualitesController($scope, template, route, model){
 
     this.initialize = function(){
-
-        route({
+    	$scope.notFound = false;
+    	
+    	route({
             viewThread: function(param){
+            	model.threads.one('sync', function(){
+					if($scope.threadExists(param.threadId)){
+						$scope.notFound = false;
+						if($scope.checkThreadsAdminRight()){
+							$scope.threadsView();
+						}
+						else{
+							template.open('error', '401');
+						}
+					}
+					else{
+						$scope.notFound = true;
+						template.open('error', '404');
+					}
+				});
+				model.threads.sync();		
             }
         });
 
@@ -267,6 +284,16 @@ function ActualitesController($scope, template, route, model){
         $scope.currentThread = undefined;
 		template.open('main', 'threads-view');
     };
+    
+    $scope.threadExists = function(threadId){
+    	var exists = false;
+		model.threads.forEach(function(item){
+			if(item._id === threadId){
+				exists = true;
+			}
+		});
+		return exists;
+	};
 
     /* Util */
     $scope.formatDate = function(date){
