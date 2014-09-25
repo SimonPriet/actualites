@@ -3,6 +3,9 @@ routes.define(function($routeProvider){
         .when('/view/thread/:threadId', {
             action: 'viewThread'
         })
+        .when('/view/thread/:threadId/info/:infoId', {
+            action: 'viewInfo'
+        })
 });
 
 function ActualitesController($scope, template, route, model){
@@ -11,23 +14,72 @@ function ActualitesController($scope, template, route, model){
     	$scope.notFound = false;
     	
     	route({
-            viewThread: function(param){
+            viewThread: function(params){
             	model.threads.one('sync', function(){
-					if($scope.threadExists(param.threadId)){
-						$scope.notFound = false;
+					$scope.thread = undefined;
+            		$scope.thread = model.threads.find(function(thread){
+    					return thread._id === params.threadId;
+    				});
+    				if($scope.thread === undefined){
+    					$scope.notFound = true;
+    					template.open('error', '404');
+    				}
+    				else{
 						if($scope.checkThreadsAdminRight()){
+							$scope.notFound = false;
+							$scope.thread = undefined;
 							$scope.threadsView();
 						}
 						else{
+							$scope.notFound = true;
 							template.open('error', '401');
 						}
-					}
-					else{
-						$scope.notFound = true;
-						template.open('error', '404');
-					}
+    				}
 				});
 				model.threads.sync();		
+            },
+            viewInfo: function(params){
+            	model.threads.one('sync', function(){
+            		$scope.thread = undefined;
+            		$scope.thread = model.threads.find(function(thread){
+    					return thread._id === params.threadId;
+    				});
+    				if($scope.thread === undefined){
+    					$scope.notFound = true;
+    					template.open('error', '404');
+    				}
+    				else{
+    					if($scope.checkThreadsAdminRight()){
+    						$scope.infos.one('sync', function(){
+        						$scope.info = undefined;
+        						$scope.info = model.infos.find(function(info){
+        							return info._id === params.infoId;
+        						});
+        						if($scope.info === undefined){
+        							$scope.notFound = true;
+        							template.open('error', '404');
+        						}
+        						else{
+        							if($scope.isInfoVisible($scope.info)){
+        								$scope.notFound = false;
+										$scope.setFilter($scope.info.status);
+        								$scope.openMainPage();
+        							}
+        							else{
+        								$scope.notFound = true;
+        								template.open('error', '401');
+        							}
+        						}
+        					});
+        					$scope.infos.sync();
+						}
+						else{
+							$scope.notFound = true;
+							template.open('error', '401');
+						}
+    				}
+				});
+				model.threads.sync();
             }
         });
 
@@ -210,6 +262,30 @@ function ActualitesController($scope, template, route, model){
     	}
     	return "actualites.edition.status." + info.status;
     };
+	
+	$scope.setFilter = function(state){
+    	switch(state) {
+			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
+				$scope.display.show1 = true;
+				$scope.display.show2 = false;
+				$scope.display.show3 = false;
+				break;
+			case ACTUALITES_CONFIGURATION.infoStatus.PENDING:
+				$scope.display.show1 = false;
+				$scope.display.show2 = true;
+				$scope.display.show3 = false;
+				break;
+			case ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED:
+				$scope.display.show1 = false;
+				$scope.display.show2 = false;
+				$scope.display.show3 = true;
+				break;
+			default:
+				$scope.display.show1 = true;
+				$scope.display.show2 = true;
+				$scope.display.show3 = true;
+		}
+    };
 
     /* Info Delete */
     $scope.isInfoDeletable = function(info) {
@@ -284,16 +360,6 @@ function ActualitesController($scope, template, route, model){
         $scope.currentThread = undefined;
 		template.open('main', 'threads-view');
     };
-    
-    $scope.threadExists = function(threadId){
-    	var exists = false;
-		model.threads.forEach(function(item){
-			if(item._id === threadId){
-				exists = true;
-			}
-		});
-		return exists;
-	};
 
     /* Util */
     $scope.formatDate = function(date){

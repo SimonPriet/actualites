@@ -335,7 +335,8 @@ public class StateControllerHelper extends BaseExtractorHelper {
 					"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 			.putString("username", user.getUsername())
 			.putString("info", title)
-			.putString("actuUri", container.config().getString("host") + pathPrefix);
+			.putString("actuUri", container.config().getString("host") + pathPrefix +
+					"#/view/thread/" + info.getThreadId() + "/info/" + infoId);
 		if (infoId != null && !infoId.isEmpty()) {
 			notification.notifyTimeline(request, user, NEWS_NAME, eventType, ids, infoId, template, params);
 		}

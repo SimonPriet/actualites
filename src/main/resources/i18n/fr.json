@@ -67,8 +67,8 @@
 	"thread.manager": "Gestion",
 	"thread.comment": "Commenter",
 	"thread.list.view": "Gestion des catégories",
-	"thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour cette catégorie.",
-	"thread.list.view.error.404": "Cette catégorie n'existe plus.",
+	"thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour ce contenu.",
+	"thread.list.view.error.404": "Ce contenu n'existe plus.",
 
 	"group.Teacher" : "Tous les enseignants du groupe {0}.",
 	"group.Personnel" : "Tous les personnels du groupe {0}.",
