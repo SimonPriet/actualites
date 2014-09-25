@@ -50,8 +50,7 @@ var actualitesBehaviours = {
 		}
 	},
 	workflow: {
-		edit: 'fr.wseduc.actualites.controllers.ActualitesController|viewEdit',
-		admin: 'fr.wseduc.actualites.controllers.ActualitesController|viewAdmin'
+		admin: 'fr.wseduc.actualites.controllers.ActualitesController|createThread'
 	}
 };
 
