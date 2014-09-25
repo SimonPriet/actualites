@@ -255,7 +255,7 @@ public class StateControllerHelper extends BaseExtractorHelper {
 					}
 				});
 			}
-			else{ // notify the owner of the new only
+			else{ // notify the owner of the news only
 				if(eventType == NEWS_PUBLISH_EVENT_TYPE){
 					JsonObject owner = new JsonObject();
 					String userId = body.getObject("owner").getString("userId");
@@ -290,7 +290,7 @@ public class StateControllerHelper extends BaseExtractorHelper {
 				jo = (JsonObject) shared.get(i);
 				if(jo.containsField("userId")){
 					id = jo.getString("userId");
-					if(!ids.contains(id)){
+					if(!ids.contains(id) && !(user.getUserId().equals(id))){
 						ids.add(id);
 					}
 					remaining.getAndDecrement();
@@ -307,7 +307,7 @@ public class StateControllerHelper extends BaseExtractorHelper {
 										for (Object o : event) {
 											if (!(o instanceof JsonObject)) continue;
 											userId = ((JsonObject) o).getString("id");
-											if(!ids.contains(userId)){
+											if(!ids.contains(userId) && !(user.getUserId().equals(userId))){
 												ids.add(userId);
 											}
 										}
