@@ -17,23 +17,22 @@ import fr.wseduc.actualites.services.InfoService;
 import fr.wseduc.webutils.http.Renders;
 
 public class InfoControllerHelper extends BaseExtractorHelper {
-	
+
 	private static final String INFO_ID_PARAMETER = "infoid";
 	private static final String STATE_PARAMETER = "status";
 	private static final String VISIBILITY_FILTER_PARAMETER = "filter";
-	
+
 	private static final VisibilityFilter DEFAULT_VISIBILITY_FILTER = VisibilityFilter.OWNER_AND_SHARED;
-	
+
 	protected final InfoService infoService;
-	
+
 	public InfoControllerHelper(final InfoService infoService) {
 		this.infoService = infoService;
 	}
-	
+
 	public void listInfos(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
-		
-		extractVisibiltyFilter(request, thread);
+
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
 			@Override
 			public void handle(final BaseResource model) {
@@ -46,12 +45,28 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
+	public void listInfosForLinker(final HttpServerRequest request) {
+		final ThreadResource thread = new ThreadRequestModel();
+
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
+			@Override
+			public void handle(final BaseResource model) {
+				try {
+					infoService.listForLinker(thread, arrayResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
+			}
+		});
+	}
+
 	public void listThreadInfos(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
 		thread.requireUser();
 		thread.requireThreadId();
-		
+
 		thread.setVisibilityFilter(DEFAULT_VISIBILITY_FILTER);
 		extractThreadId(request, thread);
 		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
@@ -66,13 +81,13 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
 	public void listThreadInfosByStatus(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
 		thread.requireUser();
 		thread.requireThreadId();
 		thread.requireStateFilter();
-		
+
 		extractThreadId(request, thread);
 		extractVisibiltyFilter(request, thread);
 		extractStateFilter(request, thread);
@@ -88,12 +103,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
 	public void retrieve(final HttpServerRequest request) {
 		final InfoResource info = new InfoRequestModel();
 		info.requireThreadId();
 		info.requireInfoId();
-		
+
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		try {
@@ -103,13 +118,13 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			renderErrorException(request, e);
 		}
 	}
-	
+
 	public void create(final HttpServerRequest request) {
 		final InfoResource info = new InfoRequestModel();
 		info.requireUser();
 		info.requireThreadId();
 		info.requireBody();
-		
+
 		extractThreadId(request, info);
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
 			@Override
@@ -123,14 +138,14 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
 	public void update(final HttpServerRequest request) {
 		final InfoResource info = new InfoRequestModel();
 		info.requireUser();
 		info.requireThreadId();
 		info.requireInfoId();
 		info.requireBody();
-		
+
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
@@ -145,13 +160,13 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
 	public void delete(final HttpServerRequest request) {
 		final InfoResource info = new InfoRequestModel();
 		info.requireUser();
 		info.requireThreadId();
 		info.requireInfoId();
-		
+
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		extractUserFromRequest(info, request, new Handler<BaseResource>() {
@@ -166,14 +181,14 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
+
 	public void comment(final HttpServerRequest request) {
 		final InfoResource info = new InfoRequestModel();
 		info.requireUser();
 		info.requireThreadId();
 		info.requireInfoId();
 		info.requireBody();
-		
+
 		extractThreadId(request, info);
 		extractInfoId(request, info);
 		extractUserAndBodyFromRequest(info, request, new Handler<BaseResource>() {
@@ -188,8 +203,8 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			}
 		});
 	}
-	
-	
+
+
 	protected void extractVisibiltyFilter(final HttpServerRequest request, final ThreadResource thread) {
 		try {
 			thread.setVisibilityFilter(request.params().get(VISIBILITY_FILTER_PARAMETER), DEFAULT_VISIBILITY_FILTER);
@@ -199,7 +214,7 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			Renders.badRequest(request, ire.getMessage());
 		}
 	}
-	
+
 	protected void extractStateFilter(final HttpServerRequest request, final ThreadResource thread) {
 		try {
 			thread.setStateFilter(request.params().get(STATE_PARAMETER));
@@ -209,7 +224,7 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			Renders.badRequest(request, ire.getMessage());
 		}
 	}
-	
+
 	protected void extractInfoId(final HttpServerRequest request, final InfoResource info) {
 		try {
 			info.setInfoId(request.params().get(INFO_ID_PARAMETER));

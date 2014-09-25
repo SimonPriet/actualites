@@ -34,13 +34,8 @@ public class ActualitesController extends BaseController {
 	private final ThreadControllerHelper threadHelper;
 	private final InfoControllerHelper infoHelper;
 	private final StateControllerHelper stateHelper;
-	private final InfoService infoService;
-	private final ThreadService threadService;
 
 	public ActualitesController(final String collection, final ThreadService threadService, final InfoService infoService) {
-		this.infoService = infoService;
-		this.threadService = threadService;
-
 		this.threadHelper = new ThreadControllerHelper(collection, threadService);
 		this.infoHelper = new InfoControllerHelper(infoService);
 		this.stateHelper = new StateControllerHelper(infoService, threadService);
@@ -119,13 +114,22 @@ public class ActualitesController extends BaseController {
 	}
 
 
-	@Get("/infos/:filter")
+	@Get("/infos")
 	@ApiDoc("Get infos in thread by status and by thread id.")
 	@SecuredAction("actualites.infos.list")
 	public void listInfos(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		infoHelper.listInfos(request);
 	}
+
+	@Get("/linker/infos")
+	@ApiDoc("List infos without their content. Used by linker")
+	@SecuredAction("actualites.view")
+	public void listInfosForLinker(final HttpServerRequest request) {
+		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
+		infoHelper.listInfosForLinker(request);
+	}
+
 
 	@Get("/thread/:id/infos")
 	@ApiDoc("Get infos in thread by thread id.")

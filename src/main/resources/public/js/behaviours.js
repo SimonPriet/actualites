@@ -89,6 +89,52 @@ Behaviours.register('actualites', {
 		return workflow;
 	},
 	resourceRights: function(){
-		return ['read', 'contrib', 'publish', 'manager', 'comment']
+		return ['read', 'contrib', 'publish', 'manager', 'comment'];
+	},
+	
+	// Used by component "linker" to load news
+	loadResources: function(callback){
+		http().get('/actualites/linker/infos').done(function(data) {
+			var infosArray = _.map(data, function(thread){
+				var infos = _.map(thread.infos, function(info){
+					// Keep news that are published and not expired
+					if(info.status === 3) {	
+						if(info.expirationDate && (moment().unix() > moment(info.expirationDate).unix())) {
+							return;
+						}
+						
+						var threadIcon;
+						if (typeof (thread.icon) === 'undefined' || thread.icon === '' ) {
+							threadIcon = '/img/icons/glyphicons_036_file.png';
+						}
+						else {
+							threadIcon = thread.icon + '?thumbnail=48x48';
+						}
+						
+						return {
+							title : info.title + ' [' + thread.title + ']',
+							ownerName : info.owner.displayName,
+							owner : info.owner.userId,
+							icon : threadIcon,
+							path : '/actualites?thread=' + thread._id + '&info=' + info._id, // TODO
+							id : info._id,
+							thread_id : thread._id
+						};
+					}
+				});
+				
+				return infos;
+			});
+			
+			this.resources = _.compact(_.flatten(infosArray));
+			this.resources = _.sortBy(this.resources, function(info) {
+				return info.title;
+			});
+			
+			if(typeof callback === 'function'){
+				callback(this.resources);
+			}
+		}.bind(this));
 	}
+	
 });

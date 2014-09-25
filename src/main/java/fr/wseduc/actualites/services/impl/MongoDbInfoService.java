@@ -32,7 +32,7 @@ import fr.wseduc.mongodb.MongoUpdateBuilder;
 import fr.wseduc.webutils.Either;
 
 public class MongoDbInfoService extends AbstractService implements InfoService {
-	
+
 	public MongoDbInfoService(final String collection) {
 		super(collection);
 	}
@@ -49,12 +49,12 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 				.putString("displayName", info.getUser().getUsername()))
 			.putObject("created", now).putObject("modified", now)
 			.putNumber("status", InfoState.DRAFT.getId());
-		
+
 		// Prepare Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId());
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		modifier.push("infos", info.getBody());
-		
+
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(new Handler<Either<String, JsonObject>>(){
 			@Override
@@ -87,7 +87,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Prepare Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
 				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
-		
+
 		// Projection
 		JsonObject idMatch = new JsonObject();
 		idMatch.putString("_id", info.getInfoId());
@@ -95,7 +95,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		elemMatch.putObject("$elemMatch", idMatch);
 		JsonObject projection = new JsonObject();
 		projection.putObject("infos", elemMatch);
-		
+
 		mongo.findOne(collection,  MongoQueryBuilder.build(query), projection, validResultHandler(new Handler<Either<String, JsonObject>>(){
 			@Override
 			public void handle(Either<String, JsonObject> event) {
@@ -123,7 +123,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
 				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
-		
+
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare Info object update
 		for (String attr: info.getBody().getFieldNames()) {
@@ -132,10 +132,10 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			}
 		}
 		modifier.set("infos.$.modified", MongoDb.now());
-		
+
 		// Prepare Thread update
 		modifier.set("modified", MongoDb.now());
-		
+
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
 	}
@@ -145,42 +145,42 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
 				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
-		
+
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare Info delete
 		JsonObject infoMatcher = new JsonObject();
 		modifier.pull("infos", infoMatcher.putString("_id", info.getInfoId()));
-		
+
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
 	}
-	
+
 	@Override
 	public void changeState(final InfoResource info, final InfoState targetState, final Handler<Either<String, JsonObject>> handler) {
 		// Query
 		DBObject infoMatch = new BasicDBObject();
 		infoMatch.put("_id", info.getInfoId());
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
-		
+
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare Info object update
 		modifier.set("infos.$.status", targetState.getId());
 		modifier.set("infos.$.modified", MongoDb.now());
-		
+
 		// Prepare Thread update
 		modifier.set("modified", MongoDb.now());
-		
+
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
 	}
-	
+
 	@Override
 	public void addComment(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
 		// Query
 		DBObject infoMatch = new BasicDBObject();
 		infoMatch.put("_id", info.getInfoId());
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
-		
+
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare comment object
 		info.getBody()
@@ -188,11 +188,11 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 			.putString("authorName", info.getUser().getUsername())
 			.putObject("posted", MongoDb.now());
 		modifier.push("infos.$.comments", info.getBody());
-		
+
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
 	}
-	
+
 	@Override
 	public void list(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
 		// Start with Thread if present
@@ -203,54 +203,79 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		else {
 			query = QueryBuilder.start("_id").is(thread.getThreadId());
 		}
-		
+
 		// Visibility Filter
 		if (thread.getUser() != null) {
-			prepareVisibilityFilteredQuery(query, thread.getUser(), thread.getVisibilityFilter());
+			prepareVisibilityFilteredQuery(query, thread.getUser(), VisibilityFilter.ALL);
 		} else {
 			preparePublicVisibleQuery(query);
 		}
-		
+
 		// Projection
 		JsonObject projection = new JsonObject();
 		projection.putNumber("infos", 1);
-		
+
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
 		mongo.find(collection, MongoQueryBuilder.build(query), sort, projection, validResultsHandler(handler));
 	}
-	
+
+	@Override
+	public void listForLinker(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
+		QueryBuilder query = QueryBuilder.start();
+
+		// Visibility Filter
+		if (thread.getUser() != null) {
+			prepareVisibilityFilteredQuery(query, thread.getUser(), VisibilityFilter.ALL);
+		} else {
+			preparePublicVisibleQuery(query);
+		}
+
+		// Projection
+		JsonObject projection = new JsonObject();
+		projection.putNumber("created", 0)
+			.putNumber("modified", 0)
+			.putNumber("mode", 0)
+			.putNumber("owner", 0)
+			.putNumber("infos.content", 0)
+			.putNumber("infos.created", 0)
+			.putNumber("infos.modified", 0);
+
+		JsonObject sort = new JsonObject().putNumber("infos.title", 1);
+		mongo.find(collection, MongoQueryBuilder.build(query), sort, projection, validResultsHandler(handler));
+	}
+
 
 	@Override
 	public void canDoByState(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final InfoState state, final Handler<Boolean> handler) {
 		final QueryBuilder query = QueryBuilder.start();
 		prepareIsSharedQuery(query, user, threadId, sharedMethod);
-		
+
 		DBObject infoMatch = new BasicDBObject();
 		infoMatch.put("_id", infoId);
 		infoMatch.put("status", state.getId());
 		query.put("infos").elemMatch(infoMatch);
-		
+
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
-	
+
 	@Override
 	public void canDoMineByState(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final InfoState state, final Handler<Boolean> handler) {
 		final QueryBuilder query = QueryBuilder.start();
 		prepareIsSharedQuery(query, user, threadId, sharedMethod);
-		
+
 		DBObject infoMatch = new BasicDBObject();
 		infoMatch.put("_id", infoId);
 		infoMatch.put("status", state.getId());
 		infoMatch.put("owner.userId", user.getUserId());
 		query.put("infos").elemMatch(infoMatch);
-		
+
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
-	
+
 	@Override
 	public void canDoSharedOrMineByState(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final InfoState state, final Handler<Boolean> handler) {
 		final QueryBuilder query = QueryBuilder.start();
-		
+
 		// Shared
 		final QueryBuilder sharedQuery = QueryBuilder.start();
 		prepareIsSharedQuery(sharedQuery, user, threadId, sharedMethod);
@@ -258,7 +283,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		infoMatch.put("_id", infoId);
 		infoMatch.put("status", state.getId());
 		sharedQuery.put("infos").elemMatch(infoMatch);
-		
+
 		// Mine
 		final QueryBuilder mineQuery = QueryBuilder.start();
 		DBObject mineMatch = new BasicDBObject();
@@ -266,17 +291,17 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		mineMatch.put("status", state.getId());
 		mineMatch.put("owner.userId", user.getUserId());
 		mineQuery.put("infos").elemMatch(mineMatch);
-		
+
 		query.or(sharedQuery.get(), mineQuery.get());
-		
+
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
-	
+
 	@Override
 	public void canDoByStatesAndModes(final UserInfos user, final String threadId, final String infoId, final String sharedMethod, final Map<InfoMode, InfoState> statesAndModes, final Handler<Boolean> handler) {
 		final QueryBuilder query = QueryBuilder.start();
 		prepareIsSharedQuery(query, user, threadId, sharedMethod);
-		
+
 		DBObject[] orsArray = new DBObject[statesAndModes.size()];
 		List<DBObject> ors = new ArrayList<DBObject>(statesAndModes.size());
 		for(Entry<InfoMode, InfoState> entry : statesAndModes.entrySet()) {
@@ -289,15 +314,15 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 					).get());
 		}
 		query.or(ors.toArray(orsArray));
-		
+
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
 
-	
+
 	protected void prepareIsSharedQuery(final QueryBuilder query, final UserInfos user, final String threadId, final String sharedMethod) {
 		// ThreadId
 		query.put("_id").is(threadId);
-		
+
 		// Permissions
 		List<DBObject> groups = new ArrayList<>();
 		groups.add(QueryBuilder.start("userId").is(user.getUserId())
@@ -314,7 +339,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 						new QueryBuilder().or(groups.toArray(new DBObject[groups.size()])).get()).get()
 		);
 	}
-	
+
 	protected void executeCountQuery(final JsonObject query, final int expectedCountResult, final Handler<Boolean> handler) {
 		mongo.count(collection, query, new Handler<Message<JsonObject>>() {
 			@Override

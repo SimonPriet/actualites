@@ -280,7 +280,7 @@ model.build = function(){
 
 	this.collection(Info, {
 		sync: function(){
-			http().get('/actualites/infos/all').done(function(data){
+			http().get('/actualites/infos').done(function(data){
 				var that = this;
 				this.all = [];
 				data.forEach(function(thread){
