@@ -91,4 +91,38 @@ public class MongoDbThreadService extends AbstractService implements ThreadServi
 			}
 		});
 	}
+
+	@Override
+	public void getSharedWithIds(String threadId, UserInfos user, final Handler<Either<String, JsonArray>> handler) {
+		this.retrieve(threadId, user, new Handler<Either<String, JsonObject>>() {
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				JsonArray sharedWithIds = new JsonArray();
+				if (event.isRight()) {
+					try {
+						JsonObject thread = event.right().getValue();
+						if (thread.containsField("owner")) {
+							sharedWithIds.add(thread.getObject("owner"));
+						}
+						if (thread.containsField("shared")) {
+							JsonArray shared = thread.getArray("shared");
+							for(Object jo : shared){
+								sharedWithIds.add(jo);
+							}
+							handler.handle(new Either.Right<String, JsonArray>(sharedWithIds));
+						}
+						else {
+							handler.handle(new Either.Right<String, JsonArray>(new JsonArray()));
+						}
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonArray>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
+					}
+				}
+				else {
+					handler.handle(new Either.Left<String, JsonArray>(event.left().getValue()));
+				}
+			}
+		});
+	}
 }

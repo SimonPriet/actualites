@@ -257,21 +257,29 @@ public class StateControllerHelper extends BaseExtractorHelper {
 			}
 			else{ // notify the owner of the news only
 				if(eventType == NEWS_PUBLISH_EVENT_TYPE){
-					JsonObject owner = new JsonObject();
-					String userId = body.getObject("owner").getString("userId");
-					owner.putString("userId", userId);
-					JsonArray shared = new JsonArray();
-					shared.add(owner);
-					extractUserIds(request, shared, user, info, body, eventType, "notify-news-published.html");
+					threadService.getSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+						@Override
+						public void handle(Either<String, JsonArray> event) {
+							if (event.isRight()) {
+								// get all ids
+								JsonArray shared = event.right().getValue();
+								extractUserIds(request, shared, user, info, body, eventType, "notify-news-published.html");
+							}
+						}
+					});
 				}
 				else{
 					if(eventType == NEWS_UNPUBLISH_EVENT_TYPE){
-						JsonObject owner = new JsonObject();
-						String userId = body.getObject("owner").getString("userId");
-						owner.putString("userId", userId);
-						JsonArray shared = new JsonArray();
-						shared.add(owner);
-						extractUserIds(request, shared, user, info, body, eventType, "notify-news-unpublished.html");
+						threadService.getSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+							@Override
+							public void handle(Either<String, JsonArray> event) {
+								if (event.isRight()) {
+									// get all ids
+									JsonArray shared = event.right().getValue();
+									extractUserIds(request, shared, user, info, body, eventType, "notify-news-unpublished.html");
+								}
+							}
+						});
 					}
 				}
 			}

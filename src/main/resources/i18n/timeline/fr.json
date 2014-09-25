@@ -1,7 +1,7 @@
 {
 	"timeline.actu.info.submitted": "a envoyé une nouvelle actualité pour validation ",
-	"timeline.actu.info.unsubmitted": "a annulé la demande de validation pour l'actualité ",
-	"timeline.actu.info.published": "a publié votre actualité ",
-	"timeline.actu.info.unpublished": "a dépublié votre actualité ",
+	"timeline.actu.info.unsubmitted": "a annulé la demande de validation pour cette actualité ",
+	"timeline.actu.info.published": "a publié cette actualité ",
+	"timeline.actu.info.unpublished": "a dépublié cette actualité ",
 	"timeline.actu.thread.shared": "a partagé avec vous la catégorie "
 }
