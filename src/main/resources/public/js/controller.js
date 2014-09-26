@@ -60,7 +60,7 @@ function ActualitesController($scope, template, route, model){
         							if($scope.isInfoVisible($scope.info)){
         								$scope.notFound = false;
 										$scope.setFilter($scope.info.status);
-										template.open('main', 'single-info-view');
+										template.open('main', 'single-info');
         							}
         							else{
         								$scope.notFound = true;
@@ -192,23 +192,26 @@ function ActualitesController($scope, template, route, model){
 	};
 	
     $scope.showDeleteInfo = function(info) {
-    	$scope.currentInfo = info;
+    	$scope.infoToDelete = info;
     	$scope.display.showConfirmRemove = true;
     }
     
     $scope.cancelDeleteInfo = function() {
-    	$scope.currentInfo = undefined;
+    	$scope.infoToDelete = undefined;
     	$scope.display.showConfirmRemove = false;
     }
     
     $scope.deleteInfo = function() {
-    	$scope.currentInfo.delete();
+    	$scope.infoToDelete.delete();
     	$scope.display.showConfirmRemove = false;
+    	if($scope.info) {
+    		$scope.openMainPage();
+    	}
     }
 
     $scope.saveInfo = function(){
     	if($scope.info) {
-    		template.open('main', 'single-info-view');
+    		template.open('main', 'single-info');
     	}
     	else {
     		template.open('main', 'infos-list');
@@ -219,7 +222,7 @@ function ActualitesController($scope, template, route, model){
 
     $scope.cancelEditInfo = function(){
     	if($scope.info) {
-    		template.open('main', 'single-info-view');
+    		template.open('main', 'single-info');
     	}
     	else {
     		template.open('main', 'infos-list');
