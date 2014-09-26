@@ -124,7 +124,7 @@ public class ActualitesController extends BaseController {
 
 	@Get("/linker/infos")
 	@ApiDoc("List infos without their content. Used by linker")
-	@SecuredAction("actualites.view")
+	@SecuredAction("actualites.infos.list")
 	public void listInfosForLinker(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		infoHelper.listInfosForLinker(request);
