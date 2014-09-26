@@ -14,20 +14,19 @@ function ActualitesController($scope, template, route, model){
     	$scope.notFound = false;
     	
     	route({
+    		// Routes viewThread and viewInfo are used by notifications
             viewThread: function(params){
             	model.threads.one('sync', function(){
-					$scope.thread = undefined;
-            		$scope.thread = model.threads.find(function(thread){
+            		var aThread = model.threads.find(function(thread){
     					return thread._id === params.threadId;
     				});
-    				if($scope.thread === undefined){
+    				if(aThread === undefined){
     					$scope.notFound = true;
     					template.open('error', '404');
     				}
     				else{
 						if($scope.checkThreadsAdminRight()){
 							$scope.notFound = false;
-							$scope.thread = undefined;
 							$scope.threadsView();
 						}
 						else{
@@ -36,15 +35,13 @@ function ActualitesController($scope, template, route, model){
 						}
     				}
 				});
-				model.threads.sync();		
             },
             viewInfo: function(params){
             	model.threads.one('sync', function(){
-            		$scope.thread = undefined;
-            		$scope.thread = model.threads.find(function(thread){
+            		var aThread = model.threads.find(function(thread){
     					return thread._id === params.threadId;
     				});
-    				if($scope.thread === undefined){
+    				if(aThread === undefined){
     					$scope.notFound = true;
     					template.open('error', '404');
     				}
@@ -63,7 +60,7 @@ function ActualitesController($scope, template, route, model){
         							if($scope.isInfoVisible($scope.info)){
         								$scope.notFound = false;
 										$scope.setFilter($scope.info.status);
-        								$scope.openMainPage();
+										template.open('main', 'single-info-view');
         							}
         							else{
         								$scope.notFound = true;
@@ -71,7 +68,6 @@ function ActualitesController($scope, template, route, model){
         							}
         						}
         					});
-        					$scope.infos.sync();
 						}
 						else{
 							$scope.notFound = true;
@@ -79,7 +75,6 @@ function ActualitesController($scope, template, route, model){
 						}
     				}
 				});
-				model.threads.sync();
             }
         });
 
@@ -172,6 +167,9 @@ function ActualitesController($scope, template, route, model){
     };
 
     $scope.openMainPage = function(){
+    	delete $scope.info;
+    	delete $scope.currentInfo;
+    	window.location.hash = '';
 		template.open('main', 'infos-list');
 	}
 
@@ -209,13 +207,23 @@ function ActualitesController($scope, template, route, model){
     }
 
     $scope.saveInfo = function(){
-    	template.open('main', 'infos-list');
+    	if($scope.info) {
+    		template.open('main', 'single-info-view');
+    	}
+    	else {
+    		template.open('main', 'infos-list');
+    	}
 		$scope.currentInfo.save();
 		$scope.currentInfo = undefined;
     };
 
     $scope.cancelEditInfo = function(){
-		template.open('main', 'infos-list');
+    	if($scope.info) {
+    		template.open('main', 'single-info-view');
+    	}
+    	else {
+    		template.open('main', 'infos-list');
+    	}
         $scope.currentInfo = undefined;
     };
 

@@ -19,10 +19,6 @@
 				<button ng-if="checkThreadsAdminRight()" ng-click="threadsView()" translate content="thread.list.view"></button>
 			</div>
 		</div>
-		<div ng-if="thread" class="row">
-			<h2>[[thread.title]]</h2>
-			<a ng-click="closeThread()">Afficher toutes les actualités</a>
-		</div>
 
 		<container template="main"></container>
 	</div>

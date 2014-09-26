@@ -25,6 +25,8 @@
 	"actualites.links.admin.edition": "Accéder à l'application",
 	"actualites.links.read": "Lire les actualités",
 	"actualites.links.back": "<< Retour",
+	"actualites.links.display.news.of.all.threads": "Afficher les actualités de toutes les catégories",
+	"actualites.links.display.all.news": "Afficher toutes les actualités",
 
 	"actualites.edition.title": "Gestion des actualités",
 

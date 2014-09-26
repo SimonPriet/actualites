@@ -1,19 +1,12 @@
-<div ng-if="display.emptyThread" class="row">
-	<h2 translate content="actualites.thread.empty"></h2>
-</div>
+<div>
+	<div class="contextual-buttons">
+		<div class="action-buttons">
+			<a ng-click="openMainPage()"><i18n>actualites.links.display.all.news</i18n></a>
+		</div>
+	</div>
 
-<container template="filters"></container>
-
-<div ng-if="thread" class="row">
-	<h2>[[thread.title]]</h2>
-	<a ng-click="closeThread()">
-		<i18n>actualites.links.display.news.of.all.threads</i18n>
-	</a>
-</div>
-		
-<div ng-repeat="info in infos.all | orderBy:'modified.$date':true">
 	<div class="row vertical-spacing"></div>
-	<div ng-if="isInfoVisible(info)" class="illustrated-article">
+	<div class="illustrated-article">
 		<div class="illustration" ng-click="openThread(info.thread)">
 			<div class="image">
 				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />
@@ -34,6 +27,4 @@
 			<div class="row"></div>
 		</article>
 	</div>
-
 </div>
-
