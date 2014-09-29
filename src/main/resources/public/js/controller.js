@@ -1,3 +1,6 @@
+// custom loading
+loader.loadFile('/actualites/public/js/additional.js');
+
 routes.define(function($routeProvider){
     $routeProvider
         .when('/view/thread/:threadId', {
@@ -102,6 +105,7 @@ function ActualitesController($scope, template, route, model){
 			show3: true
 		};
         
+        $scope.startDate = moment();
         $scope.appPrefix = 'actualites';
         $scope.currentThread = {};
 
