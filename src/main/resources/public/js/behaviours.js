@@ -116,7 +116,7 @@ Behaviours.register('actualites', {
 							ownerName : info.owner.displayName,
 							owner : info.owner.userId,
 							icon : threadIcon,
-							path : '/actualites?thread=' + thread._id + '&info=' + info._id, // TODO
+							path : '/actualites#/view/thread/' + thread._id + '/info/' + info._id,
 							id : info._id,
 							thread_id : thread._id
 						};
