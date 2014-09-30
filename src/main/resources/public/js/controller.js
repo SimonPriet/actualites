@@ -420,6 +420,14 @@ function ActualitesController($scope, template, route, model){
 		}
 		return right;
 	};
+	
+	$scope.canDeleteComment = function(info, comment){
+		var right = false;
+		if(comment.author === model.me.userId || info.thread.myRights.deleteThread){
+			right = true;
+		}
+		return right;
+	};
 
     this.initialize();
 }

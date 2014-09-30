@@ -8,7 +8,9 @@
 		<em>le [[formatDate(comment.posted)]]</em>
 		<p>[[comment.comment]]</p>
 	</div>
-
+	<div ng-if="comment._id" class="right-magnet cell">
+		<a ng-if="canDeleteComment(info, comment)" ng-click="info.deleteComment(comment, $index)">supprimer</a>
+	</div>
 </article>
 
 <behaviour name="comment" resource="info" class="row">

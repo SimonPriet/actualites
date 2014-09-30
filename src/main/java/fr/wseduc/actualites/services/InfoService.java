@@ -31,6 +31,8 @@ public interface InfoService {
 
 	public void addComment(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
+	public void deleteComment(InfoResource info, String commentId, Handler<Either<String, JsonObject>> handler);
+
 	public void canDoByState(UserInfos user, String threadId, String infoId, String sharedMethod, InfoState state, Handler<Boolean> handler);
 
 	public void canDoMineByState(UserInfos user, String threadId, String infoId, String sharedMethod, InfoState state, Handler<Boolean> handler);

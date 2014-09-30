@@ -183,11 +183,47 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare comment object
+		final ObjectId newId = new ObjectId();
 		info.getBody()
+			.putString("_id", newId.toStringMongod())
 			.putString("author", info.getUser().getUserId())
 			.putString("authorName", info.getUser().getUsername())
 			.putObject("posted", MongoDb.now());
 		modifier.push("infos.$.comments", info.getBody());
+
+		// Execute query
+		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validResultHandler(new Handler<Either<String, JsonObject>>(){
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				if (event.isRight()) {
+					try {
+						// Extract info
+						JsonObject comment = new JsonObject();
+						comment.putString("_id", newId.toStringMongod());
+						handler.handle(new Either.Right<String, JsonObject>(comment));
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonObject>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
+					}
+				}
+				else {
+					handler.handle(event);
+				}
+			}
+		}));
+	}
+
+	@Override
+	public void deleteComment(InfoResource info, String commentId, Handler<Either<String, JsonObject>> handler) {
+		// Query
+		DBObject infoMatch = new BasicDBObject();
+		infoMatch.put("_id", info.getInfoId());
+		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId()).put("infos").elemMatch(infoMatch);
+
+		// Prepare comment delete
+		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
+		JsonObject commentMatcher = new JsonObject();
+		modifier.pull("infos.$.comments", commentMatcher.putString("_id", commentId));
 
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(handler));
@@ -317,7 +353,6 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 		executeCountQuery(MongoQueryBuilder.build(query), 1, handler);
 	}
-
 
 	protected void prepareIsSharedQuery(final QueryBuilder query, final UserInfos user, final String threadId, final String sharedMethod) {
 		// ThreadId

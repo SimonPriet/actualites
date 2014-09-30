@@ -19,6 +19,7 @@ import fr.wseduc.webutils.http.Renders;
 public class InfoControllerHelper extends BaseExtractorHelper {
 
 	private static final String INFO_ID_PARAMETER = "infoid";
+	private static final String COMMENT_ID_PARAMETER = "commentid";
 	private static final String STATE_PARAMETER = "status";
 	private static final String VISIBILITY_FILTER_PARAMETER = "filter";
 
@@ -196,6 +197,30 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 			public void handle(final BaseResource model) {
 				try {
 					infoService.addComment(info, notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
+			}
+		});
+	}
+
+	public void deleteComment(final HttpServerRequest request) {
+		final InfoResource info = new InfoRequestModel();
+		info.requireUser();
+		info.requireThreadId();
+		info.requireInfoId();
+		info.requireBody();
+
+		extractThreadId(request, info);
+		extractInfoId(request, info);
+
+		extractUserFromRequest(info, request, new Handler<BaseResource>() {
+			@Override
+			public void handle(final BaseResource model) {
+				try {
+					String commentId = request.params().get(COMMENT_ID_PARAMETER);
+					infoService.deleteComment(info, commentId, notEmptyResponseHandler(request));
 				}
 				catch (Exception e) {
 					renderErrorException(request, e);

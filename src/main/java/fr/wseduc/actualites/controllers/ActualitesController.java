@@ -62,7 +62,6 @@ public class ActualitesController extends BaseController {
 		threadHelper.listThreads(request);
 	}
 
-
 	@Post("/threads")
 	@ApiDoc("Create a new Thread.")
 	@SecuredAction("actualites.create")
@@ -240,5 +239,12 @@ public class ActualitesController extends BaseController {
 	@SecuredAction(value = "thread.comment", type = ActionType.RESOURCE)
 	public void comment(final HttpServerRequest request) {
 		infoHelper.comment(request);
+	}
+
+	@Delete("/thread/:id/info/:infoid/comment/:commentid")
+	@ApiDoc("Comment : delete a comment by thread id, info id and comment id ")
+	@SecuredAction(value = "thread.comment", type = ActionType.RESOURCE)
+	public void deleteComment(final HttpServerRequest request) {
+		infoHelper.deleteComment(request);
 	}
 }

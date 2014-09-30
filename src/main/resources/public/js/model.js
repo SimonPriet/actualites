@@ -137,13 +137,23 @@ Info.prototype.delete = function(){
 
 
 Info.prototype.comment = function(commentText){
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/comment', { comment: commentText });
-	this.comments.push(new Comment({
-		author: model.me.userId,
-		authorName: model.me.username,
-		comment: commentText,
-		posted: moment()
-	}));
+	var info = this;
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/comment', { comment: commentText }).done(function(comment){
+		info.comments.push(new Comment({
+			_id: comment._id,
+			author: model.me.userId,
+			authorName: model.me.username,
+			comment: commentText,
+			posted: moment()
+		}));
+	});
+};
+
+Info.prototype.deleteComment = function(comment, index){
+	var info = this;
+	http().delete('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/comment/' + comment._id).done(function(comment){
+		info.comments.splice(index, 1);
+	});
 };
 
 function Thread(){
