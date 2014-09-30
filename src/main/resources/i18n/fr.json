@@ -2,6 +2,7 @@
 	"actualites.title": "Actualités",
 	"actualites.title.edition": "Gestion des actualités",
 	"actualites.title.admin": "Administration des actualités",
+	"actualites.title.new": "Nouvelle actualité",
 
 	"actualites.threads.title": "Fils d'actualités",
 	"actualites.threads.title.admin": "Gestion des fils d'actualités",
@@ -69,6 +70,7 @@
 	"thread.manager": "Gestion",
 	"thread.comment": "Commenter",
 	"thread.list.view": "Gestion des catégories",
+	"thread.title.edit": "Modifier la catégorie",
 	"thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour ce contenu.",
 	"thread.list.view.error.404": "Ce contenu n'existe plus.",
 

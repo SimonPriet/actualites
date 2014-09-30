@@ -62,7 +62,6 @@ function ActualitesController($scope, template, route, model){
         						else{
         							if($scope.isInfoVisible($scope.info)){
         								$scope.notFound = false;
-										$scope.setFilter($scope.info.status);
 										template.open('main', 'single-info');
         							}
         							else{

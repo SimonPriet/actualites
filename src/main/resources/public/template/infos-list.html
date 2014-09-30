@@ -1,3 +1,10 @@
+<div class="row contextual-buttons ng-scope">
+	<div class="action-buttons" >
+		<button ng-if="checkThreadsSubmitRight()" ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+		<button ng-if="checkThreadsAdminRight()" ng-click="threadsView()" translate content="thread.list.view"></button>
+	</div>
+</div>
+
 <div ng-if="display.emptyThread" class="row">
 	<h2 translate content="actualites.thread.empty"></h2>
 </div>
