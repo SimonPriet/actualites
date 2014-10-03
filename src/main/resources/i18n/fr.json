@@ -69,6 +69,7 @@
 	"thread.publish": "Publier",
 	"thread.manager": "Gestion",
 	"thread.comment": "Commenter",
+	"thread.title": "Titre du fil d'actualités",
 	"thread.title.edit": "Modifier le fil d'actualités",
 	"thread.list.view": "Gestion des fils d'actualités",
 	"thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour ce contenu.",
