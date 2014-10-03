@@ -26,12 +26,12 @@
 	"actualites.links.admin.edition": "Accéder à l'application",
 	"actualites.links.read": "Lire les actualités",
 	"actualites.links.back": "<< Retour",
-	"actualites.links.display.news.of.all.threads": "Afficher les actualités de toutes les catégories",
+	"actualites.links.display.news.of.all.threads": "Afficher les actualités de tous les fils",
 	"actualites.links.display.all.news": "Afficher toutes les actualités",
 
 	"actualites.edition.title": "Gestion des actualités",
 
-	"actualites.edition.thread.new": "Nouvelle catégorie",
+	"actualites.edition.thread.new": "Nouveau fil d'actualités",
 	"actualites.edition.thread.back": "Retour aux actualités",
 	"actualites.edition.thread.create": "Créer un nouveau fil",
 	"actualites.edition.thread.edit": "Editer",
@@ -69,8 +69,8 @@
 	"thread.publish": "Publier",
 	"thread.manager": "Gestion",
 	"thread.comment": "Commenter",
-	"thread.list.view": "Gestion des catégories",
-	"thread.title.edit": "Modifier la catégorie",
+	"thread.title.edit": "Modifier le fil d'actualités",
+	"thread.list.view": "Gestion des fils d'actualités",
 	"thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour ce contenu.",
 	"thread.list.view.error.404": "Ce contenu n'existe plus.",
 
