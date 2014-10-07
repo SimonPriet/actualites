@@ -70,10 +70,15 @@ Info.prototype.toJSON = function(){
 	};
 }
 
-Info.prototype.create = function(){
+Info.prototype.create = function(callback){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(e){
-		model.infos.sync();
+	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(response){
+		if((typeof callback === 'function') && response && response._id){
+			callback(response._id);
+		}
+		else {
+			model.infos.sync();
+		}
 	}.bind(this));
 }
 
@@ -82,12 +87,12 @@ Info.prototype.saveModifications = function(){
 	http().putJson(resourceUrl, this);
 };
 
-Info.prototype.save = function(){
+Info.prototype.save = function(callback){
 	if(this._id){
 		this.saveModifications();
 	}
 	else{
-		this.create();
+		this.create(callback);
 	}
 };
 

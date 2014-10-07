@@ -213,13 +213,24 @@ function ActualitesController($scope, template, route, model){
     }
 
     $scope.saveInfo = function(){
+    	var callback;
     	if($scope.info) {
     		template.open('main', 'single-info');
     	}
+		else if(!$scope.currentInfo._id && $scope.currentInfo.thread && 
+				$scope.currentInfo.thread.myRights.publish) {
+			/* A moderator can validate a piece of news he has just written, 
+			   without going back to the news list */
+			var threadId = $scope.currentInfo.thread._id;
+			callback = function(infoId) {
+				window.location.href = '/actualites#/view/thread/' + threadId + '/info/' + infoId;
+				window.location.reload();
+			};
+		}
     	else {
     		template.open('main', 'infos-list');
     	}
-		$scope.currentInfo.save();
+		$scope.currentInfo.save(callback);
 		$scope.currentInfo = undefined;
     };
 
