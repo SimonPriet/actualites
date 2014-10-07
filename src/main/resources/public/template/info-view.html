@@ -46,7 +46,7 @@
 			<button ng-click="info.publish()" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
 		</behaviour>
 		<behaviour name="unpublish" resource="info.thread" class="cell">
-			<button ng-click="info.unpublish()" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
+			<button ng-click="info.unpublish(canSkipPendingStatus(info))" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
 		</behaviour>
 	</div>
 	<div class="cell" ng-if="isInfoUnpublishable(info)">

@@ -112,9 +112,22 @@ Info.prototype.publish = function(){
 	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', this);
 };
 
-Info.prototype.unpublish = function(){
-	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', this);
+Info.prototype.unpublish = function(canSkipPendingStatus){
+	var that = this;
+	if(!canSkipPendingStatus) {
+		this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
+	}
+	else {
+		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+	}
+
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', this)
+	.done(function(){
+		// hack to unsubmit
+		if(canSkipPendingStatus === true) {
+			that.unsubmit();
+		}
+	});
 }
 
 

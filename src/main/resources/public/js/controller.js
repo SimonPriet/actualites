@@ -218,7 +218,7 @@ function ActualitesController($scope, template, route, model){
     		template.open('main', 'single-info');
     	}
 		else if(!$scope.currentInfo._id && $scope.currentInfo.thread && 
-				$scope.currentInfo.thread.myRights.publish) {
+				$scope.canPublish($scope.currentInfo.thread)) {
 			/* A moderator can validate a piece of news he has just written, 
 			   without going back to the news list */
 			var threadId = $scope.currentInfo.thread._id;
@@ -246,7 +246,10 @@ function ActualitesController($scope, template, route, model){
 
     /* Info Publication */
     $scope.isInfoPublishable = function(info) {
-        return info && info._id && info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING;
+        return info && info._id && 
+        (info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING ||
+        	(info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT && $scope.canSkipPendingStatus(info))
+		);
     };
 
 	$scope.openThread = function(thread){
@@ -263,7 +266,15 @@ function ActualitesController($scope, template, route, model){
 
     /* Info Submit */
     $scope.isInfoSubmitable = function(info){
-        return info && info._id && info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+    	var result = false;
+    	if(info && info._id && info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
+    		result = true;
+    		
+        	if($scope.canSkipPendingStatus(info)){
+    			result = false;
+    		}
+    	}
+    	return result;
     };
 
     $scope.isInfoSubmitted = function(info){
@@ -396,6 +407,7 @@ function ActualitesController($scope, template, route, model){
 		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
     };
 
+    // Functions to check rights
     $scope.checkThreadsRightsFilter = function(category){
     	return category.myRights.submit !== undefined;
 	};
@@ -439,6 +451,17 @@ function ActualitesController($scope, template, route, model){
 		}
 		return right;
 	};
+	
+	$scope.canPublish = function(thread){
+		return (thread.myRights.publish !== undefined);
+	}
+	
+	// A moderator can validate his own drafts (he does not need to go through status 'pending')
+	$scope.canSkipPendingStatus = function(info){
+		return (info && info.owner.userId === model.me.userId && 
+			info.thread && $scope.canPublish(info.thread));
+	}
+	
 
     this.initialize();
 }
