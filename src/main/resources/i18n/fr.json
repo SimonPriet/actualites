@@ -30,9 +30,7 @@
 	"actualites.links.display.all.news": "Afficher toutes les actualités",
 
 	"actualites.edition.title": "Gestion des actualités",
-
 	"actualites.edition.thread.new": "Nouveau fil d'actualités",
-	"actualites.edition.thread.back": "Retour aux actualités",
 	"actualites.edition.thread.create": "Créer un nouveau fil",
 	"actualites.edition.thread.edit": "Editer",
 	"actualites.edition.thread.save": "Enregistrer",
