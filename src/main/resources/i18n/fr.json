@@ -3,6 +3,11 @@
 	"actualites.title.edition": "Gestion des actualités",
 	"actualites.title.admin": "Administration des actualités",
 	"actualites.title.new": "Nouvelle actualité",
+	
+	"actualites.create.thread": "Fil d'actualité",
+	"actualites.create.title": "Titre",
+	"actualites.create.date.publish": "Date de publication",
+	"actualites.create.date.expire": "Date d'expiration",
 
 	"actualites.threads.title": "Fils d'actualités",
 	"actualites.threads.title.admin": "Gestion des fils d'actualités",
