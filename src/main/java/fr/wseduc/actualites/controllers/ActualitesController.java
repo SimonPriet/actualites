@@ -121,6 +121,14 @@ public class ActualitesController extends BaseController {
 		infoHelper.listInfos(request);
 	}
 
+	@Get("/infos/last")
+	@ApiDoc("Get infos in thread by status and by thread id.")
+	@SecuredAction("actualites.infos.list")
+	public void listLastPublishedInfos(final HttpServerRequest request) {
+		infoHelper.listLastPublishedInfos(request);
+	}
+
+
 	@Get("/linker/infos")
 	@ApiDoc("List infos without their content. Used by linker")
 	@SecuredAction("actualites.infos.list")

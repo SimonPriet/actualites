@@ -47,6 +47,24 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 		});
 	}
 
+	public void listLastPublishedInfos(final HttpServerRequest request) {
+		final ThreadResource thread = new ThreadRequestModel();
+
+		extractUserFromRequest(thread, request, new Handler<BaseResource>() {
+			@Override
+			public void handle(final BaseResource model) {
+				try {
+					infoService.listLastPublishedInfos(thread.getUser(), notEmptyResponseHandler(request));
+				}
+				catch (Exception e) {
+					renderErrorException(request, e);
+				}
+			}
+		});
+
+
+	}
+
 	public void listInfosForLinker(final HttpServerRequest request) {
 		final ThreadResource thread = new ThreadRequestModel();
 

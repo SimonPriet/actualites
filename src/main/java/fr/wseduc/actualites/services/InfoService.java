@@ -25,6 +25,8 @@ public interface InfoService {
 
 	public void list(ThreadResource thread, Handler<Either<String, JsonArray>> handler);
 
+	public void listLastPublishedInfos(UserInfos user, Handler<Either<String, JsonObject>> handler);
+
 	public void listForLinker(ThreadResource thread, Handler<Either<String, JsonArray>> handler);
 
 	public void changeState(InfoResource info, InfoState targetState, Handler<Either<String, JsonObject>> handler);

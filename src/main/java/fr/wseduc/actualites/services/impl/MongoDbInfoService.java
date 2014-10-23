@@ -1,13 +1,18 @@
 package fr.wseduc.actualites.services.impl;
 
+import static fr.wseduc.actualites.Actualites.COLLECTION;
 import static org.entcore.common.mongodb.MongoDbResult.validActionResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 import org.bson.types.ObjectId;
 import org.entcore.common.service.VisibilityFilter;
@@ -43,7 +48,9 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		final ObjectId newId = new ObjectId();
 		JsonObject now = MongoDb.now();
 		info.cleanPersistedObject();
-		info.getBody().putString("_id", newId.toStringMongod())
+
+		JsonObject body = info.getBody();
+		body.putString("_id", newId.toString())
 			.putObject("owner", new JsonObject()
 				.putString("userId", info.getUser().getUserId())
 				.putString("displayName", info.getUser().getUsername()))
@@ -53,7 +60,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Prepare Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId());
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
-		modifier.push("infos", info.getBody());
+		modifier.push("infos", body);
 
 		// Execute query
 		mongo.update(collection, MongoQueryBuilder.build(query), modifier.build(), validActionResultHandler(new Handler<Either<String, JsonObject>>(){
@@ -64,7 +71,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 						if (event.right().getValue().getNumber("number").intValue() == 1) {
 							// Respond with created info Id
 							JsonObject created = new JsonObject();
-							created.putString("_id", newId.toStringMongod());
+							created.putString("_id", newId.toString());
 							handler.handle(new Either.Right<String, JsonObject>(created));
 						}
 						else {
@@ -185,7 +192,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		// Prepare comment object
 		final ObjectId newId = new ObjectId();
 		info.getBody()
-			.putString("_id", newId.toStringMongod())
+			.putString("_id", newId.toString())
 			.putString("author", info.getUser().getUserId())
 			.putString("authorName", info.getUser().getUsername())
 			.putObject("posted", MongoDb.now());
@@ -199,7 +206,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 					try {
 						// Extract info
 						JsonObject comment = new JsonObject();
-						comment.putString("_id", newId.toStringMongod());
+						comment.putString("_id", newId.toString());
 						handler.handle(new Either.Right<String, JsonObject>(comment));
 					}
 					catch (Exception e) {
@@ -254,6 +261,57 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		JsonObject sort = new JsonObject().putNumber("modified", -1);
 		mongo.find(collection, MongoQueryBuilder.build(query), sort, projection, validResultsHandler(handler));
 	}
+
+	@Override
+	public void listLastPublishedInfos(final UserInfos user, final Handler<Either<String, JsonObject>> handler) {
+
+		final String currentDate = getCurrentDate();
+
+		StringBuilder cmd = new StringBuilder();
+		cmd.append("{ \"aggregate\" : \"").append(COLLECTION)
+		.append("\", \"pipeline\" : [")
+		.append("{ \"$match\" : { \"$or\" : [{ \"owner.userId\" : \"").append(user.getUserId())
+		.append("\"}, {\"shared\" : { \"$elemMatch\" : { \"userId\": \"").append(user.getUserId())
+		// TODO : add groups
+		.append("\"}}} ]}},")
+		.append("{ \"$unwind\": \"$infos\" },")
+		.append("{ \"$match\" : {")
+		.append("\"infos.status\":").append(InfoState.PUBLISHED.getId())
+		.append(", \"$or\": [")
+
+		.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
+		.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
+		.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": null},")
+		.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": null}")
+
+		.append("]}},")
+		.append("{ \"$project\" : {")
+		.append("\"infos._id\": 1,")
+		.append("\"infos.title\":1,")
+		.append("\"infos.lastDate\": { \"$cond\" : { ")
+		.append(" \"if\" : { \"$gt\" : [ \"$infos.publicationDate\", \"$infos.modified\" ] }, ")
+		.append(" \"then\" : \"$infos.publicationDate\",")
+		.append(" \"else\" : \"$infos.modified\" } }")
+		.append("}},")
+		.append("{ \"$sort\" : { \"infos.lastDate\": -1 } },")
+		// TODO : the number of news must be a parameter of the webservice
+		.append("{ \"$limit\" : 5}")
+		.append("]}");
+
+		mongo.command(cmd.toString(), validResultHandler(handler));
+	}
+
+	/**
+	 * @return Current date as Json string. Example : {$date: "2014-10-23T10:28:52.000Z" }
+	 */
+	private String getCurrentDate() {
+		DateFormat formatter = new SimpleDateFormat("'{\"$date\": \"'yyyy-MM-dd'T'HH:mm:ss'.000Z\" }'");
+		formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+		return formatter.format(new Date());
+	}
+
+
 
 	@Override
 	public void listForLinker(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
