@@ -283,7 +283,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	}
 
 	@Override
-	public void listLastPublishedInfos(final UserInfos user, final Handler<Either<String, JsonObject>> handler) {
+	public void listLastPublishedInfos(final UserInfos user, final int resultSize, final Handler<Either<String, JsonObject>> handler) {
 
 		final String currentDate = getCurrentDate();
 
@@ -311,7 +311,8 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 		.append("{ \"$project\" : {")
 			.append("\"infos._id\": 1,")
-			.append("\"infos.title\":1,")
+			.append("\"infos.title\": 1,")
+			.append("\"title\": 1,")
 			// Put max(publicationDate, modified) in new field "date"
 			.append("\"infos.date\": { \"$cond\" : { ")
 				.append(" \"if\" : { \"$gt\" : [ \"$infos.publicationDate\", \"$infos.modified\" ] }, ")
@@ -322,7 +323,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		.append("{ \"$sort\" : { \"infos.date\": -1 } },")
 
 		// TODO : the number of news must be a parameter of the webservice
-		.append("{ \"$limit\" : 5}")
+		.append("{ \"$limit\" : ").append(resultSize).append("}")
 		.append("]}");
 
 		mongo.command(cmd.toString(), validResultHandler(handler));
