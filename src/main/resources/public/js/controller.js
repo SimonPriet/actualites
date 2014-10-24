@@ -148,13 +148,13 @@ function ActualitesController($scope, template, route, model){
 
         // For Published Infos, enforce publication and expiration dates if the user has not 'contrib' permission
         if (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED && (info.myRights.contrib === undefined)) {
-            if (info.publicationDate !== undefined && info.publicationDate !== null) {
-                if (moment().unix() < moment(info.publicationDate).unix()) {
+            if (info.hasPublicationDate === true) {
+                if (moment().unix() < moment(info.publicationDate.$date).unix()) {
                     return false;
                 }
             }
-            if (info.expirationDate !== undefined && info.expirationDate !== null) {
-                if (moment().unix() > moment(info.expirationDate).unix()) {
+            if (info.hasExpirationDate === true) {
+                if (moment().unix() > moment(info.expirationDate.$date).unix()) {
                     return false;
                 }
             }
@@ -292,11 +292,11 @@ function ActualitesController($scope, template, route, model){
 
     $scope.getState = function(info){
     	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
-    		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate).unix())){
+    		if(info.hasPublicationDate && (moment().unix() < moment(info.publicationDate.$date).unix())){
     			// label (A venir)
     			return "actualites.edition.status.4" ;
     		}
-    		if(info.expirationDate && (moment().unix() > moment(info.expirationDate).unix())){
+    		if(info.hasExpirationDate && (moment().unix() > moment(info.expirationDate.$date).unix())){
     			// label (Expiree)
     			return "actualites.edition.status.5" ;
     		}
