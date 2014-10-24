@@ -61,14 +61,30 @@ function Info(data){
 }
 
 Info.prototype.toJSON = function(){
+	var pubDate = null;
+	if(this.hasPublicationDate) {
+		if(!moment.isMoment(this.publicationDate)) {
+			this.publicationDate = moment(this.publicationDate);
+		}
+		pubDate = this.publicationDate.unix();
+	}
+	
+	var expDate = null;
+	if(this.hasExpirationDate) {
+		if(!moment.isMoment(this.expirationDate)) {
+			this.expirationDate = moment(this.expirationDate);
+		}
+		expDate = this.expirationDate.unix();
+	}
+	
 	return {
 		title: this.title,
-		publicationDate: this.hasPublicationDate ? this.publicationDate : null,
-		expirationDate: this.hasExpirationDate ? this.expirationDate : null,
+		publicationDate: pubDate,
+		expirationDate: expDate,
 		content: this.content,
 		owner: this.owner
 	};
-}
+};
 
 Info.prototype.create = function(callback){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;

@@ -1,5 +1,6 @@
 package fr.wseduc.actualites.services;
 
+import java.text.ParseException;
 import java.util.Map;
 
 import org.entcore.common.user.UserInfos;
@@ -15,11 +16,11 @@ import fr.wseduc.webutils.Either;
 
 public interface InfoService {
 
-	public void create(InfoResource info, Handler<Either<String, JsonObject>> handler);
+	public void create(InfoResource info, Handler<Either<String, JsonObject>> handler) throws ParseException;
 
 	public void retrieve(InfoResource info, Handler<Either<String, JsonObject>> handler);
 
-	public void update(InfoResource info, Handler<Either<String, JsonObject>> handler);
+	public void update(InfoResource info, Handler<Either<String, JsonObject>> handler) throws ParseException;
 
 	public void delete(InfoResource info, Handler<Either<String, JsonObject>> handler);
 

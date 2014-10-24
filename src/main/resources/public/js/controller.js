@@ -191,7 +191,15 @@ function ActualitesController($scope, template, route, model){
     };
 
 	$scope.editInfo = function(info){
-		$scope.currentInfo = info;
+		var editedInfo = info;
+		if (editedInfo.hasPublicationDate && editedInfo.publicationDate instanceof Object) {
+			editedInfo.publicationDate = editedInfo.publicationDate.$date;
+		}
+		if (editedInfo.hasExpirationDate && editedInfo.expirationDate instanceof Object) {
+			editedInfo.expirationDate = editedInfo.expirationDate.$date;
+		}
+		
+		$scope.currentInfo = editedInfo;
 	};
 	
     $scope.showDeleteInfo = function(info) {
@@ -231,6 +239,7 @@ function ActualitesController($scope, template, route, model){
     		template.open('main', 'infos-list');
     	}
 		$scope.currentInfo.save(callback);
+		$scope.currentInfo = $scope.currentInfo.toJSON();
 		$scope.currentInfo = undefined;
     };
 

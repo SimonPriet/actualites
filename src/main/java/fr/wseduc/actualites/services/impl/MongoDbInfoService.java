@@ -6,12 +6,14 @@ import static org.entcore.common.mongodb.MongoDbResult.validResultHandler;
 import static org.entcore.common.mongodb.MongoDbResult.validResultsHandler;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.TimeZone;
 
 import org.bson.types.ObjectId;
@@ -43,7 +45,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	}
 
 	@Override
-	public void create(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
+	public void create(final InfoResource info, final Handler<Either<String, JsonObject>> handler) throws ParseException {
 		// Prepare Info object
 		final ObjectId newId = new ObjectId();
 		JsonObject now = MongoDb.now();
@@ -56,6 +58,9 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 				.putString("displayName", info.getUser().getUsername()))
 			.putObject("created", now).putObject("modified", now)
 			.putNumber("status", InfoState.DRAFT.getId());
+
+		replaceDate(body, "publicationDate");
+		replaceDate(body, "expirationDate");
 
 		// Prepare Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId());
@@ -87,6 +92,17 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 				}
 			}
 		}));
+	}
+
+	private void replaceDate(JsonObject body, String dateFieldname) throws ParseException {
+		long date = body.getLong(dateFieldname, 0L);
+		if(date != 0L) {
+			// Replace received date (unix timestamp in seconds) by a JsonObject
+			// so that it will be stored as a date in MongoDB, e.g. as ISODate("2014-10-22T12:39:21.823Z")
+			body.putElement(dateFieldname,
+					new JsonObject().putNumber("$date",
+							TimeUnit.MILLISECONDS.convert(date, TimeUnit.SECONDS)));
+		}
 	}
 
 	@Override
@@ -126,16 +142,20 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	}
 
 	@Override
-	public void update(final InfoResource info, final Handler<Either<String, JsonObject>> handler) {
+	public void update(final InfoResource info, final Handler<Either<String, JsonObject>> handler) throws ParseException {
 		// Query
 		QueryBuilder query = QueryBuilder.start("_id").is(info.getThreadId())
 				.put("infos").elemMatch(new BasicDBObject("_id", info.getInfoId()));
 
+		JsonObject body = info.getBody();
+		replaceDate(body, "publicationDate");
+		replaceDate(body, "expirationDate");
+
 		MongoUpdateBuilder modifier = new MongoUpdateBuilder();
 		// Prepare Info object update
-		for (String attr: info.getBody().getFieldNames()) {
+		for (String attr: body.getFieldNames()) {
 			if (! info.isProtectedField(attr)) {
-				modifier.set("infos.$." + attr, info.getBody().getValue(attr));
+				modifier.set("infos.$." + attr, body.getValue(attr));
 			}
 		}
 		modifier.set("infos.$.modified", MongoDb.now());
@@ -270,35 +290,59 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		StringBuilder cmd = new StringBuilder();
 		cmd.append("{ \"aggregate\" : \"").append(COLLECTION)
 		.append("\", \"pipeline\" : [")
-		.append("{ \"$match\" : { \"$or\" : [{ \"owner.userId\" : \"").append(user.getUserId())
-		.append("\"}, {\"shared\" : { \"$elemMatch\" : { \"userId\": \"").append(user.getUserId())
-		// TODO : add groups
-		.append("\"}}} ]}},")
+
+		// ShareAndOwner
+		.append("{ \"$match\" : { \"$or\" : [")
+			.append("{ \"owner.userId\" : \"").append(user.getUserId())
+			.append("\"}, {\"shared\" : { \"$elemMatch\" : { ")
+			.append(getSharedMatch(user))
+		.append("}}} ]}},")
+
 		.append("{ \"$unwind\": \"$infos\" },")
+
 		.append("{ \"$match\" : {")
 		.append("\"infos.status\":").append(InfoState.PUBLISHED.getId())
 		.append(", \"$or\": [")
-
-		.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
-		.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
-		.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": null},")
-		.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": null}")
-
+			.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
+			.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": { \"$gt\": ").append(currentDate).append("}},")
+			.append("{\"infos.publicationDate\": { \"$lte\": ").append(currentDate).append("}, \"infos.expirationDate\": null},")
+			.append("{\"infos.publicationDate\": null, \"infos.expirationDate\": null}")
 		.append("]}},")
+
 		.append("{ \"$project\" : {")
-		.append("\"infos._id\": 1,")
-		.append("\"infos.title\":1,")
-		.append("\"infos.lastDate\": { \"$cond\" : { ")
-		.append(" \"if\" : { \"$gt\" : [ \"$infos.publicationDate\", \"$infos.modified\" ] }, ")
-		.append(" \"then\" : \"$infos.publicationDate\",")
-		.append(" \"else\" : \"$infos.modified\" } }")
+			.append("\"infos._id\": 1,")
+			.append("\"infos.title\":1,")
+			// Put max(publicationDate, modified) in new field "date"
+			.append("\"infos.date\": { \"$cond\" : { ")
+				.append(" \"if\" : { \"$gt\" : [ \"$infos.publicationDate\", \"$infos.modified\" ] }, ")
+				.append(" \"then\" : \"$infos.publicationDate\",")
+				.append(" \"else\" : \"$infos.modified\" } }")
 		.append("}},")
-		.append("{ \"$sort\" : { \"infos.lastDate\": -1 } },")
+
+		.append("{ \"$sort\" : { \"infos.date\": -1 } },")
+
 		// TODO : the number of news must be a parameter of the webservice
 		.append("{ \"$limit\" : 5}")
 		.append("]}");
 
 		mongo.command(cmd.toString(), validResultHandler(handler));
+	}
+
+	private String getSharedMatch(final UserInfos user) {
+		String sharedMethod = "fr-wseduc-actualites-controllers-ActualitesController|listThreadInfos";
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(" \"$or\" : [")
+			.append(" { \"userId\" : \"").append(user.getUserId())
+			.append("\", \"").append(sharedMethod).append("\" : true");
+
+		for (String gpId: user.getProfilGroupsIds()) {
+			sb.append("}, { \"groupId\" : \"").append(gpId)
+				.append("\", \"").append(sharedMethod).append("\" : true");
+		}
+		sb.append("}]");
+
+		return sb.toString();
 	}
 
 	/**
@@ -310,8 +354,6 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 		return formatter.format(new Date());
 	}
-
-
 
 	@Override
 	public void listForLinker(final ThreadResource thread, final Handler<Either<String, JsonArray>> handler) {
