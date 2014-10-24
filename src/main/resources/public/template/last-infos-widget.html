@@ -1,0 +1,11 @@
+<h2>Actualites</h2>
+
+<ul class="row">
+	<li ng-repeat="thread in widget.threads">
+		<a ng-href="/actualites#/view/thread/[[thread._id]]/info/[[thread.infos._id]]">
+			[[thread.infos.title ]] - [[thread.title]]
+		</a>
+	</li>
+
+	<li ng-if="widget.actus === 0">Aucune actualité</li>
+</ul>

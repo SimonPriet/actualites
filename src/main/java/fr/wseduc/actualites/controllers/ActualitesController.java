@@ -121,7 +121,7 @@ public class ActualitesController extends BaseController {
 		infoHelper.listInfos(request);
 	}
 
-	@Get("/infos/last")
+	@Get("/infos/last/:resultSize")
 	@ApiDoc("Get infos in thread by status and by thread id.")
 	@SecuredAction("actualites.infos.list")
 	public void listLastPublishedInfos(final HttpServerRequest request) {
