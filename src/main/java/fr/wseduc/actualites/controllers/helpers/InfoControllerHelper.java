@@ -67,12 +67,12 @@ public class InfoControllerHelper extends BaseExtractorHelper {
 						try {
 							size = Integer.parseInt(resultSize);
 						} catch (NumberFormatException e) {
-							badRequest(request); // TODO : ajouter un message d'erreur
+							badRequest(request, "actualites.widget.bad.request.size.must.be.an.integer");
 							return;
 						}
 
 						if(size <=0 || size > 20) {
-							badRequest(request); // TODO : ajouter un message d'erreur
+							badRequest(request, "actualites.widget.bad.request.invalid.size");
 							return;
 						}
 					}

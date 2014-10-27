@@ -93,5 +93,12 @@
 	"filters.published": "Publiées",
 	"filters.drafts": "Brouillons",
 	"filters.submitted": "Soumises",
-	"actualites.links.admin.main": "Accéder à l'application"
+	"actualites.links.admin.main": "Accéder à l'application",
+	
+	"actualites.widget.title": "Actualités",
+	"actualites.widget.empty": "Aucune actualité",
+	"actualites.widget.thread": "Fil",
+	"actualites.widget.author": "Auteur",
+	"actualites.widget.bad.request.size.must.be.an.integer" : "Le paramètre resultSize doit être un entier",
+	"actualites.widget.bad.request.invalid.size" : "Le paramètre resultSize est invalide, il doit être compris entre 1 et 20"
 }

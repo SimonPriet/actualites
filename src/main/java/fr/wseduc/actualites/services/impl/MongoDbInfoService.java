@@ -312,6 +312,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 		.append("{ \"$project\" : {")
 			.append("\"infos._id\": 1,")
 			.append("\"infos.title\": 1,")
+			.append("\"infos.owner.displayName\": 1,")
 			.append("\"title\": 1,")
 			// Put max(publicationDate, modified) in new field "date"
 			.append("\"infos.date\": { \"$cond\" : { ")
@@ -322,7 +323,6 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 
 		.append("{ \"$sort\" : { \"infos.date\": -1 } },")
 
-		// TODO : the number of news must be a parameter of the webservice
 		.append("{ \"$limit\" : ").append(resultSize).append("}")
 		.append("]}");
 

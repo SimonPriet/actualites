@@ -415,7 +415,7 @@ function ActualitesController($scope, template, route, model){
 		}
 		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').format('dddd DD MMM YYYY');
     };
-
+    
     // Functions to check rights
     $scope.checkThreadsRightsFilter = function(category){
     	return category.myRights.submit !== undefined;

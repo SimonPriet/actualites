@@ -1,11 +1,14 @@
-<h2>Actualites</h2>
-
-<ul class="row">
-	<li ng-repeat="thread in widget.threads">
-		<a ng-href="/actualites#/view/thread/[[thread._id]]/info/[[thread.infos._id]]">
-			[[thread.infos.title ]] - [[thread.title]]
-		</a>
-	</li>
-
-	<li ng-if="widget.actus === 0">Aucune actualité</li>
-</ul>
+<nav class="vertical">
+	<h2><i18n>actualites.widget.title</i18n></h2>
+	
+	<ul class="row">
+		<li ng-repeat="thread in widget.threads">
+			<a ng-href="/actualites#/view/thread/[[thread._id]]/info/[[thread.infos._id]]"
+			tooltip="[[thread.infos.tooltip]]">
+				[[thread.infos.title]] ([[thread.infos.relativeDate]])
+			</a>
+		</li>
+	
+		<li ng-if="widget.actus === 0"><i18n>actualites.widget.empty</i18n></li>
+	</ul>
+</nav>
