@@ -9,6 +9,6 @@
 			</a>
 		</li>
 	
-		<li ng-if="widget.actus === 0"><i18n>actualites.widget.empty</i18n></li>
+		<li ng-if="widget.threads === undefined || widget.threads.length === 0"><i18n>actualites.widget.empty</i18n></li>
 	</ul>
 </nav>
