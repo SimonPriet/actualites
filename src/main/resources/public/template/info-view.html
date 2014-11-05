@@ -15,18 +15,18 @@
 	</div>
 </lightbox>
 <div class="row lower-title" ng-if="info.expirationDate">
-	<label class="cell" translate content="actualites.info.label.author"></label>
+	<span class="cell" translate content="actualites.info.label.author"></span>
 	<a ng-href="/userbook/annuaire#[[info.owner.userId]]"><span class="cell info-metadata">&nbsp;[[info.owner.displayName]]</span></a>
-	<label class="cell" translate content="actualites.info.label.initialDate"></label>
+	<span class="cell" translate content="actualites.info.label.initialDate"></span>
 	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]&nbsp;</span>
-	<label class="cell" translate content="actualites.info.label.expiration"></label>
+	<span class="cell" translate content="actualites.info.label.expiration"></span>
 	<span class="cell info-metadata">&nbsp;[[formatDate(info.expirationDate)]]</span>
 </div>
 
 <div class="row lower-title" ng-if="!info.expirationDate">
-	<label class="cell" translate content="actualites.info.label.author"></label>
+	<span class="cell" translate content="actualites.info.label.author"></span>
 	<a ng-href="/userbook/annuaire#[[info.owner.userId]]"><span class="cell info-metadata">&nbsp;[[info.owner.displayName]]</span></a>
-	<label class="cell" translate content="actualites.info.label.publication"></label>
+	<span class="cell" translate content="actualites.info.label.publication"></span>
 	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publicationDate) : formatDate(info.modified))]]</span>
 </div>
 
