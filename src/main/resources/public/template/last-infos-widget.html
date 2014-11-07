@@ -1,5 +1,5 @@
-<nav class="vertical">
-	<h2><i18n>actualites.widget.title</i18n></h2>
+<div class="last-infos-widget widget">
+	<h1><i18n>actualites.widget.title</i18n></h1>
 	
 	<ul class="row">
 		<li ng-repeat="thread in widget.threads">
@@ -11,4 +11,4 @@
 	
 		<li ng-if="widget.threads === undefined || widget.threads.length === 0"><i18n>actualites.widget.empty</i18n></li>
 	</ul>
-</nav>
+</div>
