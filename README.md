@@ -11,15 +11,15 @@
 
 ## Configuration
 
-Dans le fichier `/ent-core.embedded.json` :
+Dans le fichier `/ent-core.json.template` :
 
 
 Déclarer l'application dans la liste :
 <pre>
 	{
-      "name": "fr.wseduc~actualites~0.1-SNAPSHOT",
+      "name": "net.atos~actualites~0.2-SNAPSHOT",
       "config": {
-        "main" : "fr.wseduc.actualites.Actualites",
+        "main" : "net.atos.entng.actualites.Actualites",
         "port" : 8022,
         "app-name" : "Actualites",
         "app-address" : "/actualites",
@@ -37,7 +37,7 @@ Déclarer l'application dans la liste :
 </pre>
 
 
-Associer une route d'entée à la configuration du module proxy intégré (`"name": "fr.wseduc~rbs~0.1-SNAPSHOT"`) :
+Associer une route d'entée à la configuration du module proxy intégré (`"name": "net.atos~actualites~0.2-SNAPSHOT"`) :
 <pre>
 	{
 		"location": "/actualites",
