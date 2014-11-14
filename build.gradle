@@ -30,6 +30,21 @@ def configurePom(def pom) {
 				name 'Camille Wintz'
 				email 'camille.wintz@web-education.net'
 			}
+			developer {
+				id 'cverdier'
+				name 'Cyril Verdier'
+				email 'cyril.verdier@atos.net'
+			}
+			developer {
+				id 'dmtran'
+				name 'Duy Minh Tran'
+				email 'duy-minh.tran@atos.net'
+			}
+			developer {
+				id 'zkourrida'
+				name 'Zakaria Kourrida'
+				email 'zakaria.kourrida@atos.net'
+			}
 		}
 
 		scm {

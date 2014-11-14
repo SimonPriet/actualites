@@ -1,5 +1,5 @@
 {
-	"main" : "fr.wseduc.actualites.Actualites",
+	"main" : "net.atos.entng.actualites.Actualites",
 	"port" : 8022,
 	"app-name" : "Actualites",
 	"app-address" : "/actualites",

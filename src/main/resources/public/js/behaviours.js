@@ -1,56 +1,56 @@
 var actualitesBehaviours = {
 	resources: {
 		view: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|getThread'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|getThread'
 		},
 		contrib: {
-			right: 'fr-wseduc.actualites-controllers-ActualitesController|createDraft'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|createDraft'
 		},
 		updateDraft: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|updateDraft'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|updateDraft'
 		},
 		updatePending: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|updatePending'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|updatePending'
 		},
 		updatePublished: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|updatePublished'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|updatePublished'
 		},
 		submit: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|submit'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|submit'
 		},
 		unsubmit: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|unsubmit'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|unsubmit'
 		},
 		publish: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|publish'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|publish'
 		},
 		unpublish: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|unpublish'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|unpublish'
 		},
 		editThread: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|updateThread'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|updateThread'
 		},
 		deleteThread: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|deleteThread'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|deleteThread'
 		},
 		share: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|shareThread'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|shareThread'
 		},
 		trash: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|trash'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|trash'
 		},
 		restore: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|restore'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|restore'
 		},
 		delete: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|delete'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|delete'
 		},
 		comment: {
-			right: 'fr-wseduc-actualites-controllers-ActualitesController|comment'
+			right: 'net-atos-entng-actualites-controllers-ActualitesController|comment'
 		}
 	},
 	workflow: {
-		admin: 'fr.wseduc.actualites.controllers.ActualitesController|createThread'
+		admin: 'net.atos.entng.actualites.controllers.ActualitesController|createThread'
 	}
 };
 
