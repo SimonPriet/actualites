@@ -93,7 +93,7 @@ Info.prototype.create = function(callback){
 			callback(response._id);
 		}
 		else {
-			model.infos.sync();
+			model.infos.fetch();
 		}
 	}.bind(this));
 }
@@ -165,7 +165,7 @@ Info.prototype.restore = function(){
 
 Info.prototype.delete = function(){
 	http().delete('/actualites/thread/' + this.thread._id + '/info/' + this._id).done(function(){
-		model.infos.sync();
+		model.infos.fetch();
 	});
 }
 
@@ -311,6 +311,7 @@ model.build = function(){
 			http().get('/actualites/threads').done(function(data){
 				this.addRange(data);
 				this.trigger('sync');
+				model.infos.fetch();
 			}.bind(this));
 		},
 		removeSelection: function(){
@@ -323,7 +324,7 @@ model.build = function(){
 	});
 
 	this.collection(Info, {
-		sync: function(){
+		fetch: function(){
 			http().get('/actualites/infos').done(function(data){
 				var that = this;
 				this.all = [];
@@ -337,6 +338,9 @@ model.build = function(){
 
 					infos.forEach(function(info){
 						info.thread = model.threads.findWhere({ _id: thread._id });
+						if (info.thread === undefined) {
+							return;
+						}
 
 						if (info.publicationDate) {
 							info.hasPublicationDate = true;
@@ -345,8 +349,8 @@ model.build = function(){
 						if (info.expirationDate) {
 							info.hasExpirationDate = true;
 						}
+						that.push(info);
 					});
-					that.addRange(infos);
 				});
 				this.trigger('sync');
 			}.bind(this))
