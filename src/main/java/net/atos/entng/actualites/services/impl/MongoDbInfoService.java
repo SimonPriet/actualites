@@ -331,7 +331,7 @@ public class MongoDbInfoService extends AbstractService implements InfoService {
 	}
 
 	private String getSharedMatch(final UserInfos user) {
-		String sharedMethod = "fr-wseduc-actualites-controllers-ActualitesController|listThreadInfos";
+		String sharedMethod = "net-atos-entng-actualites-controllers-ActualitesController|listThreadInfos";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(" \"$or\" : [")

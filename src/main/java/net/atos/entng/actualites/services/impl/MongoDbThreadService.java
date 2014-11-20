@@ -71,7 +71,7 @@ public class MongoDbThreadService extends AbstractService implements ThreadServi
 						if (thread.containsField("shared")) {
 							JsonArray shared = thread.getArray("shared");
 							for(Object jo : shared){
-								if(((JsonObject) jo).containsField("fr-wseduc-actualites-controllers-ActualitesController|publish")){
+								if(((JsonObject) jo).containsField("net-atos-entng-actualites-controllers-ActualitesController|publish")){
 									sharedWithIds.add(jo);
 								}
 							}
