@@ -99,7 +99,8 @@ Behaviours.register('actualites', {
 				var infos = _.map(thread.infos, function(info){
 					// Keep news that are published and not expired
 					if(info.status === 3) {	
-						if(info.expirationDate && (moment().unix() > moment(info.expirationDate).unix())) {
+						if(info.expirationDate && info.expirationDate.$date && 
+								moment().isAfter(moment(info.expirationDate.$date))) {
 							return;
 						}
 						
@@ -128,7 +129,7 @@ Behaviours.register('actualites', {
 			
 			this.resources = _.compact(_.flatten(infosArray));
 			this.resources = _.sortBy(this.resources, function(info) {
-				return info.title;
+				return info.title.toLowerCase();
 			});
 			
 			if(typeof callback === 'function'){
