@@ -23,58 +23,44 @@ function ActualitesController($scope, template, route, model){
             		var aThread = model.threads.find(function(thread){
     					return thread._id === params.threadId;
     				});
-    				if(aThread === undefined){
-    					$scope.notFound = true;
-    					template.open('error', '404');
+    				if(aThread !== undefined){
+    					$scope.notFound = false;
+                        $scope.openThread(aThread);
     				}
     				else{
-						if($scope.checkThreadsAdminRight()){
-							$scope.notFound = false;
-							$scope.threadsView();
-						}
-						else{
-							$scope.notFound = true;
-							template.open('error', '401');
-						}
+						$scope.notFound = true;
+                        template.open('error', '404');
     				}
 				});
             },
             viewInfo: function(params){
-            	model.threads.one('sync', function(){
-            		var aThread = model.threads.find(function(thread){
+            	model.infos.one('sync', function() {
+            		var aThread = model.threads.find(function(thread) {
     					return thread._id === params.threadId;
     				});
-    				if(aThread === undefined){
-    					$scope.notFound = true;
-    					template.open('error', '404');
+    				if(aThread !== undefined) {
+                        $scope.info = undefined;
+                        $scope.info = model.infos.find(function(info){
+                            return info._id === params.infoId;
+                        });
+                        if ($scope.info !== undefined) {
+                            if($scope.isInfoVisible($scope.info)) {
+                                $scope.notFound = false;
+                                template.open('main', 'single-info');
+                            }
+                            else {
+                                $scope.notFound = true;
+                                template.open('error', '401');
+                            }
+                        }
+                        else {
+                            $scope.notFound = true;
+                            template.open('error', '404');
+                        }
     				}
-    				else{
-    					if($scope.checkThreadsAdminRight()){
-    						$scope.infos.one('sync', function(){
-        						$scope.info = undefined;
-        						$scope.info = model.infos.find(function(info){
-        							return info._id === params.infoId;
-        						});
-        						if($scope.info === undefined){
-        							$scope.notFound = true;
-        							template.open('error', '404');
-        						}
-        						else{
-        							if($scope.isInfoVisible($scope.info)){
-        								$scope.notFound = false;
-										template.open('main', 'single-info');
-        							}
-        							else{
-        								$scope.notFound = true;
-        								template.open('error', '401');
-        							}
-        						}
-        					});
-						}
-						else{
-							$scope.notFound = true;
-							template.open('error', '401');
-						}
+    				else {
+    					$scope.notFound = true;
+                        template.open('error', '404');
     				}
 				});
             }
