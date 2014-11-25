@@ -118,6 +118,10 @@ function ActualitesController($scope, template, route, model){
         $scope.loadedThreadsNumber += $scope.loadThreadsIncrement;
     };
     
+	$scope.sortByIsHeadline = function(info) {
+		return info.isHeadline === true;
+	};
+    
     $scope.isInfoPublished = function(info) {
         return info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
     };
@@ -159,7 +163,7 @@ function ActualitesController($scope, template, route, model){
     	delete $scope.info;
     	delete $scope.currentInfo;
     	window.location.hash = '';
-		template.open('main', 'infos-list');
+    	template.open('main', 'infos-list');
 	}
 
     /* Info Edition */
@@ -178,12 +182,15 @@ function ActualitesController($scope, template, route, model){
 
 	$scope.editInfo = function(info){
 		var editedInfo = info;
-		if (editedInfo.hasPublicationDate && editedInfo.publicationDate instanceof Object) {
+		if (editedInfo.hasPublicationDate && editedInfo.publicationDate.$date) {
 			editedInfo.publicationDate = editedInfo.publicationDate.$date;
 		}
-		if (editedInfo.hasExpirationDate && editedInfo.expirationDate instanceof Object) {
+		if (editedInfo.hasExpirationDate && editedInfo.expirationDate.$date) {
 			editedInfo.expirationDate = editedInfo.expirationDate.$date;
 		}
+		
+		// setAsHeadline : temporary variable, to avoid view refresh (due to filter 'orderBy') when editing an info
+		editedInfo.setAsHeadline = editedInfo.isHeadline;
 		
 		$scope.currentInfo = editedInfo;
 	};
@@ -224,8 +231,18 @@ function ActualitesController($scope, template, route, model){
     	else {
     		template.open('main', 'infos-list');
     	}
+    	
+    	if($scope.currentInfo._id) { // When updating an info, update field 'modified' for the front end
+    		$scope.currentInfo.modified = new Object({ $date : moment().toISOString() });
+    	}
+    	
+    	if($scope.currentInfo.setAsHeadline !== undefined) {
+        	$scope.currentInfo.isHeadline = $scope.currentInfo.setAsHeadline;
+    	}
 		$scope.currentInfo.save(callback);
-		$scope.currentInfo = $scope.currentInfo.toJSON();
+    	if($scope.info) {
+    		$scope.info.updateData($scope.currentInfo);
+    	}
 		$scope.currentInfo = undefined;
     };
 
@@ -394,7 +411,10 @@ function ActualitesController($scope, template, route, model){
     /* Util */
     $scope.formatDate = function(date){
     	var momentDate;
-		if (date instanceof Object) {
+    	if(moment.isMoment(date)) {
+    		momentDate = date
+    	}
+    	else if (date instanceof Object) {
 			momentDate = moment(date.$date);
 		} else {
 			momentDate = moment(date);

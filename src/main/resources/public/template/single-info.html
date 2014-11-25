@@ -6,7 +6,7 @@
 	</div>
 
 	<div class="row vertical-spacing"></div>
-	<div class="illustrated-article">
+	<div class="illustrated-article" ng-class="{headline: info.isHeadline}">
 		<div class="illustration">
 			<div class="image">
 				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />

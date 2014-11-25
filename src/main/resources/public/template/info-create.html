@@ -19,6 +19,9 @@
 		<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> <i18n>actualites.create.date.expire</i18n></label>
 		<date-picker-actu min-date="currentInfo.publicationDate" past="true" ng-model="currentInfo.expirationDate" ng-change="showDate = true"></date-picker-actu>
 	</div>
+	<div class="row">
+		<label class="three cell"><input ng-model="currentInfo.isHeadline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
+	</div>
 	<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
 		<label class="cell">&nbsp;</label>
 	</div>

@@ -1,5 +1,8 @@
 <div class="row">
-	<h1 class="cell upper-title"><span translate content="[[getState(info)]]" class="warning-text">&nbsp;</span>[[info.title]]</h1>
+	<h1 class="cell upper-title">
+		<span translate content="[[getState(info)]]" class="warning-text">
+		&nbsp;</span>[[info.title]]
+	</h1>
 	<div class="right-magnet cell" ng-if="info.status === 1">
 		<behaviour name="contrib" resource="info">
 			<a ng-click="editInfo(info)">modifier</a> ou <a ng-click="showDeleteInfo(info)">supprimer</a>

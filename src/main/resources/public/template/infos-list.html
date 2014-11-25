@@ -17,10 +17,10 @@
 		<i18n>actualites.links.display.news.of.all.threads</i18n>
 	</a>
 </div>
-		
-<div ng-repeat="info in infos.all | orderBy:'modified.$date':true">
+
+<div ng-repeat="info in infos.all | orderBy:[sortByIsHeadline,'modified.$date']:true">
 	<div class="row vertical-spacing"></div>
-	<div ng-if="isInfoVisible(info)" class="illustrated-article">
+	<div ng-if="isInfoVisible(info)" class="illustrated-article" ng-class="{headline: info.isHeadline}">
 		<div class="illustration" ng-click="openThread(info.thread)">
 			<div class="image">
 				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />

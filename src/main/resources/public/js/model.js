@@ -82,7 +82,8 @@ Info.prototype.toJSON = function(){
 		publicationDate: pubDate,
 		expirationDate: expDate,
 		content: this.content,
-		owner: this.owner
+		owner: this.owner,
+		isHeadline : this.isHeadline
 	};
 };
 
@@ -165,6 +166,7 @@ Info.prototype.restore = function(){
 
 Info.prototype.delete = function(){
 	http().delete('/actualites/thread/' + this.thread._id + '/info/' + this._id).done(function(){
+		model.infos.unbind('sync');
 		model.infos.fetch();
 	});
 }

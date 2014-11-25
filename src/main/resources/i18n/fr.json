@@ -8,6 +8,10 @@
 	"actualites.create.title": "Titre",
 	"actualites.create.date.publish": "Date de publication",
 	"actualites.create.date.expire": "Date d'expiration",
+	"actualites.edit.title": "Titre",
+	"actualites.edit.date.publish": "Date de publication",
+	"actualites.edit.date.expire": "Date d'expiration",
+	"actualites.set.as.headline" : "Mettre en une",
 
 	"actualites.threads.title": "Fils d'actualités",
 	"actualites.threads.title.admin": "Gestion des fils d'actualités",
