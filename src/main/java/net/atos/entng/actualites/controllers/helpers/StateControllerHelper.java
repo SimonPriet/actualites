@@ -37,7 +37,6 @@ public class StateControllerHelper extends BaseExtractorHelper {
 	private static final String NEWS_SUBMIT_EVENT_TYPE = NEWS_NAME + "_SUBMIT";
 	private static final String NEWS_UNSUBMIT_EVENT_TYPE = NEWS_NAME + "_UNSUBMIT";
 	private static final String NEWS_PUBLISH_EVENT_TYPE = NEWS_NAME + "_PUBLISH";
-	private static final String NEWS_UNPUBLISH_EVENT_TYPE = NEWS_NAME + "_UNPUBLISH";
 
 	protected final InfoService infoService;
 	protected final ThreadService threadService;
@@ -170,7 +169,6 @@ public class StateControllerHelper extends BaseExtractorHelper {
 						@Override
 						public void handle(Either<String, JsonObject> event) {
 							if (event.isRight()) {
-								notifyTimeline(request, model.getUser(), info, model.getBody(), NEWS_UNPUBLISH_EVENT_TYPE);
 								renderJson(request, event.right().getValue(), 200);
 							} else {
 								JsonObject error = new JsonObject().putString("error", event.left().getValue());
@@ -256,33 +254,18 @@ public class StateControllerHelper extends BaseExtractorHelper {
 					}
 				});
 			}
-			else{ // notify the owner of the news only
-				if(eventType == NEWS_PUBLISH_EVENT_TYPE){
-					threadService.getSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
-						@Override
-						public void handle(Either<String, JsonArray> event) {
-							if (event.isRight()) {
-								// get all ids
-								JsonArray shared = event.right().getValue();
-								extractUserIds(request, shared, user, info, body, eventType, "notify-news-published.html");
-							}
+			else if(eventType == NEWS_PUBLISH_EVENT_TYPE){
+				// notify the owner of the news only
+				threadService.getSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+					@Override
+					public void handle(Either<String, JsonArray> event) {
+						if (event.isRight()) {
+							// get all ids
+							JsonArray shared = event.right().getValue();
+							extractUserIds(request, shared, user, info, body, eventType, "notify-news-published.html");
 						}
-					});
-				}
-				else{
-					if(eventType == NEWS_UNPUBLISH_EVENT_TYPE){
-						threadService.getSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
-							@Override
-							public void handle(Either<String, JsonArray> event) {
-								if (event.isRight()) {
-									// get all ids
-									JsonArray shared = event.right().getValue();
-									extractUserIds(request, shared, user, info, body, eventType, "notify-news-unpublished.html");
-								}
-							}
-						});
 					}
-				}
+				});
 			}
 		}
 	}
