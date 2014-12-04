@@ -5,8 +5,9 @@
 		<li ng-repeat="thread in widget.threads">
 			<a ng-href="/actualites#/view/thread/[[thread._id]]/info/[[thread.infos._id]]"
 			tooltip="[[thread.infos.tooltip]]">
-				[[thread.infos.title]] ([[thread.infos.relativeDate]])
+				[[thread.infos.title]]
 			</a>
+			<span class="relative-date small-text">([[thread.infos.relativeDate]])</span>
 		</li>
 	
 		<li ng-if="widget.threads === undefined || widget.threads.length === 0"><i18n>actualites.widget.empty</i18n></li>
