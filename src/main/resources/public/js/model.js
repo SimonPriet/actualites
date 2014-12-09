@@ -63,18 +63,20 @@ function Info(data){
 Info.prototype.toJSON = function(){
 	var pubDate = null;
 	if(this.hasPublicationDate) {
-		if(!moment.isMoment(this.publicationDate)) {
-			this.publicationDate = moment(this.publicationDate);
+		pubDate = this.publicationDate;
+		if(!moment.isMoment(pubDate)) {
+			pubDate = moment(pubDate);
 		}
-		pubDate = this.publicationDate.unix();
+		pubDate = pubDate.unix();
 	}
 	
 	var expDate = null;
 	if(this.hasExpirationDate) {
-		if(!moment.isMoment(this.expirationDate)) {
-			this.expirationDate = moment(this.expirationDate);
+		expDate = this.expirationDate;
+		if(!moment.isMoment(expDate)) {
+			expDate = moment(expDate);
 		}
-		expDate = this.expirationDate.unix();
+		expDate = expDate.unix();
 	}
 	
 	return {

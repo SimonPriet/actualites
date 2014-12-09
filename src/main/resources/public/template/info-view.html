@@ -17,7 +17,7 @@
 		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelDeleteInfo()" />
 	</div>
 </lightbox>
-<div class="row lower-title" ng-if="info.expirationDate">
+<div class="row lower-title" ng-if="info.hasExpirationDate">
 	<span class="cell" translate content="actualites.info.label.author"></span>
 	<a ng-href="/userbook/annuaire#[[info.owner.userId]]"><span class="cell info-metadata">&nbsp;[[info.owner.displayName]]</span></a>
 	<span class="cell" translate content="actualites.info.label.initialDate"></span>
@@ -26,7 +26,7 @@
 	<span class="cell info-metadata">&nbsp;[[formatDate(info.expirationDate)]]</span>
 </div>
 
-<div class="row lower-title" ng-if="!info.expirationDate">
+<div class="row lower-title" ng-if="!info.hasExpirationDate">
 	<span class="cell" translate content="actualites.info.label.author"></span>
 	<a ng-href="/userbook/annuaire#[[info.owner.userId]]"><span class="cell info-metadata">&nbsp;[[info.owner.displayName]]</span></a>
 	<span class="cell" translate content="actualites.info.label.publication"></span>
