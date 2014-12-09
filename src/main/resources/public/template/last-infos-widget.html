@@ -2,7 +2,7 @@
 	<h1><i18n>actualites.widget.title</i18n></h1>
 	
 	<ul class="row">
-		<li ng-repeat="thread in widget.threads">
+		<li ng-repeat="thread in widget.threads" ng-class="{ 'border': $last === false }">
 			<a ng-href="/actualites#/view/thread/[[thread._id]]/info/[[thread.infos._id]]"
 			tooltip="[[thread.infos.tooltip]]">
 				[[thread.infos.title]]
