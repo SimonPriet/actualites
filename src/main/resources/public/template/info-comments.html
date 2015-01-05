@@ -4,8 +4,8 @@
 
 <article class="row comment" ng-repeat="comment in info.comments.all">
 	<div class="lower-title">
-		<a href="/userbook/annuaire#/[[comment.author]]">[[comment.authorName]]</a>
-		<em>le [[formatDate(comment.posted)]]</em>
+		<a href="/userbook/annuaire#/[[comment.owner]]">[[comment.username]]</a>
+		<em>le [[formatDate(comment.modified)]]</em>
 		<p>[[comment.comment]]</p>
 	</div>
 	<div ng-if="comment._id" class="right-magnet cell">

@@ -1,56 +1,56 @@
 var actualitesBehaviours = {
 	resources: {
 		view: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|getThread'
+			right: 'net-atos-entng-actualites-controllers-ThreadController|getThread'
 		},
 		contrib: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|createDraft'
+			right: 'net-atos-entng-actualites-controllers-InfoController|createDraft'
 		},
 		updateDraft: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|updateDraft'
+			right: 'net-atos-entng-actualites-controllers-InfoController|updateDraft'
 		},
 		updatePending: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|updatePending'
+			right: 'net-atos-entng-actualites-controllers-InfoController|updatePending'
 		},
 		updatePublished: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|updatePublished'
+			right: 'net-atos-entng-actualites-controllers-InfoController|updatePublished'
 		},
 		submit: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|submit'
+			right: 'net-atos-entng-actualites-controllers-InfoController|submit'
 		},
 		unsubmit: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|unsubmit'
+			right: 'net-atos-entng-actualites-controllers-InfoController|unsubmit'
 		},
 		publish: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|publish'
+			right: 'net-atos-entng-actualites-controllers-InfoController|publish'
 		},
 		unpublish: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|unpublish'
+			right: 'net-atos-entng-actualites-controllers-InfoController|unpublish'
 		},
 		editThread: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|updateThread'
+			right: 'net-atos-entng-actualites-controllers-ThreadController|updateThread'
 		},
 		deleteThread: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|deleteThread'
+			right: 'net-atos-entng-actualites-controllers-ThreadController|deleteThread'
 		},
 		share: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|shareThread'
+			right: 'net-atos-entng-actualites-controllers-ThreadController|shareThread'
 		},
 		trash: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|trash'
+			right: 'net-atos-entng-actualites-controllers-InfoController|trash'
 		},
 		restore: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|restore'
+			right: 'net-atos-entng-actualites-controllers-InfoController|restore'
 		},
 		delete: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|delete'
+			right: 'net-atos-entng-actualites-controllers-InfoController|delete'
 		},
 		comment: {
-			right: 'net-atos-entng-actualites-controllers-ActualitesController|comment'
+			right: 'net-atos-entng-actualites-controllers-InfoController|comment'
 		}
 	},
 	workflow: {
-		admin: 'net.atos.entng.actualites.controllers.ActualitesController|createThread'
+		admin: 'net.atos.entng.actualites.controllers.ThreadController|createThread'
 	}
 };
 
@@ -66,7 +66,7 @@ Behaviours.register('actualites', {
 		}
 
 		for(var behaviour in actualitesBehaviours.resources){
-			if(model.me.hasRight(rightsContainer, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId || model.me.userId === rightsContainer.owner.userId){
+			if(model.me.hasRight(rightsContainer, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner || model.me.userId === rightsContainer.owner){
 				if(resource.myRights[behaviour] !== undefined){
 					resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
 				}
@@ -99,8 +99,8 @@ Behaviours.register('actualites', {
 				var infos = _.map(thread.infos, function(info){
 					// Keep news that are published and not expired
 					if(info.status === 3) {	
-						if(info.expirationDate && info.expirationDate.$date && 
-								moment().isAfter(moment(info.expirationDate.$date))) {
+						if(info.expiration_date && info.expiration_date.$date && 
+								moment().isAfter(moment(info.expiration_date.$date))) {
 							return;
 						}
 						
@@ -114,8 +114,8 @@ Behaviours.register('actualites', {
 						
 						return {
 							title : info.title + ' [' + thread.title + ']',
-							ownerName : info.owner.displayName,
-							owner : info.owner.userId,
+							ownerName : info.unsername,
+							owner : info.owner,
 							icon : threadIcon,
 							path : '/actualites#/view/thread/' + thread._id + '/info/' + info._id,
 							id : info._id,

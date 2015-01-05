@@ -21,8 +21,8 @@ object ActualitesScenario {
       .check(status.is(302)))
   // Threads
   .exec(http("Thread Create")
-    .post("/actualites/threads")
-    .body(StringBody("""{"name" : "thread created"}"""))
+    .post("/actualites/thread")
+    .body(StringBody("""{"title" : "thread created"}"""))
     .check(status.is(200),
         jsonPath("$._id").find.saveAs("threadId")
       ))
@@ -30,16 +30,16 @@ object ActualitesScenario {
     .get("/actualites/thread/${threadId}")
     .check(status.is(200),
         jsonPath("$._id").find.is("${threadId}"),
-        jsonPath("$.name").find.is("thread created")
+        jsonPath("$.title").find.is("thread created")
       ))
   .exec(http("Thread Update")
     .put("/actualites/thread/${threadId}")
-    .body(StringBody("""{"name" : "thread updated"}"""))
+    .body(StringBody("""{"title" : "thread updated"}"""))
     .check(status.is(200)))
   .exec(http("Thread Get updated")
     .get("/actualites/thread/${threadId}")
     .check(status.is(200),
-        jsonPath("$.name").find.is("thread updated")
+        jsonPath("$.title").find.is("thread updated")
       ))
   .exec(http("Thread List")
     .get("/actualites/threads")

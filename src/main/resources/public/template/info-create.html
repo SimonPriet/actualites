@@ -7,20 +7,20 @@
 
 	<div class="row">
 		<label class="three cell"><i18n>actualites.create.thread</i18n></label>
-		<select ng-options="category as category.title for category in threads.filter(checkThreadsRightsFilter)" ng-model="currentInfo.thread" class="nine cell"></select>
+		<select ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]" ng-options="thread as thread.title for thread in threads.filter(checkThreadsRightsFilter)" ng-model="currentInfo.thread" class="nine cell"></select>
 	</div>
 
 	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> <i18n>actualites.create.date.publish</i18n></label>
-		<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expirationDate" ng-model="currentInfo.publicationDate" ng-change="showDate = true"></date-picker-actu>
+		<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker-actu>
 	</div>
 
 	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> <i18n>actualites.create.date.expire</i18n></label>
-		<date-picker-actu min-date="currentInfo.publicationDate" past="true" ng-model="currentInfo.expirationDate" ng-change="showDate = true"></date-picker-actu>
+		<date-picker-actu min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker-actu>
 	</div>
 	<div class="row">
-		<label class="three cell"><input ng-model="currentInfo.isHeadline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
+		<label class="three cell"><input ng-model="currentInfo.is_headline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
 	</div>
 	<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
 		<label class="cell">&nbsp;</label>
@@ -31,12 +31,10 @@
 	</div>
 
 	<div class="row">
-		<button ng-click="saveInfo();" class="right-magnet">
-			<i18n>actualites.edition.infos.save</i18n>
-		</button>
-		<button ng-click="cancelEditInfo();" class="right-magnet cancel">
-			<i18n>actualites.edition.infos.cancel</i18n>
-		</button>
+		<button ng-click="saveInfo();" class="right-magnet" translate content="actualites.edition.infos.save"></button>
+		<button ng-click="saveAndSubmit();" class="right-magnet" ng-if="!canPublish(currentInfo.thread) && canSubmit(currentInfo.thread)" translate content="actualites.edition.infos.submit"></button>
+		<button ng-click="saveAndPublish();" class="right-magnet" ng-if="canPublish(currentInfo.thread)" translate content="actualites.edition.infos.publish"></button>
+		<button ng-click="cancelEditInfo();" class="right-magnet cancel" translate content="actualites.edition.infos.cancel"></button>
 	</div>
 	<div class="row"></div>
 </article>

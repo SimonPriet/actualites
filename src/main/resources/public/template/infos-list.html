@@ -1,6 +1,6 @@
 <div class="row contextual-buttons ng-scope">
 	<div class="action-buttons" >
-		<button ng-if="checkThreadsSubmitRight()" ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
+		<button ng-if="checkOneOrMoreThreadsContibRight()" ng-click="createInfo()" translate content="actualites.edition.infos.create"></button>
 		<button ng-if="checkThreadsAdminRight()" ng-click="threadsView()" translate content="thread.list.view"></button>
 	</div>
 </div>
@@ -11,8 +11,8 @@
 
 <container template="filters"></container>
 
-<div ng-if="thread" class="row">
-	<h2>[[thread.title]]</h2>
+<div ng-if="thread_id" class="row">
+	<h2>[[thread_title]]</h2>
 	<a ng-click="closeThread()">
 		<i18n>actualites.links.display.news.of.all.threads</i18n>
 	</a>
@@ -20,14 +20,14 @@
 
 <div ng-repeat="info in infos.all | orderBy:[sortByIsHeadline,'modified.$date']:true">
 	<div class="row vertical-spacing"></div>
-	<div ng-if="isInfoVisible(info)" class="illustrated-article" ng-class="{headline: info.isHeadline}">
-		<div class="illustration" ng-click="openThread(info.thread)">
+	<div ng-if="isInfoVisible(info)" class="illustrated-article" ng-class="{headline: info.is_headline}">
+		<div class="illustration" ng-click="openThread(info.thread_id, info.thread_title)">
 			<div class="image">
-				<img ng-src="[[info.thread.icon]]?thumbnail=150x150" ng-if="info.thread.icon" />
-				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
+				<img ng-src="[[info.thread_icon]]?thumbnail=150x150" ng-if="info.thread_icon" />
+				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread_icon" />
 			</div>
 			<legend>
-				<strong>[[info.thread.title]]</strong>
+				<strong>[[info.thread_title]]</strong>
 			</legend>
 		</div>
 		<article class="illustrated-text">

@@ -21,11 +21,11 @@ function ActualitesController($scope, template, route, model){
             viewThread: function(params){
             	model.threads.one('sync', function(){
             		var aThread = model.threads.find(function(thread){
-    					return thread._id === params.threadId;
+    					return thread._id === parseInt(params.threadId);
     				});
     				if(aThread !== undefined){
     					$scope.notFound = false;
-                        $scope.openThread(aThread);
+                        $scope.openThread(aThread._id, aThread.thread_title);
     				}
     				else{
 						$scope.notFound = true;
@@ -36,12 +36,12 @@ function ActualitesController($scope, template, route, model){
             viewInfo: function(params){
             	model.infos.one('sync', function() {
             		var aThread = model.threads.find(function(thread) {
-    					return thread._id === params.threadId;
+    					return thread._id === parseInt(params.threadId);
     				});
     				if(aThread !== undefined) {
                         $scope.info = undefined;
                         $scope.info = model.infos.find(function(info){
-                            return info._id === params.infoId;
+                            return info._id === parseInt(params.infoId);
                         });
                         if ($scope.info !== undefined) {
                             if($scope.isInfoVisible($scope.info)) {
@@ -119,7 +119,7 @@ function ActualitesController($scope, template, route, model){
     };
     
 	$scope.sortByIsHeadline = function(info) {
-		return info.isHeadline === true;
+		return info.is_headline === true;
 	};
     
     $scope.isInfoPublished = function(info) {
@@ -132,25 +132,25 @@ function ActualitesController($scope, template, route, model){
            return false;
         }
         // Selected Thread
-        if ($scope.thread && $scope.thread !== info.thread) {
+        if ($scope.thread_id && $scope.thread_id !== info.thread_id) {
            return false;
         }
 
         // For Published Infos, enforce publication and expiration dates if the user has not 'contrib' permission
         if (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED && (info.myRights.contrib === undefined)) {
             if (info.hasPublicationDate === true) {
-                if (moment().isBefore(getDateAsMoment(info.publicationDate))) {
+                if (moment().isBefore(getDateAsMoment(info.publication_date))) {
                     return false;
                 }
             }
             if (info.hasExpirationDate === true) {
-                if (moment().isAfter(getDateAsMoment(info.expirationDate))) {
+                if (moment().isAfter(getDateAsMoment(info.expiration_date))) {
                     return false;
                 }
             }
         }
         
-        if(info.owner.userId !== model.me.userId 
+        if(info.owner !== model.me.userId 
         		&& info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING 
         		&& info.thread.myRights.publish === undefined
           ){
@@ -182,15 +182,15 @@ function ActualitesController($scope, template, route, model){
 
 	$scope.editInfo = function(info){
 		var editedInfo = info;
-		if (editedInfo.hasPublicationDate && editedInfo.publicationDate.$date) {
-			editedInfo.publicationDate = editedInfo.publicationDate.$date;
+		if (editedInfo.hasPublicationDate && editedInfo.publication_date.$date) {
+			editedInfo.publication_date = editedInfo.publication_date.$date;
 		}
-		if (editedInfo.hasExpirationDate && editedInfo.expirationDate.$date) {
-			editedInfo.expirationDate = editedInfo.expirationDate.$date;
+		if (editedInfo.hasExpirationDate && editedInfo.expiration_date.$date) {
+			editedInfo.expiration_date = editedInfo.expiration_date.$date;
 		}
 		
 		// setAsHeadline : temporary variable, to avoid view refresh (due to filter 'orderBy') when editing an info
-		editedInfo.setAsHeadline = editedInfo.isHeadline;
+		editedInfo.setAsHeadline = editedInfo.is_headline;
 		
 		$scope.currentInfo = editedInfo;
 	};
@@ -214,32 +214,53 @@ function ActualitesController($scope, template, route, model){
     };
 
     $scope.saveInfo = function(){
-    	var callback;
     	if($scope.info) {
     		template.open('main', 'single-info');
     	}
-		else if(!$scope.currentInfo._id && $scope.currentInfo.thread && 
-				$scope.canPublish($scope.currentInfo.thread)) {
-			/* A moderator can validate a piece of news he has just written, 
-			   without going back to the news list */
-			var threadId = $scope.currentInfo.thread._id;
-			callback = function(infoId) {
-				window.location.href = '/actualites#/view/thread/' + threadId + '/info/' + infoId;
-				window.location.reload();
-			};
-		}
     	else {
     		template.open('main', 'infos-list');
     	}
-    	
     	if($scope.currentInfo._id) { // When updating an info, update field 'modified' for the front end
     		$scope.currentInfo.modified = new Object({ $date : moment().toISOString() });
     	}
-    	
     	if($scope.currentInfo.setAsHeadline !== undefined) {
-        	$scope.currentInfo.isHeadline = $scope.currentInfo.setAsHeadline;
+        	$scope.currentInfo.is_headline = $scope.currentInfo.setAsHeadline;
     	}
-		$scope.currentInfo.save(callback);
+		$scope.currentInfo.save();
+    	if($scope.info) {
+    		$scope.info.updateData($scope.currentInfo);
+    	}
+		$scope.currentInfo = undefined;
+    };
+    
+    $scope.saveAndSubmit = function(){
+    	if($scope.info) {
+    		template.open('main', 'single-info');
+    	}
+    	else {
+    		template.open('main', 'infos-list');
+    	}
+    	if($scope.currentInfo.setAsHeadline !== undefined) {
+        	$scope.currentInfo.is_headline = $scope.currentInfo.setAsHeadline;
+    	}
+		$scope.currentInfo.submit();
+    	if($scope.info) {
+    		$scope.info.updateData($scope.currentInfo);
+    	}
+		$scope.currentInfo = undefined;
+    };
+    
+    $scope.saveAndPublish = function(){
+    	if($scope.info) {
+    		template.open('main', 'single-info');
+    	}
+    	else {
+    		template.open('main', 'infos-list');
+    	}
+    	if($scope.currentInfo.setAsHeadline !== undefined) {
+        	$scope.currentInfo.is_headline = $scope.currentInfo.setAsHeadline;
+    	}
+		$scope.currentInfo.publish();
     	if($scope.info) {
     		$scope.info.updateData($scope.currentInfo);
     	}
@@ -264,12 +285,14 @@ function ActualitesController($scope, template, route, model){
 		);
     };
 
-	$scope.openThread = function(thread){
-		$scope.thread = thread;
+	$scope.openThread = function(thread_id, thread_title){
+		$scope.thread_id = thread_id;
+		$scope.thread_title = thread_title;
 	};
 
 	$scope.closeThread = function(){
-		$scope.thread = undefined;
+		$scope.thread_id = undefined;
+		$scope.thread_title = undefined;
 	};
 
     $scope.isInfoUnpublishable = function(info) {
@@ -281,7 +304,6 @@ function ActualitesController($scope, template, route, model){
     	var result = false;
     	if(info && info._id && info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
     		result = true;
-    		
         	if($scope.canSkipPendingStatus(info)){
     			result = false;
     		}
@@ -295,15 +317,15 @@ function ActualitesController($scope, template, route, model){
 
     $scope.getState = function(info){
     	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
-    		if(info.hasPublicationDate && moment().isBefore(getDateAsMoment(info.publicationDate)) ){
+    		if(info.hasPublicationDate && moment().isBefore(getDateAsMoment(info.publication_date)) ){
     			// label (A venir)
     			return "actualites.edition.status.4" ;
     		}
-    		if(info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expirationDate)) ){
+    		if(info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date)) ){
     			// label (Expiree)
     			return "actualites.edition.status.5" ;
     		}
-    		if(info.owner.userId !== model.me.userId){
+    		if(info.owner !== model.me.userId){
     			return "actualites.edition.status.empty";
     		}
     	}
@@ -421,6 +443,8 @@ function ActualitesController($scope, template, route, model){
     	}
     	else if (date.$date) {
 			momentDate = moment(date.$date);
+		} else if (typeof date === "number"){
+			momentDate = moment.unix(date);
 		} else {
 			momentDate = moment(date);
 		}
@@ -428,14 +452,21 @@ function ActualitesController($scope, template, route, model){
     };
     
     // Functions to check rights
-    $scope.checkThreadsRightsFilter = function(category){
-    	return category.myRights.submit !== undefined;
+    $scope.checkThreadsRightsFilter = function(thread){
+    	return thread.myRights.contrib !== undefined;
 	};
 	
-	$scope.checkThreadsSubmitRight = function(){
+	$scope.checkThreadContibRight = function(thread){
+		if(thread.owner === model.me.userId || thread.myRights.contrib){
+			return true;
+		}
+		return false;
+	};
+	
+	$scope.checkOneOrMoreThreadsContibRight = function(){
 		var right = false;
 		$scope.threads.forEach(function(item){
-			if(item.myRights.submit){
+			if($scope.checkThreadContibRight(item)){
 				right = true;
 			}
 		});
@@ -447,10 +478,10 @@ function ActualitesController($scope, template, route, model){
 	};
 	
 	$scope.hasRightsOnAllThreads = function(){
-		var right = false;
+		var right = true;
 		$scope.threads.forEach(function(item){
-			if(item.myRights.editThread || item.myRights.deleteThread || item.myRights.share){
-				right = true;
+			if(!$scope.hasRightsOnThread(item)){
+				right = false;
 			}
 		});
 		return right;
@@ -458,7 +489,11 @@ function ActualitesController($scope, template, route, model){
 	
 	$scope.hasRightsOnThread = function(thread){
 		var right = false;
-		if(thread.myRights.editThread || thread.myRights.deleteThread || thread.myRights.share){
+		if(thread.owner === model.me.userId 
+			|| thread.myRights.editThread 
+			|| thread.myRights.deleteThread 
+			|| thread.myRights.share
+		){
 			right = true;
 		}
 		return right;
@@ -473,15 +508,24 @@ function ActualitesController($scope, template, route, model){
 	};
 	
 	$scope.canPublish = function(thread){
-		return (thread.myRights.publish !== undefined);
+		if(thread !== undefined){
+			return (thread.myRights.publish !== undefined);
+		}
+		return false;
 	};
+	
+    $scope.canSubmit = function(thread){
+    	if(thread !== undefined){
+			return (thread.myRights.submit !== undefined);
+		}
+		return false;
+    };
 	
 	// A moderator can validate his own drafts (he does not need to go through status 'pending')
 	$scope.canSkipPendingStatus = function(info){
-		return (info && info.owner.userId === model.me.userId && 
+		return (info && info.owner === model.me.userId && 
 			info.thread && $scope.canPublish(info.thread));
 	};
-	
 
     this.initialize();
 }
