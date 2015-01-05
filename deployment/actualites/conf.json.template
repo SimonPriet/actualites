@@ -3,6 +3,9 @@
       "config": {
         "main" : "net.atos.entng.actualites.Actualites",
         "port" : 8022,
+		"sql" : true,
+        "mongodb" : false,
+        "neo4j" : false,
         "app-name" : "Actualites",
         "app-address" : "/actualites",
         "app-icon" : "actualites-large",
