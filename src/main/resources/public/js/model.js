@@ -100,9 +100,7 @@ Info.prototype.toJSON = function(){
 };
 
 Info.prototype.create = function(){
-	if(this.status === undefined){
-		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-	}
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(response){
 		if((typeof callback === 'function') && response && response._id){
 			callback(response._id);
@@ -111,7 +109,31 @@ Info.prototype.create = function(){
 			model.infos.sync();
 		}
 	}.bind(this));
-}
+};
+
+Info.prototype.createPending = function(){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
+	http().postJson('/actualites/thread/' + this.thread._id + '/info/pending', this).done(function(response){
+		if((typeof callback === 'function') && response && response._id){
+			callback(response._id);
+		}
+		else {
+			model.infos.sync();
+		}
+	}.bind(this));
+};
+
+Info.prototype.createPublished = function(){
+	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+	http().postJson('/actualites/thread/' + this.thread._id + '/info/published', this).done(function(response){
+		if((typeof callback === 'function') && response && response._id){
+			callback(response._id);
+		}
+		else {
+			model.infos.sync();
+		}
+	}.bind(this));
+};
 
 Info.prototype.saveModifications = function(){
 	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
@@ -130,43 +152,28 @@ Info.prototype.save = function(){
 
 Info.prototype.submit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	if(this._id){
-		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit', this);
-	} else {
-		this.create();
-	}
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit');
 };
 
 Info.prototype.unsubmit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', this);
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit');
 };
 
 Info.prototype.publish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-	if(this._id){
-		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', this);
-	} else {
-		this.create();
-	}
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish');
 };
 
 Info.prototype.unpublish = function(canSkipPendingStatus){
 	var that = this;
 	if(!canSkipPendingStatus) {
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
+		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish');
 	}
 	else {
-		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
+		this.unsubmit();
 	}
-
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', this)
-	.done(function(){
-		// hack to unsubmit
-		if(canSkipPendingStatus === true) {
-			that.unsubmit();
-		}
-	});
 }
 
 Info.prototype.trash = function(){

@@ -26,8 +26,5 @@
 		"thread_id": {
 			"type": "integer"
 		}
-	},
-	"required": [
-		"thread_id"
-	]
+	}
 }

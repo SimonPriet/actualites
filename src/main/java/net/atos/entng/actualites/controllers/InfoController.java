@@ -155,7 +155,7 @@ public class InfoController extends ControllerHelper {
 	}
 
 	@Post("/thread/:" + THREAD_ID_PARAMETER + "/info")
-	@ApiDoc("Add a new Info")
+	@ApiDoc("Add a new Info with draft status")
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void createDraft(final HttpServerRequest request) {
@@ -165,9 +165,45 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						if(!status_list.contains(resource.getInteger("status"))){
-							resource.putNumber("status", status_list.get(1));
-						}
+						resource.putNumber("status", status_list.get(1));
+						crudService.create(resource, user, notEmptyResponseHandler(request));
+					}
+				});
+			}
+		});
+	}
+
+	@Post("/thread/:" + THREAD_ID_PARAMETER + "/info/pending")
+	@ApiDoc("Add a new Info with pending status")
+	@ResourceFilter(ThreadFilter.class)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
+	public void createPending(final HttpServerRequest request) {
+		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject resource) {
+						resource.putNumber("status", status_list.get(2));
+						crudService.create(resource, user, notEmptyResponseHandler(request));
+					}
+				});
+			}
+		});
+	}
+
+	@Post("/thread/:" + THREAD_ID_PARAMETER + "/info/published")
+	@ApiDoc("Add a new Info published status")
+	@ResourceFilter(ThreadFilter.class)
+	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
+	public void createPublished(final HttpServerRequest request) {
+		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject resource) {
+						resource.putNumber("status", status_list.get(3));
 						crudService.create(resource, user, notEmptyResponseHandler(request));
 					}
 				});
@@ -189,9 +225,8 @@ public class InfoController extends ControllerHelper {
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
 						if(!status_list.contains(status) || status != status_list.get(1)){
-							resource.putNumber("status", status_list.get(1));
+							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
@@ -212,9 +247,8 @@ public class InfoController extends ControllerHelper {
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
 						if(!status_list.contains(status) || status != status_list.get(2)){
-							resource.putNumber("status", status_list.get(2));
+							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
@@ -224,7 +258,7 @@ public class InfoController extends ControllerHelper {
 	@Put("/thread/:"+THREAD_ID_PARAMETER+"/info/:"+ INFO_ID_PARAMETER +"/published")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
 	@ResourceFilter(ThreadFilter.class)
-	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void updatePublished(final HttpServerRequest request) {
 		final String infoId = request.params().get(INFO_ID_PARAMETER);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -235,9 +269,8 @@ public class InfoController extends ControllerHelper {
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
 						if(!status_list.contains(status) || status != status_list.get(3)){
-							resource.putNumber("status", status_list.get(3));
+							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
@@ -254,16 +287,10 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						crudService.delete(infoId, user, notEmptyResponseHandler(request));
-					}
-				});
+				crudService.delete(infoId, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
-
 
 	@Put("/thread/:"+THREAD_ID_PARAMETER+"/info/:"+ INFO_ID_PARAMETER +"/submit")
 	@ApiDoc("Submit : Change an Info to Pending state in thread by thread and by id")
@@ -274,16 +301,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(2)){
-							resource.putNumber("status", status_list.get(2));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(2));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
@@ -297,16 +317,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(1)){
-							resource.putNumber("status", status_list.get(1));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(1));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
@@ -320,16 +333,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(3)){
-							resource.putNumber("status", status_list.get(3));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(3));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
@@ -343,16 +349,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(2)){
-							resource.putNumber("status", status_list.get(2));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(2));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
@@ -366,16 +365,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(0)){
-							resource.putNumber("status", status_list.get(0));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(0));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}
@@ -389,16 +381,9 @@ public class InfoController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(1)){
-							resource.putNumber("status", status_list.get(1));
-						}
-						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-					}
-				});
+				JsonObject resource = new JsonObject();
+				resource.putNumber("status", status_list.get(1));
+				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 			}
 		});
 	}

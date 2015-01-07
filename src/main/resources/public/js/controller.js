@@ -233,7 +233,7 @@ function ActualitesController($scope, template, route, model){
 		$scope.currentInfo = undefined;
     };
     
-    $scope.saveAndSubmit = function(){
+    $scope.saveSubmitted = function(){
     	if($scope.info) {
     		template.open('main', 'single-info');
     	}
@@ -243,14 +243,14 @@ function ActualitesController($scope, template, route, model){
     	if($scope.currentInfo.setAsHeadline !== undefined) {
         	$scope.currentInfo.is_headline = $scope.currentInfo.setAsHeadline;
     	}
-		$scope.currentInfo.submit();
+		$scope.currentInfo.createPending();
     	if($scope.info) {
     		$scope.info.updateData($scope.currentInfo);
     	}
 		$scope.currentInfo = undefined;
     };
     
-    $scope.saveAndPublish = function(){
+    $scope.savePublished = function(){
     	if($scope.info) {
     		template.open('main', 'single-info');
     	}
@@ -260,7 +260,7 @@ function ActualitesController($scope, template, route, model){
     	if($scope.currentInfo.setAsHeadline !== undefined) {
         	$scope.currentInfo.is_headline = $scope.currentInfo.setAsHeadline;
     	}
-		$scope.currentInfo.publish();
+		$scope.currentInfo.createPublished();
     	if($scope.info) {
     		$scope.info.updateData($scope.currentInfo);
     	}
@@ -514,13 +514,41 @@ function ActualitesController($scope, template, route, model){
 		return false;
 	};
 	
-    $scope.canSubmit = function(thread){
-    	if(thread !== undefined){
+	$scope.canSubmit = function(thread){
+		if(thread !== undefined){
 			return (thread.myRights.submit !== undefined);
 		}
 		return false;
-    };
-	
+	};
+
+	$scope.canEditInfo = function(info){
+		if(info && info.thread !== undefined && info.status !== undefined){
+			switch(info.status){
+			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
+				return (info.owner === model.me.userId);
+			case ACTUALITES_CONFIGURATION.infoStatus.PENDING:
+				return (info.owner === model.me.userId || thread.myRights.publish);
+			case ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED:
+				return (thread.myRights.publish);
+			}
+		}
+		return false;
+	};
+
+	$scope.canDeleteInfo = function(info){
+		if(info && info.thread !== undefined && info.status !== undefined){
+			switch(info.status){
+			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
+				return (info.owner === model.me.userId);
+			case ACTUALITES_CONFIGURATION.infoStatus.PENDING:
+				return (info.owner === model.me.userId || thread.myRights.delete);
+			case ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED:
+				return (thread.myRights.delete);
+			}
+		}
+		return false;
+	};
+
 	// A moderator can validate his own drafts (he does not need to go through status 'pending')
 	$scope.canSkipPendingStatus = function(info){
 		return (info && info.owner === model.me.userId && 

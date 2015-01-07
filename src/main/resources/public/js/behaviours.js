@@ -6,6 +6,12 @@ var actualitesBehaviours = {
 		contrib: {
 			right: 'net-atos-entng-actualites-controllers-InfoController|createDraft'
 		},
+		createPending: {
+			right: 'net-atos-entng-actualites-controllers-InfoController|createPending'
+		},
+		createPublished: {
+			right: 'net-atos-entng-actualites-controllers-InfoController|createPublished'
+		},
 		updateDraft: {
 			right: 'net-atos-entng-actualites-controllers-InfoController|updateDraft'
 		},
