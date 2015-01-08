@@ -4,7 +4,9 @@
 		&nbsp;</span>[[info.title]]
 	</h1>
 	<div class="right-magnet cell">
-		<a ng-if="canEditInfo(info)" ng-click="editInfo(info)">modifier</a> ou <a ng-if="canDeleteInfo(info)" ng-click="showDeleteInfo(info)">supprimer</a>
+		<a ng-if="canEditInfo(info)" ng-click="editInfo(info)">modifier</a>
+		&nbsp;
+		<a ng-if="canDeleteInfo(info)" ng-click="showDeleteInfo(info)">supprimer</a>
 	</div>
 </div>
 <lightbox show="display.showConfirmRemove" on-close="cancelDeleteInfo()">

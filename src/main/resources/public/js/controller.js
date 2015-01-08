@@ -527,9 +527,9 @@ function ActualitesController($scope, template, route, model){
 			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
 				return (info.owner === model.me.userId);
 			case ACTUALITES_CONFIGURATION.infoStatus.PENDING:
-				return (info.owner === model.me.userId || thread.myRights.publish);
+				return (info.owner === model.me.userId || info.thread.myRights.publish);
 			case ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED:
-				return (thread.myRights.publish);
+				return (info.thread.myRights.publish);
 			}
 		}
 		return false;
@@ -541,9 +541,9 @@ function ActualitesController($scope, template, route, model){
 			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
 				return (info.owner === model.me.userId);
 			case ACTUALITES_CONFIGURATION.infoStatus.PENDING:
-				return (info.owner === model.me.userId || thread.myRights.delete);
+				return (info.owner === model.me.userId || info.thread.myRights.delete);
 			case ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED:
-				return (thread.myRights.delete);
+				return (info.thread.myRights.delete);
 			}
 		}
 		return false;
