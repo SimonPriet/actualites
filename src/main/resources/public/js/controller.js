@@ -181,18 +181,9 @@ function ActualitesController($scope, template, route, model){
     };
 
 	$scope.editInfo = function(info){
-		var editedInfo = info;
-		if (editedInfo.hasPublicationDate && editedInfo.publication_date.$date) {
-			editedInfo.publication_date = editedInfo.publication_date.$date;
-		}
-		if (editedInfo.hasExpirationDate && editedInfo.expiration_date.$date) {
-			editedInfo.expiration_date = editedInfo.expiration_date.$date;
-		}
-		
+		$scope.currentInfo = $.extend(true, {}, info);
 		// setAsHeadline : temporary variable, to avoid view refresh (due to filter 'orderBy') when editing an info
-		editedInfo.setAsHeadline = editedInfo.is_headline;
-		
-		$scope.currentInfo = editedInfo;
+		$scope.currentInfo.setAsHeadline = $scope.currentInfo.is_headline;
 	};
 	
     $scope.showDeleteInfo = function(info) {

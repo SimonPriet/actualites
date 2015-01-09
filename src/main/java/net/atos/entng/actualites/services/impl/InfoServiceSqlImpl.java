@@ -25,8 +25,9 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified, i.owner, u.username" +
-				", t.id AS thread_id, t.title AS thread_title, t.icon AS thread_icon" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
 					" FROM actualites.comment AS c" +
@@ -72,8 +73,9 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified, i.owner, u.username" +
-				", t.id AS thread_id, t.title AS thread_title, t.icon AS thread_icon" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
 					" FROM actualites.comment AS c" +
@@ -120,8 +122,9 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified, i.owner, u.username" +
-				", t.id AS thread_id, t.title AS thread_title, t.icon AS thread_icon" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
 					" FROM actualites.comment AS c" +
@@ -168,7 +171,11 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title, i.modified AS date" +
+			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title," +
+				" CASE WHEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC' > i.modified" +
+					" THEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC'" +
+					" ELSE i.modified" +
+					" END as date" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +
 				" FROM actualites.info AS i" +
@@ -179,10 +186,10 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
 					" OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR t.owner = ?)" +
-				"AND (i.status = 3" +
+				" AND (i.status = 3" +
 					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
 				" GROUP BY i.id, u.username, t.id" +
-				" ORDER BY i.modified DESC" +
+				" ORDER BY date DESC" +
 				" LIMIT ?";
 			for(String value : groupsAndUserIds){
 				values.add(value);
@@ -200,10 +207,43 @@ public class InfoServiceSqlImpl implements InfoService {
 	}
 
 	@Override
-	public void listForLinker(UserInfos user,
-			Handler<Either<String, JsonArray>> handler) {
-		// TODO Auto-generated method stub
-
+	public void listForLinker(UserInfos user, Handler<Either<String, JsonArray>> handler) {
+		if (user != null) {
+			long unixTime = System.currentTimeMillis() / 1000L;
+			String query;
+			JsonArray values = new JsonArray();
+			List<String> groupsAndUserIds = new ArrayList<>();
+			groupsAndUserIds.add(user.getUserId());
+			if (user.getGroupsIds() != null) {
+				groupsAndUserIds.addAll(user.getGroupsIds());
+			}
+			query = "SELECT i.id as _id, i.title, i.thread_id, i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
+				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
+				", array_to_json(array_agg(group_id)) as groups" +
+				" FROM actualites.info AS i" +
+				" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id" +
+				" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
+				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
+				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
+				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
+				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
+					" OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR t.owner = ?)" +
+				" AND (i.status = 3" +
+					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
+				" GROUP BY i.id, u.username, t.id" +
+				" ORDER BY i.title";
+			for(String value : groupsAndUserIds){
+				values.add(value);
+			}
+			values.add(user.getUserId());
+			for(String value : groupsAndUserIds){
+				values.add(value);
+			}
+			values.add(user.getUserId());
+			values.add(unixTime);
+			values.add(unixTime);
+			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
+		}
 	}
 
 }

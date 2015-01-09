@@ -137,7 +137,9 @@ Info.prototype.createPublished = function(){
 
 Info.prototype.saveModifications = function(){
 	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
-	http().putJson(resourceUrl, this);
+	http().putJson(resourceUrl, this).done(function(){
+		model.infos.sync();
+	});
 };
 
 Info.prototype.save = function(){

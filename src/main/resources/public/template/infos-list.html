@@ -31,10 +31,10 @@
 			</legend>
 		</div>
 		<article class="illustrated-text">
-			<div ng-if="currentInfo !== info">
+			<div ng-if="currentInfo._id !== info._id">
 				<div ng-include="template.containers.infoView"></div>
 			</div>
-			<div ng-if="currentInfo === info">
+			<div ng-if="currentInfo._id === info._id">
 				<div ng-include="template.containers.infoEdit"></div>
 			</div>
 

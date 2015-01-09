@@ -17,7 +17,6 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.rs.ApiDoc;
@@ -27,7 +26,6 @@ import fr.wseduc.rs.Post;
 import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.request.RequestUtils;
 
 public class InfoController extends ControllerHelper {
@@ -122,29 +120,12 @@ public class InfoController extends ControllerHelper {
 						badRequest(request, "actualites.widget.bad.request.size.must.be.an.integer");
 						return;
 					}
-
 					if(size <=0 || size > 20) {
 						badRequest(request, "actualites.widget.bad.request.invalid.size");
 						return;
 					}
 				}
-				infoService.listLastPublishedInfos(user, size, new Handler<Either<String, JsonArray>>() {
-					@Override
-					public void handle(Either<String, JsonArray> event) {
-						if (event.isRight()) {
-							JsonArray rightValue = event.right().getValue();
-							if (rightValue != null && rightValue.size() > 0) {
-								JsonObject result = new JsonObject();
-								result.putArray("result", rightValue);
-								renderJson(request, result, 200);
-							} else {
-								notFound(request);
-							}
-						} else {
-							badRequest(request, event.left().getValue());
-						}
-					}
-				});
+				infoService.listLastPublishedInfos(user, size, arrayResponseHandler(request));
 			}
 		});
 	}
@@ -219,7 +200,7 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(1)){
+						if(status_list.contains(status) && status == status_list.get(1)){
 							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
 					}
@@ -241,7 +222,7 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(2)){
+						if(status_list.contains(status) && status == status_list.get(2)){
 							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
 					}
@@ -263,7 +244,7 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						Integer status = resource.getInteger("status");
-						if(!status_list.contains(status) || status != status_list.get(3)){
+						if(status_list.contains(status) && status == status_list.get(3)){
 							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 						}
 					}

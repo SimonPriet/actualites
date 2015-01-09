@@ -100,44 +100,26 @@ Behaviours.register('actualites', {
 	
 	// Used by component "linker" to load news
 	loadResources: function(callback){
-		http().get('/actualites/linker/infos').done(function(data) {
-			var infosArray = _.map(data, function(thread){
-				var infos = _.map(thread.infos, function(info){
-					// Keep news that are published and not expired
-					if(info.status === 3) {	
-						if(info.expiration_date && info.expiration_date.$date && 
-								moment().isAfter(moment(info.expiration_date.$date))) {
-							return;
-						}
-						
-						var threadIcon;
-						if (typeof (thread.icon) === 'undefined' || thread.icon === '' ) {
-							threadIcon = '/img/icons/glyphicons_036_file.png';
-						}
-						else {
-							threadIcon = thread.icon + '?thumbnail=48x48';
-						}
-						
-						return {
-							title : info.title + ' [' + thread.title + ']',
-							ownerName : info.unsername,
-							owner : info.owner,
-							icon : threadIcon,
-							path : '/actualites#/view/thread/' + thread._id + '/info/' + info._id,
-							id : info._id,
-							thread_id : thread._id
-						};
-					}
-				});
-				
-				return infos;
+		http().get('/actualites/linker/infos').done(function(infos) {
+			var infosArray = _.map(infos, function(info){
+				var threadIcon;
+				if (typeof (info.thread_icon) === 'undefined' || info.thread_icon === '' ) {
+					threadIcon = '/img/icons/glyphicons_036_file.png';
+				}
+				else {
+					threadIcon = info.thread_icon + '?thumbnail=48x48';
+				}
+				return {
+					title : info.title + ' [' + info.thread_title + ']',
+					ownerName : info.unsername,
+					owner : info.owner,
+					icon : threadIcon,
+					path : '/actualites#/view/thread/' + info.thread_id + '/info/' + info._id,
+					id : info._id,
+					thread_id : info.thread_id
+				};
 			});
-			
 			this.resources = _.compact(_.flatten(infosArray));
-			this.resources = _.sortBy(this.resources, function(info) {
-				return info.title.toLowerCase();
-			});
-			
 			if(typeof callback === 'function'){
 				callback(this.resources);
 			}
