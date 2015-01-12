@@ -3,6 +3,7 @@ package net.atos.entng.actualites.controllers;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
+import net.atos.entng.actualites.Actualites;
 import net.atos.entng.actualites.filters.InfoFilter;
 
 import org.entcore.common.controller.ControllerHelper;
@@ -22,13 +23,12 @@ import fr.wseduc.webutils.request.RequestUtils;
 
 public class CommentController extends ControllerHelper {
 
-	private static final String INFO_ID_PARAMETER = "id";
-	private static final String COMMENT_ID_PARAMETER = "commentid";
+	private static final String COMMENT_ID_PARAMETER = "id";
 
 	private static final String SCHEMA_COMMENT_CREATE = "createComment";
 	private static final String SCHEMA_COMMENT_UPDATE = "updateComment";
 
-	@Put("/info/:"+INFO_ID_PARAMETER+"/comment")
+	@Put("/info/:"+Actualites.INFO_RESOURCE_ID+"/comment")
 	@ApiDoc("Comment : Add a comment to an Info by info id")
 	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "info.comment", type = ActionType.RESOURCE)
@@ -46,7 +46,7 @@ public class CommentController extends ControllerHelper {
 		});
 	}
 
-	@Put("/info/:"+INFO_ID_PARAMETER+"/comment/:"+COMMENT_ID_PARAMETER)
+	@Put("/info/:"+Actualites.INFO_RESOURCE_ID+"/comment/:"+COMMENT_ID_PARAMETER)
 	@ApiDoc("Comment : modify a comment of an Info by info and comment id")
 	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "info.comment", type = ActionType.RESOURCE)
@@ -65,7 +65,7 @@ public class CommentController extends ControllerHelper {
 		});
 	}
 
-	@Delete("/info/:"+INFO_ID_PARAMETER+"/comment/:"+COMMENT_ID_PARAMETER)
+	@Delete("/info/:"+Actualites.INFO_RESOURCE_ID+"/comment/:"+COMMENT_ID_PARAMETER)
 	@ApiDoc("Comment : delete a comment by comment id ")
 	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "info.comment", type = ActionType.RESOURCE)

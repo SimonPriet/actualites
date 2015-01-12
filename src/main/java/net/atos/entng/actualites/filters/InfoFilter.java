@@ -5,7 +5,7 @@ import static org.entcore.common.sql.Sql.parseId;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.atos.entng.actualites.controllers.ThreadController;
+import net.atos.entng.actualites.controllers.InfoController;
 
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.sql.Sql;
@@ -25,7 +25,7 @@ public class InfoFilter implements ResourcesProvider {
 
 	@Override
 	public void authorize(final HttpServerRequest request, final Binding binding, final UserInfos user, final Handler<Boolean> handler) {
-		SqlConf conf = SqlConfs.getConf(ThreadController.class.getName());
+		SqlConf conf = SqlConfs.getConf(InfoController.class.getName());
 		String id = request.params().get(conf.getResourceIdLabel());
 		if (id != null && !id.trim().isEmpty() && (parseId(id) instanceof Integer)) {
 			request.pause();

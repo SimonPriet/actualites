@@ -38,11 +38,20 @@
 </div>
 <hr class="row"></div>
 <div class="row">
+	<!-- Lightbox : Info share -->
+	<div ng-if="infoToShare._id === info._id">
+		<lightbox show="display.showInfoSharePanel" on-close="cancelShareInfo()">
+			<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare"></share-panel>
+		</lightbox>
+	</div>
 	<div class="right-magnet cell">
-		<behaviour name="submit" resource="info" class="cell">
+		<behaviour name="publish" resource="info.thread" class="cell">
+			<button ng-click="showShareInfo(info)" translate content="share"></button>
+		</behaviour>
+		<behaviour name="submit" resource="info.thread" class="cell">
 			<button ng-click="info.submit()" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
 		</behaviour>
-		<behaviour name="unsubmit" resource="info" class="cell">
+		<behaviour name="unsubmit" resource="info.thread" class="cell">
 			<button ng-click="info.unsubmit()" ng-if="isInfoSubmitted(info)" translate content="actualites.edition.infos.unsubmit"></button>
 		</behaviour>
 		<behaviour name="publish" resource="info.thread" class="cell">
@@ -53,10 +62,12 @@
 		</behaviour>
 	</div>
 	<div class="cell" ng-if="isInfoUnpublishable(info)">
-		<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">
-			<span ng-if="info.comments.all.length > 0"><i18n>actualites.info.label.comments.many</i18n> ([[info.comments.all.length]])</span>
-			<span ng-if="info.comments.all.length === 0"><i18n>actualites.info.label.comments.none</i18n></span>
-		</a>
+		<behaviour name="comment" resource="info" class="cell">
+			<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">
+				<span ng-if="info.comments.all.length > 0"><i18n>actualites.info.label.comments.many</i18n> ([[info.comments.all.length]])</span>
+				<span ng-if="info.comments.all.length === 0"><i18n>actualites.info.label.comments.none</i18n></span>
+			</a>
+		</behaviour>
 		<a ng-click="display.commentInfo = undefined" ng-if="display.commentInfo === info"><i18n>actualites.info.label.comments.close</i18n></a>
 	</div>
 	<div class="row" ng-if="display.commentInfo === info">

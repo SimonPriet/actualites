@@ -3,6 +3,18 @@ var actualitesBehaviours = {
 		view: {
 			right: 'net-atos-entng-actualites-controllers-ThreadController|getThread'
 		},
+		editThread: {
+			right: 'net-atos-entng-actualites-controllers-ThreadController|updateThread'
+		},
+		deleteThread: {
+			right: 'net-atos-entng-actualites-controllers-ThreadController|deleteThread'
+		},
+		share: {
+			right: 'net-atos-entng-actualites-controllers-ThreadController|shareThread'
+		},
+		viewInfo: {
+			right: 'net-atos-entng-actualites-controllers-InfoController|getInfo'
+		},
 		contrib: {
 			right: 'net-atos-entng-actualites-controllers-InfoController|createDraft'
 		},
@@ -33,15 +45,6 @@ var actualitesBehaviours = {
 		unpublish: {
 			right: 'net-atos-entng-actualites-controllers-InfoController|unpublish'
 		},
-		editThread: {
-			right: 'net-atos-entng-actualites-controllers-ThreadController|updateThread'
-		},
-		deleteThread: {
-			right: 'net-atos-entng-actualites-controllers-ThreadController|deleteThread'
-		},
-		share: {
-			right: 'net-atos-entng-actualites-controllers-ThreadController|shareThread'
-		},
 		trash: {
 			right: 'net-atos-entng-actualites-controllers-InfoController|trash'
 		},
@@ -52,7 +55,13 @@ var actualitesBehaviours = {
 			right: 'net-atos-entng-actualites-controllers-InfoController|delete'
 		},
 		comment: {
-			right: 'net-atos-entng-actualites-controllers-InfoController|comment'
+			right: 'net-atos-entng-actualites-controllers-CommentController|comment'
+		},
+		updateComment: {
+			right: 'net-atos-entng-actualites-controllers-CommentController|updateComment'
+		},
+		deleteComment: {
+			right: 'net-atos-entng-actualites-controllers-CommentController|deleteComment'
 		}
 	},
 	workflow: {
@@ -72,7 +81,7 @@ Behaviours.register('actualites', {
 		}
 
 		for(var behaviour in actualitesBehaviours.resources){
-			if(model.me.hasRight(rightsContainer, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner || model.me.userId === rightsContainer.owner){
+			if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner || model.me.userId === rightsContainer.owner){
 				if(resource.myRights[behaviour] !== undefined){
 					resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
 				}

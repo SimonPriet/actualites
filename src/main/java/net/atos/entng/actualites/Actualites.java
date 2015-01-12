@@ -15,10 +15,11 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 
 public class Actualites extends BaseServer {
-
+	public static final String THREAD_RESOURCE_ID = "threadid";
 	public final static String THREAD_TABLE = "thread";
 	public final static String THREAD_SHARE_TABLE = "thread_shares";
 
+	public static final String INFO_RESOURCE_ID = "infoid";
 	public final static String INFO_TABLE = "info";
 	public final static String INFO_SHARE_TABLE = "info_shares";
 
@@ -35,6 +36,7 @@ public class Actualites extends BaseServer {
 
 		// thread table
 		SqlConf confThread = SqlConfs.createConf(ThreadController.class.getName());
+		confThread.setResourceIdLabel(THREAD_RESOURCE_ID);
 		confThread.setTable(THREAD_TABLE);
 		confThread.setShareTable(THREAD_SHARE_TABLE);
 		confThread.setSchema(getSchema());
@@ -48,6 +50,7 @@ public class Actualites extends BaseServer {
 
 		// info table
 		SqlConf confInfo = SqlConfs.createConf(InfoController.class.getName());
+		confInfo.setResourceIdLabel(INFO_RESOURCE_ID);
 		confInfo.setTable(INFO_TABLE);
 		confInfo.setShareTable(INFO_SHARE_TABLE);
 		confInfo.setSchema(getSchema());

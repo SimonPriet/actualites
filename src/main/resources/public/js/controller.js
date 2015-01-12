@@ -203,6 +203,16 @@ function ActualitesController($scope, template, route, model){
     		$scope.openMainPage();
     	}
     };
+    
+    $scope.showShareInfo = function(info) {
+    	$scope.infoToShare = info;
+    	$scope.display.showInfoSharePanel = true;
+    };
+    
+    $scope.cancelShareInfo = function() {
+    	$scope.infoToShare = undefined;
+    	$scope.display.showInfoSharePanel = false;
+    };
 
     $scope.saveInfo = function(){
     	if($scope.info) {

@@ -26,7 +26,12 @@ public class ThreadFilter implements ResourcesProvider {
 	@Override
 	public void authorize(final HttpServerRequest request, final Binding binding, final UserInfos user, final Handler<Boolean> handler) {
 		SqlConf conf = SqlConfs.getConf(ThreadController.class.getName());
-		String id = request.params().get(conf.getResourceIdLabel());
+		String id = null;
+		if(isThreadShare(binding)){
+			id = request.params().get("id");
+		} else {
+			id = request.params().get(conf.getResourceIdLabel());
+		}
 		if (id != null && !id.trim().isEmpty() && (parseId(id) instanceof Integer)) {
 			request.pause();
 			// Method
@@ -67,4 +72,12 @@ public class ThreadFilter implements ResourcesProvider {
 			handler.handle(false);
 		}
 	}
+
+	private boolean isThreadShare(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.ThreadController|shareThread".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.ThreadController|shareThreadSubmit".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.ThreadController|shareThreadRemove".equals(binding.getServiceMethod() )
+				);
+	}
+
 }
