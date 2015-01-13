@@ -1,5 +1,10 @@
-# Notes d'utilisation
+# À propos de l'application Actualités
 
+* licence : [AGPL v3](http://www.gnu.org/licenses/agpl.txt)
+* financeur : Région Picardie, Conseil général  91, Région Poitou Charente
+* description : Application de diffusion d'actualités organisées en fil
+
+# Documentation technique
 ## Construction
 
 <pre>
