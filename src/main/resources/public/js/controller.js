@@ -152,7 +152,7 @@ function ActualitesController($scope, template, route, model){
         
         if(info.owner !== model.me.userId 
         		&& info.status === ACTUALITES_CONFIGURATION.infoStatus.PENDING 
-        		&& info.thread.myRights.publish === undefined
+        		&& info.thread != undefined && info.thread.myRights.publish === undefined
           ){
         	return false;
         }
@@ -454,11 +454,14 @@ function ActualitesController($scope, template, route, model){
     
     // Functions to check rights
     $scope.checkThreadsRightsFilter = function(thread){
-    	return thread.myRights.contrib !== undefined;
-	};
-	
+    	if(thread != undefined){
+    		return thread.myRights.contrib !== undefined;
+    	}
+    	return false;
+    };
+    
 	$scope.checkThreadContibRight = function(thread){
-		if(thread.owner === model.me.userId || thread.myRights.contrib){
+		if(thread != undefined && (thread.owner === model.me.userId || thread.myRights.contrib)){
 			return true;
 		}
 		return false;
@@ -490,10 +493,11 @@ function ActualitesController($scope, template, route, model){
 	
 	$scope.hasRightsOnThread = function(thread){
 		var right = false;
-		if(thread.owner === model.me.userId 
+		if(thread != undefined 
+			&& (thread.owner === model.me.userId 
 			|| thread.myRights.editThread 
 			|| thread.myRights.deleteThread 
-			|| thread.myRights.share
+			|| thread.myRights.share)
 		){
 			right = true;
 		}
@@ -502,10 +506,17 @@ function ActualitesController($scope, template, route, model){
 	
 	$scope.canDeleteComment = function(info, comment){
 		var right = false;
-		if(comment.author === model.me.userId || info.thread.myRights.deleteThread){
+		if(comment.author === model.me.userId || (info.thread != undefined && info.thread.myRights.deleteThread)){
 			right = true;
 		}
 		return right;
+	};
+	
+	$scope.canComment = function(info){
+		if(info.myRights.comment || (info.thread != undefined && info.thread.myRights.publish)){
+			return true;
+		}
+		return false;
 	};
 	
 	$scope.canPublish = function(thread){

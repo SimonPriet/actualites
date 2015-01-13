@@ -62,12 +62,10 @@
 		</behaviour>
 	</div>
 	<div class="cell" ng-if="isInfoUnpublishable(info)">
-		<behaviour name="comment" resource="info" class="cell">
-			<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">
-				<span ng-if="info.comments.all.length > 0"><i18n>actualites.info.label.comments.many</i18n> ([[info.comments.all.length]])</span>
-				<span ng-if="info.comments.all.length === 0"><i18n>actualites.info.label.comments.none</i18n></span>
-			</a>
-		</behaviour>
+		<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">
+			<span ng-if="info.comments.all.length > 0"><i18n>actualites.info.label.comments.many</i18n> ([[info.comments.all.length]])</span>
+			<span ng-if="info.comments.all.length === 0 &&  canComment(info)"><i18n>actualites.info.label.comments.none</i18n></span>
+		</a>
 		<a ng-click="display.commentInfo = undefined" ng-if="display.commentInfo === info"><i18n>actualites.info.label.comments.close</i18n></a>
 	</div>
 	<div class="row" ng-if="display.commentInfo === info">
