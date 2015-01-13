@@ -72,7 +72,7 @@ public class InfoController extends ControllerHelper {
 
 	@Get("/infos")
 	@ApiDoc("Get infos.")
-	@SecuredAction("info.list")
+	@SecuredAction("actualites.infos.list")
 	public void listInfos(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -85,7 +85,8 @@ public class InfoController extends ControllerHelper {
 
 	@Get("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/infos")
 	@ApiDoc("Get infos in thread by thread id.")
-	@SecuredAction("info.list")
+	@ResourceFilter(ThreadFilter.class)
+	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
 	public void listInfosByThreadId(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
@@ -99,7 +100,7 @@ public class InfoController extends ControllerHelper {
 
 	@Get("/linker/infos")
 	@ApiDoc("List infos without their content. Used by linker")
-	@SecuredAction("info.list")
+	@SecuredAction("actualites.infos.list")
 	public void listInfosForLinker(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -112,7 +113,7 @@ public class InfoController extends ControllerHelper {
 
 	@Get("/infos/last/:"+RESULT_SIZE_PARAMETER)
 	@ApiDoc("Get infos in thread by status and by thread id.")
-	@SecuredAction("info.list")
+	@SecuredAction("actualites.infos.list")
 	public void listLastPublishedInfos(final HttpServerRequest request) {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override

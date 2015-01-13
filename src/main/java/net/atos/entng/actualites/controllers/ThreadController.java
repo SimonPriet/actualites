@@ -46,7 +46,7 @@ public class ThreadController extends ControllerHelper {
 
 	@Get("/threads")
 	@ApiDoc("Get Thread by id.")
-	@SecuredAction("thread.list")
+	@SecuredAction("actualites.threads.list")
 	public void listThreads(final HttpServerRequest request) {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
@@ -58,7 +58,7 @@ public class ThreadController extends ControllerHelper {
 
 	@Post("/thread")
 	@ApiDoc("Create a new Thread.")
-	@SecuredAction("thread.create")
+	@SecuredAction("actualites.create")
 	public void createThread(final HttpServerRequest request) {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
