@@ -4,11 +4,22 @@
 		&nbsp;</span>[[info.title]]
 	</h1>
 	<div class="right-magnet cell">
+		<behaviour name="publish" resource="info.thread" class="cell">
+			<a ng-click="showShareInfo(info)"><i18n>share</i18n></a>
+			&nbsp;
+		</behaviour>
 		<a ng-if="canEditInfo(info)" ng-click="editInfo(info)">modifier</a>
 		&nbsp;
 		<a ng-if="canDeleteInfo(info)" ng-click="showDeleteInfo(info)">supprimer</a>
 	</div>
 </div>
+<!-- Lightbox : Info share -->
+<div ng-if="infoToShare._id === info._id">
+	<lightbox show="display.showInfoSharePanel" on-close="cancelShareInfo()">
+		<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare"></share-panel>
+	</lightbox>
+</div>
+<!-- Lightbox : Info delete -->
 <lightbox show="display.showConfirmRemove" on-close="cancelDeleteInfo()">
 	<h2>Supprimer l'actualité</h2>
 	<p>Voulez-vous vraiment supprimer cette actualité ?</p>
@@ -38,16 +49,7 @@
 </div>
 <hr class="row"></div>
 <div class="row">
-	<!-- Lightbox : Info share -->
-	<div ng-if="infoToShare._id === info._id">
-		<lightbox show="display.showInfoSharePanel" on-close="cancelShareInfo()">
-			<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare"></share-panel>
-		</lightbox>
-	</div>
 	<div class="right-magnet cell">
-		<behaviour name="publish" resource="info.thread" class="cell">
-			<button ng-click="showShareInfo(info)" translate content="share"></button>
-		</behaviour>
 		<behaviour name="submit" resource="info.thread" class="cell">
 			<button ng-click="info.submit()" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
 		</behaviour>
