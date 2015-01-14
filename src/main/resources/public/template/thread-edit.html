@@ -1,6 +1,7 @@
 
 <article class="twelve cell">
-	<h2><i18n>thread.title.edit</i18n></h2>
+	<h2 ng-if="currentThread._id === undefined"><i18n>thread.title.new</i18n></h2>
+	<h2 ng-if="currentThread._id !== undefined"><i18n>thread.title.edit</i18n></h2>
 	<div class="two cell">
 		<image-select ng-model="currentThread.icon" default="/img/illustrations/actualites-default.png" thumbnails="[{ width: 290, height: 290 }]" class="absolute"></image-select>
 	</div>
