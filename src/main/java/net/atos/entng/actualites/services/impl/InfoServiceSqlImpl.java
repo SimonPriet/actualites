@@ -159,6 +159,9 @@ public class InfoServiceSqlImpl implements InfoService {
 			}
 			values.add(user.getUserId());
 			values.add(user.getUserId());
+			values.add(user.getUserId());
+			values.add(user.getUserId());
+			values.add(user.getUserId());
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}

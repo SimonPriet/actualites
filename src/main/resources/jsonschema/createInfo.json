@@ -29,7 +29,6 @@
 	},
 	"required": [
 		"title",
-		"status",
 		"thread_id"
 	]
 }

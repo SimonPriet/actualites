@@ -235,10 +235,8 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(status_list.contains(status) && status == status_list.get(1)){
-							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-						}
+						resource.putNumber("status", status_list.get(1));
+						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
@@ -257,10 +255,8 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(status_list.contains(status) && status == status_list.get(2)){
-							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-						}
+						resource.putNumber("status", status_list.get(2));
+						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
@@ -279,10 +275,8 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						Integer status = resource.getInteger("status");
-						if(status_list.contains(status) && status == status_list.get(3)){
-							crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
-						}
+						resource.putNumber("status", status_list.get(3));
+						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
 			}
