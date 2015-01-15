@@ -19,4 +19,6 @@ public interface InfoService {
 
 	public void listForLinker(UserInfos user, Handler<Either<String, JsonArray>> handler);
 
+	public void getSharedWithIds(String infoId, UserInfos user, Handler<Either<String, JsonArray>> handler);
+
 }

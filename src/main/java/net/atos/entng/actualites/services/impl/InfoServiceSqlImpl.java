@@ -59,6 +59,9 @@ public class InfoServiceSqlImpl implements InfoService {
 			}
 			values.add(user.getUserId());
 			values.add(user.getUserId());
+			values.add(user.getUserId());
+			values.add(user.getUserId());
+			values.add(user.getUserId());
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseSharedUnique(handler));
 		}
 	}
@@ -244,6 +247,42 @@ public class InfoServiceSqlImpl implements InfoService {
 			values.add(unixTime);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
+	}
+
+	@Override
+	public void getSharedWithIds(String infoId, UserInfos user, final Handler<Either<String, JsonArray>> handler) {
+		this.retrieve(infoId, user, new Handler<Either<String, JsonObject>>() {
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				JsonArray sharedWithIds = new JsonArray();
+				if (event.isRight()) {
+					try {
+						JsonObject info = event.right().getValue();
+						if (info.containsField("owner")) {
+							JsonObject owner = new JsonObject();
+							owner.putString("userId", info.getString("owner"));
+							sharedWithIds.add(owner);
+						}
+						if (info.containsField("shared")) {
+							JsonArray shared = info.getArray("shared");
+							for(Object jo : shared){
+								sharedWithIds.add(jo);
+							}
+							handler.handle(new Either.Right<String, JsonArray>(sharedWithIds));
+						}
+						else {
+							handler.handle(new Either.Right<String, JsonArray>(new JsonArray()));
+						}
+					}
+					catch (Exception e) {
+						handler.handle(new Either.Left<String, JsonArray>("Malformed response : " + e.getClass().getName() + " : " + e.getMessage()));
+					}
+				}
+				else {
+					handler.handle(new Either.Left<String, JsonArray>(event.left().getValue()));
+				}
+			}
+		});
 	}
 
 }

@@ -8,12 +8,15 @@ import static org.entcore.common.user.UserUtils.getUserInfos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.atos.entng.actualites.Actualites;
 import net.atos.entng.actualites.filters.InfoFilter;
 import net.atos.entng.actualites.filters.ThreadFilter;
 import net.atos.entng.actualites.services.InfoService;
+import net.atos.entng.actualites.services.ThreadService;
 import net.atos.entng.actualites.services.impl.InfoServiceSqlImpl;
+import net.atos.entng.actualites.services.impl.ThreadServiceSqlImpl;
 
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
@@ -43,16 +46,23 @@ public class InfoController extends ControllerHelper {
 	private static final String SCHEMA_INFO_CREATE = "createInfo";
 	private static final String SCHEMA_INFO_UPDATE = "updateInfo";
 
-	private static final String EVENT_TYPE = "NEWS";
 	private static final String RESOURCE_NAME = "info";
+	private static final String EVENT_TYPE = "NEWS";
+	private static final String NEWS_SUBMIT_EVENT_TYPE = EVENT_TYPE + "_SUBMIT";
+	private static final String NEWS_UNSUBMIT_EVENT_TYPE = EVENT_TYPE + "_UNSUBMIT";
+	private static final String NEWS_PUBLISH_EVENT_TYPE = EVENT_TYPE + "_PUBLISH";
+	private static final String NEWS_UNPUBLISH_EVENT_TYPE = EVENT_TYPE + "_UNPUBLISH";
+
 
 	// TRASH: 1; DRAFT: 1; PENDING: 2; PUBLISHED: 3
 	private static final List<Integer> status_list = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3));
 
 	protected final InfoService infoService;
+	protected final ThreadService threadService;
 
 	public InfoController(){
 		this.infoService = new InfoServiceSqlImpl();
+		this.threadService = new ThreadServiceSqlImpl();
 	}
 
 	@Get("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID)
@@ -165,6 +175,7 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void createPending(final HttpServerRequest request) {
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -172,7 +183,21 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						resource.putNumber("status", status_list.get(2));
-						crudService.create(resource, user, notEmptyResponseHandler(request));
+						final String threadId = resource.getString("thread_id");
+						final String title = resource.getString("title");
+						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
+							@Override
+							public void handle(Either<String, JsonObject> event) {
+								if (event.isRight()) {
+									notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
+									renderJson(request, event.right().getValue(), 200);
+								} else {
+									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									renderJson(request, error, 400);
+								}
+							}
+						};
+						crudService.create(resource, user, handler);
 					}
 				});
 			}
@@ -284,13 +309,32 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void submit(final HttpServerRequest request) {
+		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
 		final String infoId = request.params().get(INFO_ID_PARAMETER);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				JsonObject resource = new JsonObject();
-				resource.putNumber("status", status_list.get(2));
-				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
+				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject body) {
+						final String title = body.getString("title");
+						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
+							@Override
+							public void handle(Either<String, JsonObject> event) {
+								if (event.isRight()) {
+									notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
+									renderJson(request, event.right().getValue(), 200);
+								} else {
+									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									renderJson(request, error, 400);
+								}
+							}
+						};
+						JsonObject resource = new JsonObject();
+						resource.putNumber("status", status_list.get(2));
+						crudService.update(infoId, resource, user, handler);
+					}
+				});
 			}
 		});
 	}
@@ -300,13 +344,32 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void unsubmit(final HttpServerRequest request) {
+		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
 		final String infoId = request.params().get(INFO_ID_PARAMETER);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				JsonObject resource = new JsonObject();
-				resource.putNumber("status", status_list.get(1));
-				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
+				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject body) {
+						final String title = body.getString("title");
+						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
+							@Override
+							public void handle(Either<String, JsonObject> event) {
+								if (event.isRight()) {
+									notifyTimeline(request, user, threadId, infoId, title, NEWS_UNSUBMIT_EVENT_TYPE);
+									renderJson(request, event.right().getValue(), 200);
+								} else {
+									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									renderJson(request, error, 400);
+								}
+							}
+						};
+						JsonObject resource = new JsonObject();
+						resource.putNumber("status", status_list.get(1));
+						crudService.update(infoId, resource, user, handler);
+					}
+				});
 			}
 		});
 	}
@@ -316,13 +379,32 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void publish(final HttpServerRequest request) {
+		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
 		final String infoId = request.params().get(INFO_ID_PARAMETER);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				JsonObject resource = new JsonObject();
-				resource.putNumber("status", status_list.get(3));
-				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
+				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject body) {
+						final String title = body.getString("title");
+						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
+							@Override
+							public void handle(Either<String, JsonObject> event) {
+								if (event.isRight()) {
+									notifyTimeline(request, user, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
+									renderJson(request, event.right().getValue(), 200);
+								} else {
+									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									renderJson(request, error, 400);
+								}
+							}
+						};
+						JsonObject resource = new JsonObject();
+						resource.putNumber("status", status_list.get(3));
+						crudService.update(infoId, resource, user, handler);
+					}
+				});
 			}
 		});
 	}
@@ -332,13 +414,32 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void unpublish(final HttpServerRequest request) {
+		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
 		final String infoId = request.params().get(INFO_ID_PARAMETER);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				JsonObject resource = new JsonObject();
-				resource.putNumber("status", status_list.get(2));
-				crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
+				RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+					@Override
+					public void handle(JsonObject body) {
+						final String title = body.getString("title");
+						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
+							@Override
+							public void handle(Either<String, JsonObject> event) {
+								if (event.isRight()) {
+									notifyTimeline(request, user, threadId, infoId, title, NEWS_UNPUBLISH_EVENT_TYPE);
+									renderJson(request, event.right().getValue(), 200);
+								} else {
+									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									renderJson(request, error, 400);
+								}
+							}
+						};
+						JsonObject resource = new JsonObject();
+						resource.putNumber("status", status_list.get(2));
+						crudService.update(infoId, resource, user, handler);
+					}
+				});
 			}
 		});
 	}
@@ -443,11 +544,9 @@ public class InfoController extends ControllerHelper {
 			        }
 					setTimelineEventType(EVENT_TYPE);
 					JsonObject params = new JsonObject()
-						.putString("profilUri", container.config().getString("host") +
-								"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+						.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
-						.putString("resourceUri", container.config().getString("host") + pathPrefix +
-								"#/view/thread/" + threadId + "/info/" + infoId);
+						.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 					shareJsonSubmit(request, "notify-thread-shared.html", false, params, "title");
 				} else {
 					unauthorized(request);
@@ -462,6 +561,123 @@ public class InfoController extends ControllerHelper {
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void shareInfoRemove(final HttpServerRequest request) {
 		removeShare(request, false);
+	}
+
+	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType){
+		if (eventType == NEWS_SUBMIT_EVENT_TYPE) {
+			threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+				@Override
+				public void handle(Either<String, JsonArray> event) {
+					if (event.isRight()) {
+						// get all ids
+						JsonArray shared = event.right().getValue();
+						extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-submitted.html");
+					}
+				}
+			});
+		}
+		else {
+			if(eventType == NEWS_UNSUBMIT_EVENT_TYPE){
+				threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+					@Override
+					public void handle(Either<String, JsonArray> event) {
+						if (event.isRight()) {
+							// get all ids
+							JsonArray shared = event.right().getValue();
+							extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-unsubmitted.html");
+						}
+					}
+				});
+			}
+			else{
+				if(eventType == NEWS_PUBLISH_EVENT_TYPE){
+					infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
+						@Override
+						public void handle(Either<String, JsonArray> event) {
+							if (event.isRight()) {
+								// get all ids
+								JsonArray shared = event.right().getValue();
+								extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-published.html");
+							}
+						}
+					});
+				}
+				else{
+					if(eventType == NEWS_UNPUBLISH_EVENT_TYPE){
+						infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
+							@Override
+							public void handle(Either<String, JsonArray> event) {
+								if (event.isRight()) {
+									// get all ids
+									JsonArray shared = event.right().getValue();
+									extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-unpublished.html");
+								}
+							}
+						});
+					}
+				}
+			}
+		}
+	}
+
+	private void extractUserIds(final HttpServerRequest request, final JsonArray shared, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType, final String template){
+		final List<String> ids = new ArrayList<String>();
+		if (shared.size() > 0) {
+			JsonObject jo = null;
+			String groupId = null;
+			String id = null;
+			final AtomicInteger remaining = new AtomicInteger(shared.size());
+			// Extract shared with
+			for(int i=0; i<shared.size(); i++){
+				jo = (JsonObject) shared.get(i);
+				if(jo.containsField("userId")){
+					id = jo.getString("userId");
+					if(!ids.contains(id) && !(user.getUserId().equals(id))){
+						ids.add(id);
+					}
+					remaining.getAndDecrement();
+				}
+				else{
+					if(jo.containsField("groupId")){
+						groupId = jo.getString("groupId");
+						if (groupId != null) {
+							UserUtils.findUsersInProfilsGroups(groupId, eb, user.getUserId(), false, new Handler<JsonArray>() {
+								@Override
+								public void handle(JsonArray event) {
+									if (event != null) {
+										String userId = null;
+										for (Object o : event) {
+											if (!(o instanceof JsonObject)) continue;
+											userId = ((JsonObject) o).getString("id");
+											if(!ids.contains(userId) && !(user.getUserId().equals(userId))){
+												ids.add(userId);
+											}
+										}
+									}
+									if (remaining.decrementAndGet() < 1) {
+										sendNotify(request, ids, user, threadId, infoId, title, eventType, template);
+									}
+								}
+							});
+						}
+					}
+				}
+			}
+			if (remaining.get() < 1) {
+				sendNotify(request, ids, user, threadId, infoId, title, eventType, template);
+			}
+		}
+	}
+
+	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType, final String template){
+		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && user != null) {
+			JsonObject params = new JsonObject()
+				.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+				.putString("username", user.getUsername())
+				.putString("info", title)
+				.putString("actuUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+			notification.notifyTimeline(request, user, EVENT_TYPE, eventType, ids, infoId, template, params);
+		}
 	}
 
 }

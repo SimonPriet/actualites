@@ -154,24 +154,24 @@ Info.prototype.save = function(){
 
 Info.prototype.submit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit', { title: this.title });
 };
 
 Info.prototype.unsubmit = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', { title: this.title });
 };
 
 Info.prototype.publish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish');
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title });
 };
 
 Info.prototype.unpublish = function(canSkipPendingStatus){
 	var that = this;
 	if(!canSkipPendingStatus) {
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish');
+		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', { title: this.title });
 	}
 	else {
 		this.unsubmit();
