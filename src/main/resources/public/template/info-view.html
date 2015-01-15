@@ -4,10 +4,8 @@
 		&nbsp;</span>[[info.title]]
 	</h1>
 	<div class="right-magnet cell">
-		<behaviour name="publish" resource="info.thread" class="cell">
-			<a ng-click="showShareInfo(info)"><i18n>share</i18n></a>
-			&nbsp;
-		</behaviour>
+		<a ng-if="canShareInfo(info)" ng-click="showShareInfo(info)"><i18n>share</i18n></a>
+		&nbsp;
 		<a ng-if="canEditInfo(info)" ng-click="editInfo(info)">modifier</a>
 		&nbsp;
 		<a ng-if="canDeleteInfo(info)" ng-click="showDeleteInfo(info)">supprimer</a>

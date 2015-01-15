@@ -560,6 +560,18 @@ function ActualitesController($scope, template, route, model){
 		}
 		return false;
 	};
+	
+	$scope.canShareInfo = function(info){
+		if(info !== undefined){
+			if (info.owner === model.me.userId || 
+				(info.thread != undefined && 
+					(info.thread.owner === model.me.userId 
+						|| $scope.canPublish(info.thread)))){
+				return true;
+			}
+		}
+		return false;
+	};
 
 	// A moderator can validate his own drafts (he does not need to go through status 'pending')
 	$scope.canSkipPendingStatus = function(info){
