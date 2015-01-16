@@ -44,24 +44,19 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE i.id = ? " +
-				" AND ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND i.status > 2)" +
-				" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND (i.status > 1 OR i.owner = ?))" +
-				" OR (t.owner = ? AND i.owner = ?)" +
-				" OR (t.owner = ? AND i.owner <> ? AND i.status > 1))" +
+				" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
+				" OR (t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 1)))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.modified DESC";
 			values.add(Sql.parseId(id));
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseSharedUnique(handler));
 		}
 	}
@@ -94,23 +89,18 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
-				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND i.status > 2)" +
-				" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND (i.status > 1 OR i.owner = ?))" +
-				" OR (t.owner = ? AND i.owner = ?)" +
-				" OR (t.owner = ? AND i.owner <> ? AND i.status > 1)" +
+				" WHERE ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
+				" OR (t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 1)))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.modified DESC";
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}
@@ -144,24 +134,19 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE t.id = ? " +
-				" AND ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND i.status > 2)" +
-				" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND (i.status > 1 OR i.owner = ?))" +
-				" OR (t.owner = ? AND i.owner = ?)" +
-				" OR (t.owner = ? AND i.owner <> ? AND i.status > 1))" +
+				" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
+				" OR (t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 1)))" +
 				" GROUP BY t.id, i.id, u.username" +
 				" ORDER BY i.modified DESC";
 			values.add(Sql.parseId(id));
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}

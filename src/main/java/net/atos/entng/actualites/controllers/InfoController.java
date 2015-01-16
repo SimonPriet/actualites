@@ -223,12 +223,12 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/draft")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/draft")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void updateDraft(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -243,12 +243,12 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/pending")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/pending")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void updatePending(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -263,12 +263,12 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/published")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/published")
 	@ApiDoc("Update : update an Info in Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void updatePublished(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -284,12 +284,12 @@ public class InfoController extends ControllerHelper {
 	}
 
 	@Override
-	@Delete("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER)
+	@Delete("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID)
 	@ApiDoc("Delete : Real delete an Info in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
 	public void delete(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -298,13 +298,13 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/submit")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/submit")
 	@ApiDoc("Submit : Change an Info to Pending state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void submit(final HttpServerRequest request) {
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -333,13 +333,13 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/unsubmit")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/unsubmit")
 	@ApiDoc("Cancel Submit : Change an Info to Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void unsubmit(final HttpServerRequest request) {
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -368,13 +368,13 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/publish")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/publish")
 	@ApiDoc("Publish : Change an Info to Published state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void publish(final HttpServerRequest request) {
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -403,13 +403,13 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/unpublish")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/unpublish")
 	@ApiDoc("Unpublish : Change an Info to Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.publish", type = ActionType.RESOURCE)
 	public void unpublish(final HttpServerRequest request) {
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -438,12 +438,12 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"/thrash")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"/thrash")
 	@ApiDoc("Trash : Change an Info to Trash state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void trash(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -454,12 +454,12 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+INFO_ID_PARAMETER+"restore")
+	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/:"+Actualites.INFO_RESOURCE_ID+"restore")
 	@ApiDoc("Cancel Trash : Change an Info to Draft state in thread by thread and by id")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void restore(final HttpServerRequest request) {
-		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -472,7 +472,7 @@ public class InfoController extends ControllerHelper {
 
 	@Get("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/share/json/:"+INFO_ID_PARAMETER)
 	@ApiDoc("Get shared info by id.")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void shareInfo(final HttpServerRequest request) {
 		final String id = request.params().get(INFO_ID_PARAMETER);
@@ -522,7 +522,7 @@ public class InfoController extends ControllerHelper {
 
 	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/share/json/:"+INFO_ID_PARAMETER)
 	@ApiDoc("Share info by id.")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void shareInfoSubmit(final HttpServerRequest request) {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -551,7 +551,7 @@ public class InfoController extends ControllerHelper {
 
 	@Put("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/share/remove/:"+INFO_ID_PARAMETER)
 	@ApiDoc("Remove Share by id.")
-	@ResourceFilter(ThreadFilter.class)
+	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void shareInfoRemove(final HttpServerRequest request) {
 		removeShare(request, false);

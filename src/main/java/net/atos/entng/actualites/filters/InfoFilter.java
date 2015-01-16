@@ -26,7 +26,12 @@ public class InfoFilter implements ResourcesProvider {
 	@Override
 	public void authorize(final HttpServerRequest request, final Binding binding, final UserInfos user, final Handler<Boolean> handler) {
 		SqlConf conf = SqlConfs.getConf(InfoController.class.getName());
-		String id = request.params().get(conf.getResourceIdLabel());
+		String id = null;
+		if(isInfoShare(binding)){
+			id = request.params().get("id");
+		} else {
+			id = request.params().get(conf.getResourceIdLabel());
+		}
 		if (id != null && !id.trim().isEmpty() && (parseId(id) instanceof Integer)) {
 			request.pause();
 			// Method
@@ -44,16 +49,26 @@ public class InfoFilter implements ResourcesProvider {
 			query.append("SELECT count(*)")
 				.append(" FROM actualites.info AS i")
 				.append(" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id")
+				.append(" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id")
+				.append(" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id")
 				.append(" WHERE i.id = ? ")
-				.append(" AND ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ios.action = ?)")
-				.append(" OR i.owner = ? )");
+				.append(" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ios.action = ? AND i.status > 2))")
+				.append(" OR (t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ? AND i.status > 1)))");
 			values.add(Sql.parseId(id));
+			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
 			values.add(sharedMethod);
 			values.add(user.getUserId());
-
+			for(String value : groupsAndUserIds){
+				values.add(value);
+			}
+			if(isInfoAction(binding) || isInfoPending(binding)){
+				values.add("net-atos-entng-actualites-controllers-InfoController|publish");
+			} else {
+				values.add(sharedMethod);
+			}
 			// Execute
 			Sql.getInstance().prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
 				@Override
@@ -66,5 +81,25 @@ public class InfoFilter implements ResourcesProvider {
 		} else {
 			handler.handle(false);
 		}
+	}
+
+	private boolean isInfoAction(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|getInfo".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.CommentController|Comment".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.CommentController|updateComment".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.CommentController|deleteComment".equals(binding.getServiceMethod() )
+				);
+	}
+
+	private boolean isInfoShare(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|shareInfo".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.InfoController|shareInfoSubmit".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.InfoController|shareInfoRemove".equals(binding.getServiceMethod() )
+				);
+	}
+
+	private boolean isInfoPending(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|unsubmit".equals(binding.getServiceMethod()) ||
+				"net.atos.entng.actualites.controllers.InfoController|updatePending".equals(binding.getServiceMethod()));
 	}
 }
