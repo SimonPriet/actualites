@@ -183,7 +183,7 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						resource.putNumber("status", status_list.get(2));
-						final String threadId = resource.getString("thread_id");
+						final String threadId = resource.getNumber("thread_id").toString();
 						final String title = resource.getString("title");
 						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
 							@Override
