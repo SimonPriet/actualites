@@ -541,7 +541,7 @@ public class InfoController extends ControllerHelper {
 						.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
 						.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
-					shareJsonSubmit(request, "notify-thread-shared.html", false, params, "title");
+					shareJsonSubmit(request, "notify-info-shared.html", false, params, "title");
 				} else {
 					unauthorized(request);
 				}
