@@ -32,12 +32,14 @@
 
 	<div class="row">
 		<button ng-click="saveInfo();" class="right-magnet" translate content="actualites.edition.infos.save"></button>
+		<div ng-if="currentInfo.thread !== undefined">
 		<behaviour name="createPending" resource="currentInfo.thread">
 			<button ng-click="saveSubmitted();" class="right-magnet" ng-if="!canPublish(currentInfo.thread)" translate content="actualites.edition.infos.submit"></button>
 		</behaviour>
 		<behaviour name="createPublished" resource="currentInfo.thread">
 			<button ng-click="savePublished();" class="right-magnet" translate content="actualites.edition.infos.publish"></button>
 		</behaviour>
+		</div>
 		<button ng-click="cancelEditInfo();" class="right-magnet cancel" translate content="actualites.edition.infos.cancel"></button>
 	</div>
 	<div class="row"></div>

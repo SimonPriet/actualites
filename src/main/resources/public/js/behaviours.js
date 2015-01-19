@@ -72,21 +72,18 @@ var actualitesBehaviours = {
 Behaviours.register('actualites', {
 	behaviours: actualitesBehaviours,
 	resource: function(resource){
-		var rightsContainer = resource;
-		if(resource.thread){
-			rightsContainer = resource.thread;
-		}
-		if(!resource.myRights){
-			resource.myRights = {};
-		}
-
-		for(var behaviour in actualitesBehaviours.resources){
-			if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner || model.me.userId === rightsContainer.owner){
-				if(resource.myRights[behaviour] !== undefined){
-					resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
-				}
-				else{
-					resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+		if(resource !== undefined){
+			if(!resource.myRights){
+				resource.myRights = {};
+			}
+			for(var behaviour in actualitesBehaviours.resources){
+				if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner){
+					if(resource.myRights[behaviour] !== undefined){
+						resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
+					}
+					else{
+						resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+					}
 				}
 			}
 		}

@@ -47,7 +47,7 @@
 </div>
 <hr class="row"></div>
 <div class="row">
-	<div class="right-magnet cell">
+	<div ng-if="info.thread !== undefined" class="right-magnet cell">
 		<behaviour name="submit" resource="info.thread" class="cell">
 			<button ng-click="info.submit()" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
 		</behaviour>
