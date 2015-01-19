@@ -25,8 +25,8 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -71,8 +71,8 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -115,8 +115,8 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
+				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -163,8 +163,8 @@ public class InfoServiceSqlImpl implements InfoService {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
 			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title," +
-				" CASE WHEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC' > i.modified" +
-					" THEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC'" +
+				" CASE WHEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' > i.modified" +
+					" THEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1'" +
 					" ELSE i.modified" +
 					" END as date" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
