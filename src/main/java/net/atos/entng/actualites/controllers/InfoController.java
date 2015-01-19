@@ -525,23 +525,40 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(InfoFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void shareInfoSubmit(final HttpServerRequest request) {
+		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
+		final String infoId = request.params().get(INFO_ID_PARAMETER);
+		if(threadId == null || threadId.trim().isEmpty()
+			|| infoId == null || infoId.trim().isEmpty()) {
+            badRequest(request);
+            return;
+        }
+		request.pause();
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
 				if (user != null) {
-					final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
-					final String infoId = request.params().get(INFO_ID_PARAMETER);
-					if(threadId == null || threadId.trim().isEmpty()
-						|| infoId == null || infoId.trim().isEmpty()) {
-			            badRequest(request);
-			            return;
-			        }
-					setTimelineEventType(EVENT_TYPE);
-					JsonObject params = new JsonObject()
-						.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
-						.putString("username", user.getUsername())
-						.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
-					shareJsonSubmit(request, "notify-info-shared.html", false, params, "title");
+					infoService.retrieve(infoId, user, new Handler<Either<String, JsonObject>>() {
+						@Override
+						public void handle(Either<String, JsonObject> event) {
+							request.resume();
+							if(event.right() != null){
+								JsonObject info = event.right().getValue();
+								if(info != null && info.containsField("status")){
+									if(info.getInteger("status") > 2){
+										// notify only when info is published
+										setTimelineEventType(EVENT_TYPE);
+										JsonObject params = new JsonObject()
+											.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+											.putString("username", user.getUsername())
+											.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+										shareJsonSubmit(request, "notify-info-shared.html", false, params, "title");
+									} else {
+										shareJsonSubmit(request, null, false, null, null);
+									}
+								}
+							}
+						}
+					});
 				} else {
 					unauthorized(request);
 				}
