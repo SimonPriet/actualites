@@ -35,10 +35,7 @@ function ActualitesController($scope, template, route, model){
             },
             viewInfo: function(params){
             	model.infos.one('sync', function() {
-            		var aThread = model.threads.find(function(thread) {
-    					return thread._id === parseInt(params.threadId);
-    				});
-    				if(aThread !== undefined) {
+    				if(params.threadId !== undefined) {
                         $scope.info = undefined;
                         $scope.info = model.infos.find(function(info){
                             return info._id === parseInt(params.infoId);

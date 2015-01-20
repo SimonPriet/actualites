@@ -53,7 +53,7 @@ public class InfoFilter implements ResourcesProvider {
 				.append(" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id")
 				.append(" WHERE i.id = ? ")
 				.append(" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ios.action = ? AND i.status > 2))")
-				.append(" OR (((t.owner = ? OR ((ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + ") AND ts.action = ?)) AND i.status > 1))");
+				.append(" OR  ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1))");
 			values.add(Sql.parseId(id));
 			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
