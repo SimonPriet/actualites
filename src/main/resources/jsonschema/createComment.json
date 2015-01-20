@@ -3,6 +3,10 @@
 	"type": "object",
 	"additionalProperties" : false,
 	"properties": {
+		"title": {
+			"description": "News title : used only for notification system",
+			"type": "string"
+		},
 		"comment": {
 			"type": "string"
 		},

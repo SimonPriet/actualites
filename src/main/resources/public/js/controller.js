@@ -9,6 +9,9 @@ routes.define(function($routeProvider){
         .when('/view/thread/:threadId/info/:infoId', {
             action: 'viewInfo'
         })
+        .when('/view/info/:infoId/comment/:commentId', {
+            action: 'viewComment'
+        })
         .otherwise({
         	action: 'main'
         });
@@ -38,7 +41,7 @@ function ActualitesController($scope, template, route, model){
             },
             viewInfo: function(params){
             	model.infos.one('sync', function() {
-    				if(params.threadId !== undefined) {
+    				if(params.infoId !== undefined) {
                         $scope.info = undefined;
                         $scope.info = model.infos.find(function(info){
                             return info._id === parseInt(params.infoId);
@@ -46,6 +49,35 @@ function ActualitesController($scope, template, route, model){
                         if ($scope.info !== undefined) {
                             if($scope.isInfoVisible($scope.info)) {
                                 $scope.notFound = false;
+                                template.open('main', 'single-info');
+                            }
+                            else {
+                                $scope.notFound = true;
+                                template.open('error', '401');
+                            }
+                        }
+                        else {
+                            $scope.notFound = true;
+                            template.open('error', '404');
+                        }
+    				}
+    				else {
+    					$scope.notFound = true;
+                        template.open('error', '404');
+    				}
+				});
+            },
+            viewComment: function(params){
+            	model.infos.one('sync', function() {
+    				if(params.infoId !== undefined) {
+                        $scope.info = undefined;
+                        $scope.info = model.infos.find(function(info){
+                            return info._id === parseInt(params.infoId);
+                        });
+                        if ($scope.info !== undefined) {
+                            if($scope.isInfoVisible($scope.info) && $scope.info.comments.all.length > 0) {
+                                $scope.notFound = false;
+                                $scope.display.commentInfo = $scope.info;
                                 template.open('main', 'single-info');
                             }
                             else {

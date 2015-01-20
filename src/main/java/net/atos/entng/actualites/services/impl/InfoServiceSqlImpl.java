@@ -33,7 +33,7 @@ public class InfoServiceSqlImpl implements InfoService {
 					" FROM actualites.comment AS c" +
 					" LEFT JOIN actualites.users AS au ON c.owner = au.id" +
 					" WHERE i.id = c.info_id" +
-					" ORDER BY c.modified DESC) cr)" +
+					" ORDER BY c.modified ASC) cr)" +
 					" AS comments" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +
@@ -79,7 +79,7 @@ public class InfoServiceSqlImpl implements InfoService {
 					" FROM actualites.comment AS c" +
 					" LEFT JOIN actualites.users AS au ON c.owner = au.id" +
 					" WHERE i.id = c.info_id" +
-					" ORDER BY c.modified DESC) cr)" +
+					" ORDER BY c.modified ASC) cr)" +
 					" AS comments" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +
@@ -123,7 +123,7 @@ public class InfoServiceSqlImpl implements InfoService {
 					" FROM actualites.comment AS c" +
 					" LEFT JOIN actualites.users AS au ON c.owner = au.id" +
 					" WHERE i.id = c.info_id" +
-					" ORDER BY c.modified DESC) cr)" +
+					" ORDER BY c.modified ASC) cr)" +
 					" AS comments" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +

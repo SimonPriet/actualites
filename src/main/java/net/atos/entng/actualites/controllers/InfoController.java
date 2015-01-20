@@ -175,7 +175,6 @@ public class InfoController extends ControllerHelper {
 	@ResourceFilter(ThreadFilter.class)
 	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void createPending(final HttpServerRequest request) {
-		final String infoId = request.params().get(Actualites.INFO_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
@@ -189,6 +188,8 @@ public class InfoController extends ControllerHelper {
 							@Override
 							public void handle(Either<String, JsonObject> event) {
 								if (event.isRight()) {
+									JsonObject info = event.right().getValue();
+									String infoId = info.getNumber("id").toString();
 									notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {

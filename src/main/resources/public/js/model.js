@@ -216,7 +216,7 @@ Info.prototype.delete = function(){
 
 Info.prototype.comment = function(commentText){
 	var info = this;
-	http().putJson('/actualites/info/' + this._id + '/comment', { info_id: this._id, comment: commentText }).done(function(comment){
+	http().putJson('/actualites/info/' + this._id + '/comment', { info_id: this._id, title: this.title, comment: commentText }).done(function(comment){
 		info.comments.push(new Comment({
 			_id: comment.id,
 			owner: model.me.userId,

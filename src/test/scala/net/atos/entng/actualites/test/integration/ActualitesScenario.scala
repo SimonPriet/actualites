@@ -160,7 +160,7 @@ object ActualitesScenario {
     .check(status.is(401)))
   .exec(http("Info Comment (nr)")
     .put("/actualites/info/${infoId}/comment")
-    .body(StringBody("""{"info_id" : ${infoId}, "comment" : "student comment"}"""))
+    .body(StringBody("""{"info_id" : ${infoId}, "title" : "info not updated", "comment" : "student comment"}"""))
     .check(status.is(401)))
   .exec(http("Info Submit (nr)")
     .put("/actualites/thread/${threadId}/info/${infoId}/submit")
@@ -241,7 +241,7 @@ object ActualitesScenario {
     .check(status.is(401)))
   .exec(http("Info Comment (sr)")
     .put("/actualites/info/${infoId}/comment")
-    .body(StringBody("""{"info_id" : ${infoId}, "comment" : "student comment"}"""))
+    .body(StringBody("""{"info_id" : ${infoId}, "title" : "info not updated", "comment" : "student comment"}"""))
     .check(status.is(401)))
   .exec(http("Info Submit (sr)")
     .put("/actualites/thread/${threadId}/info/${infoId}/submit")
@@ -286,7 +286,7 @@ object ActualitesScenario {
   // comment
   .exec(http("Info Comment")
     .put("/actualites/info/${infoId}/comment")
-    .body(StringBody("""{"info_id" : ${infoId}, "comment" : "student comment"}"""))
+    .body(StringBody("""{"info_id" : ${infoId}, "title" : "info updated", "comment" : "student comment"}"""))
     .check(status.is(401)))
   .exec(http("Thread Info List (sr)") // Get via List
     .get("/actualites/thread/${threadId}/infos")
