@@ -78,28 +78,38 @@ Info.prototype.toJSON = function(){
 		this.status = infoStatus.DRAFT;
 	}
 	if(pubDate === null || expDate === null){
-		if(pubDate === null){
+		if(pubDate === null && expDate === null){
 			return {
 				title: this.title,
-				expiration_date: expDate,
 				content: this.content,
 				status: this.status,
 				is_headline: this.is_headline,
 				thread_id: this.thread._id
 			};
 		} else {
-			return {
-				title: this.title,
-				publication_date: pubDate,
-				content: this.content,
-				status: this.status,
-				is_headline: this.is_headline,
-				thread_id: this.thread._id
-			};
+			if(pubDate === null){
+				return {
+					title: this.title,
+					expiration_date: expDate,
+					content: this.content,
+					status: this.status,
+					is_headline: this.is_headline,
+					thread_id: this.thread._id
+				};
+			} else {
+				return {
+					title: this.title,
+					publication_date: pubDate,
+					content: this.content,
+					status: this.status,
+					is_headline: this.is_headline,
+					thread_id: this.thread._id
+				};
+			}
 		}
 	}
 	else{
-			return {
+		return {
 			title: this.title,
 			publication_date: pubDate,
 			expiration_date: expDate,
