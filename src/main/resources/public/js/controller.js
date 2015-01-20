@@ -8,6 +8,9 @@ routes.define(function($routeProvider){
         })
         .when('/view/thread/:threadId/info/:infoId', {
             action: 'viewInfo'
+        })
+        .otherwise({
+        	action: 'main'
         });
 });
 
@@ -60,6 +63,9 @@ function ActualitesController($scope, template, route, model){
                         template.open('error', '404');
     				}
 				});
+            },
+            main: function(params){
+            	template.open('main', 'infos-list');
             }
         });
 
