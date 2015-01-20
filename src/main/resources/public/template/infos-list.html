@@ -9,7 +9,7 @@
 	<h2 translate content="actualites.thread.empty"></h2>
 </div>
 
-<container template="filters"></container>
+<container ng-if="checkOneOrMoreThreadsContibRight()" template="filters"></container>
 
 <div ng-if="thread_id" class="row">
 	<h2>[[thread_title]]</h2>
