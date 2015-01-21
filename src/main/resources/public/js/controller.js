@@ -23,7 +23,7 @@ function ActualitesController($scope, template, route, model){
     	$scope.notFound = false;
     	
     	route({
-    		// Routes viewThread and viewInfo are used by notifications
+    		// Routes viewThread, viewInfo adn viewComment are used by notifications
             viewThread: function(params){
             	model.threads.one('sync', function(){
             		var aThread = model.threads.find(function(thread){
@@ -38,6 +38,7 @@ function ActualitesController($scope, template, route, model){
                         template.open('error', '404');
     				}
 				});
+				model.threads.sync();
             },
             viewInfo: function(params){
             	model.infos.one('sync', function() {
@@ -66,6 +67,7 @@ function ActualitesController($scope, template, route, model){
                         template.open('error', '404');
     				}
 				});
+				model.infos.sync();
             },
             viewComment: function(params){
             	model.infos.one('sync', function() {
@@ -95,6 +97,7 @@ function ActualitesController($scope, template, route, model){
                         template.open('error', '404');
     				}
 				});
+				model.infos.sync();
             },
             main: function(params){
             	template.open('main', 'infos-list');
