@@ -15,6 +15,8 @@ import net.atos.entng.actualites.services.InfoService;
 
 public class InfoServiceSqlImpl implements InfoService {
 
+	private static final String THREAD_PUBLISH = "net-atos-entng-actualites-controllers-InfoController|publish";
+
 	@Override
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler) {
 		if (user != null) {
@@ -45,7 +47,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE i.id = ? " +
 				" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
-				" OR ((t.owner = ? OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + ") AND i.status > 1))" +
+				" OR ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.modified DESC";
 			values.add(Sql.parseId(id));
@@ -57,6 +59,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(THREAD_PUBLISH);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseSharedUnique(handler));
 		}
 	}
@@ -90,7 +93,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
-				" OR ((t.owner = ? OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + ") AND i.status > 1))" +
+				" OR ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.modified DESC";
 			values.add(user.getUserId());
@@ -101,6 +104,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(THREAD_PUBLISH);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}
@@ -135,7 +139,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE t.id = ? " +
 				" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
-				" OR ((t.owner = ? OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + ") AND i.status > 1))" +
+				" OR ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1))" +
 				" GROUP BY t.id, i.id, u.username" +
 				" ORDER BY i.modified DESC";
 			values.add(Sql.parseId(id));
@@ -147,6 +151,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(THREAD_PUBLISH);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}
@@ -176,7 +181,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
-					" OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR t.owner = ?)" +
+					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
 					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
 				" GROUP BY i.id, u.username, t.id" +
@@ -189,6 +194,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(THREAD_PUBLISH);
 			values.add(user.getUserId());
 			values.add(unixTime);
 			values.add(unixTime);
@@ -218,7 +224,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
-					" OR ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR t.owner = ?)" +
+					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
 					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
 				" GROUP BY i.id, u.username, t.id" +
@@ -230,6 +236,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
+			values.add(THREAD_PUBLISH);
 			values.add(user.getUserId());
 			values.add(unixTime);
 			values.add(unixTime);
