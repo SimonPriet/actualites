@@ -576,7 +576,7 @@ public class InfoController extends ControllerHelper {
 	}
 
 	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType){
-		if (eventType == NEWS_SUBMIT_EVENT_TYPE) {
+		if (eventType.equals(NEWS_SUBMIT_EVENT_TYPE)) {
 			threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
@@ -589,7 +589,7 @@ public class InfoController extends ControllerHelper {
 			});
 		}
 		else {
-			if(eventType == NEWS_UNSUBMIT_EVENT_TYPE){
+			if(eventType.equals(NEWS_UNSUBMIT_EVENT_TYPE)){
 				threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
 					@Override
 					public void handle(Either<String, JsonArray> event) {
@@ -602,7 +602,7 @@ public class InfoController extends ControllerHelper {
 				});
 			}
 			else{
-				if(eventType == NEWS_PUBLISH_EVENT_TYPE){
+				if(eventType.equals(NEWS_PUBLISH_EVENT_TYPE)){
 					infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
 						@Override
 						public void handle(Either<String, JsonArray> event) {
@@ -615,7 +615,7 @@ public class InfoController extends ControllerHelper {
 					});
 				}
 				else{
-					if(eventType == NEWS_UNPUBLISH_EVENT_TYPE){
+					if(eventType.equals(NEWS_UNPUBLISH_EVENT_TYPE)){
 						infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
 							@Override
 							public void handle(Either<String, JsonArray> event) {
