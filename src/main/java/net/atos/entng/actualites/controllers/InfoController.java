@@ -5,9 +5,14 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 import static org.entcore.common.user.UserUtils.getUserInfos;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.atos.entng.actualites.Actualites;
@@ -544,7 +549,7 @@ public class InfoController extends ControllerHelper {
 							request.resume();
 							if(event.right() != null){
 								JsonObject info = event.right().getValue();
-								if(info != null && info.containsField("status")){
+								if(info != null && info.containsField("status") && info.containsField("publication_date")){
 									if(info.getInteger("status") > 2){
 										// notify only when info is published
 										setTimelineEventType(EVENT_TYPE);
@@ -552,6 +557,19 @@ public class InfoController extends ControllerHelper {
 											.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 											.putString("username", user.getUsername())
 											.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
+										String date = info.getString("publication_date");
+										if(!date.trim().isEmpty()){
+											try {
+												Date publication_date = dfm.parse(date);
+												Date timeNow=new Date(System.currentTimeMillis());
+												if(publication_date.after(timeNow)){
+													params.putNumber("timeline-publish-date", publication_date.getTime());
+												}
+											} catch (ParseException e) {
+												e.printStackTrace();
+											}
+										}
 										shareJsonSubmit(request, "notify-info-shared.html", false, params, "title");
 									} else {
 										shareJsonSubmit(request, null, false, null, null);
