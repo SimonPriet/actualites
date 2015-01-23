@@ -13,12 +13,12 @@
 			"type": "integer"
 		},
 		"publication_date": {
-			"description": "Unix timestamp representing the start date of the booking",
-      		"type": "integer"
+			"description": "string timestamp representing the start date of the booking",
+      		"type": "string"
 		},
 		"expiration_date": {
-			"description": "Unix timestamp representing the start date of the booking",
-      		"type": "integer"
+			"description": "string timestamp representing the start date of the booking",
+      		"type": "string"
 		},
 		"is_headline": {
       		"type": "boolean"

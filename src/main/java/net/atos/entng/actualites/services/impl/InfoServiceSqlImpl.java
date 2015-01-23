@@ -27,8 +27,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -74,8 +73,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -119,8 +117,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' AS publication_date" +
-				", to_timestamp(i.expiration_date) AT TIME ZONE 'UTC-1' AS expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
 				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
 				", (SELECT json_agg(cr.*) FROM (" +
 					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
@@ -159,7 +156,6 @@ public class InfoServiceSqlImpl implements InfoService {
 	@Override
 	public void listLastPublishedInfos(UserInfos user, int resultSize, Handler<Either<String, JsonArray>> handler) {
 		if (user != null) {
-			long unixTime = System.currentTimeMillis() / 1000L;
 			String query;
 			JsonArray values = new JsonArray();
 			List<String> groupsAndUserIds = new ArrayList<>();
@@ -168,8 +164,8 @@ public class InfoServiceSqlImpl implements InfoService {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
 			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title," +
-				" CASE WHEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1' > i.modified" +
-					" THEN to_timestamp(i.publication_date) AT TIME ZONE 'UTC-1'" +
+				" CASE WHEN i.publication_date > i.modified" +
+					" THEN i.publication_date" +
 					" ELSE i.modified" +
 					" END as date" +
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
@@ -183,7 +179,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
 					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
-					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
+					" AND ((i.publication_date = NULL OR i.publication_date <= NOW()) AND (i.expiration_date = NULL OR i.expiration_date >= NOW())))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY date DESC" +
 				" LIMIT ?";
@@ -196,8 +192,6 @@ public class InfoServiceSqlImpl implements InfoService {
 			}
 			values.add(THREAD_PUBLISH);
 			values.add(user.getUserId());
-			values.add(unixTime);
-			values.add(unixTime);
 			values.add(resultSize);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
@@ -206,7 +200,6 @@ public class InfoServiceSqlImpl implements InfoService {
 	@Override
 	public void listForLinker(UserInfos user, Handler<Either<String, JsonArray>> handler) {
 		if (user != null) {
-			long unixTime = System.currentTimeMillis() / 1000L;
 			String query;
 			JsonArray values = new JsonArray();
 			List<String> groupsAndUserIds = new ArrayList<>();
@@ -226,7 +219,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
 					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
-					" AND ((i.publication_date = NULL OR i.publication_date <= ?) AND (i.expiration_date = NULL OR i.expiration_date >= ?)))" +
+					" AND ((i.publication_date = NULL OR i.publication_date <= NOW()) AND (i.expiration_date = NULL OR i.expiration_date >= NOW())))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.title";
 			for(String value : groupsAndUserIds){
@@ -238,8 +231,6 @@ public class InfoServiceSqlImpl implements InfoService {
 			}
 			values.add(THREAD_PUBLISH);
 			values.add(user.getUserId());
-			values.add(unixTime);
-			values.add(unixTime);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
 		}
 	}

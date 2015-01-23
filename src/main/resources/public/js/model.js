@@ -62,7 +62,7 @@ Info.prototype.toJSON = function(){
 		if(!moment.isMoment(pubDate)) {
 			pubDate = moment(pubDate);
 		}
-		pubDate = pubDate.unix();
+		pubDate = pubDate.toISOString();
 	}
 	
 	var expDate = null;
@@ -71,7 +71,7 @@ Info.prototype.toJSON = function(){
 		if(!moment.isMoment(expDate)) {
 			expDate = moment(expDate);
 		}
-		expDate = expDate.unix();
+		expDate = expDate.toISOString();
 	}
 	
 	if(!this.status){
@@ -400,11 +400,15 @@ model.build = function(){
 						info.comments = undefined;
 					}
 					if (info.publication_date) {
+						info.publication_date += "Z";
 						info.hasPublicationDate = true;
 					}
 					if (info.expiration_date) {
+						info.expiration_date += "Z";
 						info.hasExpirationDate = true;
 					}
+					info.created += "Z";
+					info.modified += "Z";
 					that.push(info);
 				});
 				this.trigger('sync');
