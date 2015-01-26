@@ -559,7 +559,7 @@ public class InfoController extends ControllerHelper {
 											.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
 										String date = info.getString("publication_date");
-										if(!date.trim().isEmpty()){
+										if(date != null && !date.trim().isEmpty()){
 											try {
 												Date publication_date = dfm.parse(date);
 												Date timeNow=new Date(System.currentTimeMillis());
