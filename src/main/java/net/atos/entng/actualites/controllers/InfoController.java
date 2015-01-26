@@ -549,7 +549,7 @@ public class InfoController extends ControllerHelper {
 							request.resume();
 							if(event.right() != null){
 								JsonObject info = event.right().getValue();
-								if(info != null && info.containsField("status") && info.containsField("publication_date")){
+								if(info != null && info.containsField("status")){
 									if(info.getInteger("status") > 2){
 										// notify only when info is published
 										setTimelineEventType(EVENT_TYPE);
