@@ -35,7 +35,7 @@ var publish_rights = ["net-atos-entng-actualites-controllers-InfoController|crea
 
 print("BEGIN;");
 db.actualites.threads.find().forEach(function(thread){
-	if(thread.title !== undefined && thread.owner.userId !== undefined){
+	if(thread.title && thread.owner.userId){
 		// Insert user if not exist
 		var user_query = "SELECT actualites.insert_user('" +
 			thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
@@ -47,7 +47,7 @@ db.actualites.threads.find().forEach(function(thread){
 			+ thread.created.toISOString() + "', '"
 			+ thread.modified.toISOString() + "', '"
 			+ thread.title.replace(/'/g, "''") + "'";
-		if(thread.icon !== undefined){
+		if(thread.icon){
 			thread_query += ", icon";
 			thread_values += ", '" + thread.icon + "'";
 		}
@@ -55,12 +55,12 @@ db.actualites.threads.find().forEach(function(thread){
 		thread_values += (thread.mode !== undefined) ? ", " + thread.mode + ");" : ", 0);";
 		thread_query = thread_query + thread_values;
 		print(thread_query);
-		if(thread.shared !== undefined){
+		if(thread.shared && thread.shared.length > 0){
 			// thread_share entry
 			var thread_share_query = "INSERT INTO actualites.thread_shares VALUES ";
 			thread.shared.forEach(function(share){
 				var keys = Object.keys(share);
-				var memeberId = (share.userId !== undefined) ? share.userId : share.groupId;
+				var memeberId = (share.userId) ? share.userId : share.groupId;
 				for(var i=1; i<keys.length; i++){
 					if(share[keys[i]] === true && info_old_rights.indexOf(keys[i]) === -1){
 						// getThread & listInfosByThreadId rights will be added with the contrib rights
@@ -83,7 +83,7 @@ db.actualites.threads.find().forEach(function(thread){
 					}
 				}
 				// Insert user / group if not exist
-				if(share.userId !== undefined){
+				if(share.userId){
 					var user_query = "SELECT actualites.insert_user('" +
 						share.userId + "', '');";
 					print(user_query);
@@ -95,9 +95,9 @@ db.actualites.threads.find().forEach(function(thread){
 			});
 			print(thread_share_query.replace(/, $/, ";"));
 		}
-		if(thread.infos !== undefined){
+		if(thread.infos){
 			thread.infos.forEach(function(info){
-				if(info.title !== undefined && info.status !== undefined && info.owner.userId !== undefined){
+				if(info.title && info.status !== undefined && info.owner.userId){
 					// Insert user if not exist
 					var user_query = "SELECT actualites.insert_user('" +
 						thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
@@ -108,17 +108,17 @@ db.actualites.threads.find().forEach(function(thread){
 						+ "', '" + info.created.toISOString()
 						+ "', '" + info.modified.toISOString()
 						+ "', '" + info.title.replace(/'/g, "''");
-					if(info.content !== undefined){
+					if(info.content){
 						info_query += ", content";
 						info_values += "', '" + info.content.replace(/'/g, "''");
 					}
 					info_query += ", status";
 					info_values += "', " + info.status;
-					if(info.publicationDate !== null){
+					if(info.publicationDate){
 						info_query += ", publication_date";
 						info_values += ", '" + info.publicationDate.toISOString() + "'";
 					}
-					if(info.expirationDate !== null){
+					if(info.expirationDate){
 						info_query += ", expiration_date";
 						info_values += ", '" + info.expirationDate.toISOString() + "'";
 					}
@@ -127,12 +127,12 @@ db.actualites.threads.find().forEach(function(thread){
 					info_values += ", currval('actualites.thread_id_seq'));";
 					info_query = info_query + info_values;
 					print(info_query);
-					if(thread.shared !== undefined){
+					if(thread.shared && thread.shared.length > 0){
 						// info_share entry
 						var info_share_query = "INSERT INTO actualites.info_shares VALUES ";
 						thread.shared.forEach(function(share){
 							var keys = Object.keys(share);
-							var memeberId = (share.userId !== undefined) ? share.userId : share.groupId;
+							var memeberId = (share.userId) ? share.userId : share.groupId;
 							var can_read = false;
 							for(var i=1; !can_read && i<keys.length; i++){
 								// can read info ?
@@ -144,7 +144,7 @@ db.actualites.threads.find().forEach(function(thread){
 								}
 							}
 							// Insert user / group if not exist
-							if(share.userId !== undefined){
+							if(share.userId){
 								var user_query = "SELECT actualites.insert_user('" +
 									share.userId + "', '');";
 								print(user_query);
@@ -156,9 +156,9 @@ db.actualites.threads.find().forEach(function(thread){
 						});
 						print(info_share_query.replace(/, $/, ";"));
 					}
-					if(info.comments !== undefined){
+					if(info.comments){
 						info.comments.forEach(function(comment){
-							if(comment.comment !== undefined && comment.author !== undefined){
+							if(comment.comment && comment.author){
 								var comment_query = "INSERT INTO actualites.comment (owner, created, modified, comment, info_id) VALUES ('"
 									+ comment.author.replace(/'/g, "''") + "', '"
 									+ comment.posted.toISOString() + "', '"
