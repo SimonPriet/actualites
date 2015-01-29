@@ -33,9 +33,9 @@ var contrib_rights = ["net-atos-entng-actualites-controllers-InfoController|list
 var publish_rights = ["net-atos-entng-actualites-controllers-InfoController|createPublished",
 					 "net-atos-entng-actualites-controllers-InfoController|updatePublished"];
 
+print("BEGIN;");
 db.actualites.threads.find().forEach(function(thread){
 	if(thread.title !== undefined && thread.owner.userId !== undefined){
-		print("BEGIN;");
 		// Insert user if not exist
 		var user_query = "SELECT actualites.insert_user('" +
 			thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
@@ -172,6 +172,6 @@ db.actualites.threads.find().forEach(function(thread){
 				}
 			});
 		}
-		print("COMMIT;");
 	}
 });
+print("COMMIT;");
