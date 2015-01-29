@@ -35,9 +35,10 @@ var publish_rights = ["net-atos-entng-actualites-controllers-InfoController|crea
 
 db.actualites.threads.find().forEach(function(thread){
 	if(thread.title !== undefined && thread.owner.userId !== undefined){
+		print("BEGIN;");
 		// Insert user if not exist
 		var user_query = "SELECT actualites.insert_user('" +
-			thread.owner.userId + "', '" + thread.owner.displayName + "');";
+			thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
 		print(user_query);
 		// thread entry
 		var thread_query = "INSERT INTO actualites.thread (owner, created, modified, title";
@@ -45,7 +46,7 @@ db.actualites.threads.find().forEach(function(thread){
 			+ thread.owner.userId + "', '"
 			+ thread.created.toISOString() + "', '"
 			+ thread.modified.toISOString() + "', '"
-			+ thread.title + "'";
+			+ thread.title.replace(/'/g, "''") + "'";
 		if(thread.icon !== undefined){
 			thread_query += ", icon";
 			thread_values += ", '" + thread.icon + "'";
@@ -99,17 +100,17 @@ db.actualites.threads.find().forEach(function(thread){
 				if(info.title !== undefined && info.status !== undefined && info.owner.userId !== undefined){
 					// Insert user if not exist
 					var user_query = "SELECT actualites.insert_user('" +
-						thread.owner.userId + "', '" + thread.owner.displayName + "');";
+						thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
 					print(user_query);
 					var info_query = "INSERT INTO actualites.info (owner, created, modified, title";
 					var info_values = " VALUES ('"
 						+ info.owner.userId
 						+ "', '" + info.created.toISOString()
 						+ "', '" + info.modified.toISOString()
-						+ "', '" + info.title;
+						+ "', '" + info.title.replace(/'/g, "''");
 					if(info.content !== undefined){
 						info_query += ", content";
-						info_values += "', '" + info.content;
+						info_values += "', '" + info.content.replace(/'/g, "''");
 					}
 					info_query += ", status";
 					info_values += "', " + info.status;
@@ -159,10 +160,10 @@ db.actualites.threads.find().forEach(function(thread){
 						info.comments.forEach(function(comment){
 							if(comment.comment !== undefined && comment.author !== undefined){
 								var comment_query = "INSERT INTO actualites.comment (owner, created, modified, comment, info_id) VALUES ('"
-									+ comment.author + "', '"
+									+ comment.author.replace(/'/g, "''") + "', '"
 									+ comment.posted.toISOString() + "', '"
 									+ comment.posted.toISOString() + "', '"
-									+ comment.comment + "', "
+									+ comment.comment.replace(/'/g, "''") + "', "
 									+ "currval('actualites.info_id_seq'));";
 							}
 							print(comment_query);
@@ -171,5 +172,6 @@ db.actualites.threads.find().forEach(function(thread){
 				}
 			});
 		}
+		print("COMMIT;");
 	}
 });
