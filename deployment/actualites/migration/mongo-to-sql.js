@@ -1,6 +1,10 @@
 var rights = JSON.parse("{" +
-	"\"net-atos-entng-actualites-controllers-ActualitesController|comment\": \"net-atos-entng-actualites-controllers-CommentController|comment\", " + 
-	"\"net-atos-entng-actualites-controllers-ActualitesController|deleteComment\": \"net-atos-entng-actualites-controllers-CommentController|deleteComment\", " +
+	"\"net-atos-entng-actualites-controllers-ActualitesController|updateThread\": \"net-atos-entng-actualites-controllers-ThreadController|updateThread\", " + 
+	"\"net-atos-entng-actualites-controllers-ActualitesController|deleteThread\": \"net-atos-entng-actualites-controllers-ThreadController|deleteThread\", " +
+	"\"net-atos-entng-actualites-controllers-ActualitesController|shareThread\": \"net-atos-entng-actualites-controllers-ThreadController|shareThread\", " + 
+	"\"net-atos-entng-actualites-controllers-ActualitesController|shareThreadRemove\": \"net-atos-entng-actualites-controllers-ThreadController|shareThreadRemove\", " +
+	"\"net-atos-entng-actualites-controllers-ActualitesController|shareThreadSubmit\": \"net-atos-entng-actualites-controllers-ThreadController|shareThreadSubmit\", " +
+	"\"net-atos-entng-actualites-controllers-ActualitesController|delete\": \"net-atos-entng-actualites-controllers-InfoController|delete\", " +
 	"\"net-atos-entng-actualites-controllers-ActualitesController|listThreadInfos\": \"net-atos-entng-actualites-controllers-InfoController|listInfosByThreadId\", " +
 	"\"net-atos-entng-actualites-controllers-ActualitesController|getThread\": \"net-atos-entng-actualites-controllers-ThreadController|getThread\", " +
 	"\"net-atos-entng-actualites-controllers-ActualitesController|updatePending\": \"net-atos-entng-actualites-controllers-InfoController|updatePending\", " +
@@ -16,14 +20,11 @@ var rights = JSON.parse("{" +
 "}");
 
 var info_old_rights = ["net-atos-entng-actualites-controllers-ActualitesController|comment",
-                   "net-atos-entng-actualites-controllers-ActualitesController|deleteComment",
-                   "net-atos-entng-actualites-controllers-ActualitesController|getInfo"];
+                       "net-atos-entng-actualites-controllers-ActualitesController|deleteComment",
+                       "net-atos-entng-actualites-controllers-ActualitesController|getInfo"];
 var info_new_rights = ["net-atos-entng-actualites-controllers-CommentController|comment",
                        "net-atos-entng-actualites-controllers-CommentControllerr|deleteComment",
                        "net-atos-entng-actualites-controllers-InfoController|getInfo"];
-var info_old_rights = ["net-atos-entng-actualites-controllers-ActualitesController|comment",
-                       "net-atos-entng-actualites-controllers-ActualitesController|deleteComment",
-                       "net-atos-entng-actualites-controllers-ActualitesController|getInfo"];
 var contrib_rights = ["net-atos-entng-actualites-controllers-InfoController|listInfosByThreadId",
                       "net-atos-entng-actualites-controllers-ThreadController|getThread",
                       "net-atos-entng-actualites-controllers-InfoController|createPending", 
@@ -58,6 +59,7 @@ db.actualites.threads.find().forEach(function(thread){
 		if(thread.shared && thread.shared.length > 0){
 			// thread_share entry
 			var thread_share_query = "INSERT INTO actualites.thread_shares VALUES ";
+			var areThreadRights = false;
 			thread.shared.forEach(function(share){
 				var keys = Object.keys(share);
 				var memeberId = (share.userId) ? share.userId : share.groupId;
@@ -66,17 +68,20 @@ db.actualites.threads.find().forEach(function(thread){
 						// getThread & listInfosByThreadId rights will be added with the contrib rights
 						if(keys[i] !== "net-atos-entng-actualites-controllers-ActualitesController|getThread" &&
 								keys[i] !== "net-atos-entng-actualites-controllers-ActualitesController|listThreadInfos"){
+							areThreadRights = true;
 							thread_share_query += "('" + memeberId + "', currval('actualites.thread_id_seq'), '" + rights[keys[i]] + "'), ";
 						}
 						// add new publish rights
 						if(keys[i] === "net-atos-entng-actualites-controllers-ActualitesController|publish"){
 							publish_rights.forEach(function(right){
+								areThreadRights = true;
 								thread_share_query += "('" + memeberId + "', currval('actualites.thread_id_seq'), '" + right + "'), ";
 							});
 						}
 						// add new contrib rights
 						if(keys[i] === "net-atos-entng-actualites-controllers-ActualitesController|createDraft"){
 							contrib_rights.forEach(function(right){
+								areThreadRights = true;
 								thread_share_query += "('" + memeberId + "', currval('actualites.thread_id_seq'), '" + right + "'), ";
 							});
 						}
@@ -85,22 +90,24 @@ db.actualites.threads.find().forEach(function(thread){
 				// Insert user / group if not exist
 				if(share.userId){
 					var user_query = "SELECT actualites.insert_user('" +
-						share.userId + "', '');";
+						share.userId + "', null);";
 					print(user_query);
 				} else {
 					var group_query = "SELECT actualites.insert_group('" +
-						share.groupId + "', '');";
+						share.groupId + "', null);";
 					print(group_query);
 				}
 			});
-			print(thread_share_query.replace(/, $/, ";"));
+			if(areThreadRights){
+				print(thread_share_query.replace(/, $/, ";"));
+			}
 		}
 		if(thread.infos){
 			thread.infos.forEach(function(info){
 				if(info.title && info.status !== undefined && info.owner.userId){
 					// Insert user if not exist
 					var user_query = "SELECT actualites.insert_user('" +
-						thread.owner.userId + "', '" + thread.owner.displayName.replace(/'/g, "''") + "');";
+						info.owner.userId + "', '" + info.owner.displayName.replace(/'/g, "''") + "');";
 					print(user_query);
 					var info_query = "INSERT INTO actualites.info (owner, created, modified, title";
 					var info_values = " VALUES ('"
@@ -116,11 +123,21 @@ db.actualites.threads.find().forEach(function(thread){
 					info_values += "', " + info.status;
 					if(info.publicationDate){
 						info_query += ", publication_date";
-						info_values += ", '" + info.publicationDate.toISOString() + "'";
+						if(typeof info.publicationDate === 'string'){
+							info_values += ", '" + info.publicationDate + "'";
+						}
+						else{
+							info_values += ", '" + info.publicationDate.toISOString() + "'";
+						}
 					}
 					if(info.expirationDate){
 						info_query += ", expiration_date";
-						info_values += ", '" + info.expirationDate.toISOString() + "'";
+						if(typeof info.expirationDate === 'string'){
+							info_values += ", '" + info.expirationDate + "'";
+						}
+						else{
+							info_values += ", '" + info.expirationDate.toISOString() + "'";
+						}
 					}
 					info_query += ", is_headline, thread_id)";
 					info_values += (info.isHeadline !== undefined) ? ", " + info.isHeadline : ", false";
@@ -146,11 +163,11 @@ db.actualites.threads.find().forEach(function(thread){
 							// Insert user / group if not exist
 							if(share.userId){
 								var user_query = "SELECT actualites.insert_user('" +
-									share.userId + "', '');";
+									share.userId + "', null);";
 								print(user_query);
 							} else {
 								var group_query = "SELECT actualites.insert_group('" +
-									share.groupId + "', '');";
+									share.groupId + "', null);";
 								print(group_query);
 							}
 						});
