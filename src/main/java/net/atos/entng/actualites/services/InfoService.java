@@ -1,5 +1,7 @@
 package net.atos.entng.actualites.services;
 
+import java.util.List;
+
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -21,4 +23,5 @@ public interface InfoService {
 
 	public void getSharedWithIds(String infoId, UserInfos user, Handler<Either<String, JsonArray>> handler);
 
+	void removeAllInfosShares(List<String> groupsIds, Handler<Either<String, JsonObject>> handler);
 }

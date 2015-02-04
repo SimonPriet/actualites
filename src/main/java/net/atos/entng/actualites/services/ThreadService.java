@@ -1,5 +1,7 @@
 package net.atos.entng.actualites.services;
 
+import java.util.List;
+
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -14,4 +16,7 @@ public interface ThreadService {
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
 	public void getPublishSharedWithIds(String categoryId, UserInfos user, Handler<Either<String, JsonArray>> handler);
+
+	void removeAllGroupsShares(List<String> groupsIds, Handler<Either<String, JsonObject>> handler);
+
 }
