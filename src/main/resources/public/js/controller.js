@@ -616,6 +616,13 @@ function ActualitesController($scope, template, route, model){
 		return (info && info.owner === model.me.userId && 
 			info.thread && $scope.canPublish(info.thread));
 	};
+	
+	$scope.isAnonymous = function(id){
+		if(id !== undefined && id in ["1", "2", "3", "4"]){
+			return true;
+		}
+		return false;
+	};
 
     this.initialize();
 }

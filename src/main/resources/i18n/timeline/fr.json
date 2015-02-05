@@ -5,5 +5,10 @@
 	"timeline.actu.info.unpublished": "a dépublié l'actualité ",
 	"timeline.actu.info.comment": "a commenté l'actualité ",
 	"timeline.actu.info.shared": "a partagé avec vous l'actualité ",
-	"timeline.actu.thread.shared": "a partagé avec vous le fil d'actualités "
+	"timeline.actu.thread.shared": "a partagé avec vous le fil d'actualités ",
+	
+	"user.personnel.deleted" : "Ancien personnel",
+	"user.teacher.deleted" : "Ancien enseignant",
+	"user.student.deleted" : "Ancien élève",
+	"user.relative.deleted" : "Ancien parent"
 }

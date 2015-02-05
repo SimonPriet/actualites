@@ -271,18 +271,4 @@ public class InfoServiceSqlImpl implements InfoService {
 		});
 	}
 
-	@Override
-	public void removeAllInfosShares(List<String> groupsIds, Handler<Either<String, JsonObject>> handler) {
-		String query;
-		JsonArray values = new JsonArray();
-		if (groupsIds != null && groupsIds.size() > 0) {
-			query = "DELETE FROM actualites.info_shares WHERE member_id IN " + Sql.listPrepared(groupsIds.toArray());
-			values = new JsonArray();
-			for(String value : groupsIds){
-				values.add(value);
-			}
-			Sql.getInstance().prepared(query.toString(), values, SqlResult.validRowsResultHandler(handler));
-		}
-	}
-
 }

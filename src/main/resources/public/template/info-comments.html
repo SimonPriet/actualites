@@ -4,7 +4,8 @@
 
 <article class="row comment" ng-repeat="comment in info.comments.all">
 	<div class="lower-title">
-		<a href="/userbook/annuaire#/[[comment.owner]]">[[comment.username]]</a>
+		<a ng-if="isAnonymous(comment.owner)"><i18n>comment.username</i18n></a>
+		<a ng-if="!isAnonymous(comment.owner)" href="/userbook/annuaire#/[[comment.owner]]">[[comment.username]]</a>
 		<em>le [[formatDate(comment.modified)]]</em>
 		<p>[[comment.comment]]</p>
 	</div>
