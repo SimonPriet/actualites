@@ -33,27 +33,35 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 
 	@Override
 	public void deleteGroups(JsonArray groups) {
-		if (shareOldGroupsToUsers && groups != null && groups.size() > 0){
-			final JsonArray gIds = new JsonArray();
-			for (Object o : groups) {
-				if (!(o instanceof JsonObject)) continue;
-				final JsonObject j = (JsonObject) o;
-				gIds.add(j.getString("group"));
-			}
-			if (gIds.size() > 0) {
-				// Delete (CASCADE) all shares from thread_shares and members tables
-				String query = "DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(gIds.toArray());
-				Sql.getInstance().prepared(query, gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
-					@Override
-					public void handle(Either<String, JsonObject> event) {
-						if (event.isRight()) {
-							log.info("The groups " + gIds.toList().toString() + " are deleted");
-						} else {
-							log.error("Error deleting these groups " + gIds.toList().toString() + ". Message : " + event.left().getValue());
+		if(groups != null && groups.size() > 0){
+			if (!shareOldGroupsToUsers){
+				final JsonArray gIds = new JsonArray();
+				for (Object o : groups) {
+					if (!(o instanceof JsonObject)) continue;
+					final JsonObject j = (JsonObject) o;
+					gIds.add(j.getString("group"));
+				}
+				if (gIds.size() > 0) {
+					// Delete (CASCADE) all shares from thread_shares and members tables
+					String query = "DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(gIds.toArray());
+					Sql.getInstance().prepared(query, gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
+						@Override
+						public void handle(Either<String, JsonObject> event) {
+							if (event.isRight()) {
+								log.info("The groups " + gIds.toList().toString() + " are deleted");
+							} else {
+								log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting these groups " + gIds.toList().toString()
+										+ ". Message : " + event.left().getValue());
+							}
 						}
-					}
-				}));
+					}));
+				}
+			} else {
+				// TODO Implement shareOldGroupsToUsers
+				log.error("[ActualitesRepositoryEvents][deleteGroups] Case (shareOldGroupsToUsers) for Event is not implemented");
 			}
+		} else {
+			log.error("[ActualitesRepositoryEvents][deleteGroups] groups is empty");
 		}
 	}
 
@@ -98,6 +106,8 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			if (relativeIds.size() > 0){
 				this.anonymizeOwner(relativeIds, ANONYMOUS_RELATIVE_ID);
 			}
+		} else {
+			log.error("[ActualitesRepositoryEvents][deleteUsers] users is empty");
 		}
 	}
 
@@ -125,6 +135,8 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 					}
 				}
 			}));
+		} else {
+			log.error("[ActualitesRepositoryEvents][anonymizeOwner] usersIds is empty");
 		}
 	}
 
