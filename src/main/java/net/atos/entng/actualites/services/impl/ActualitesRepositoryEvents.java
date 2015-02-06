@@ -41,6 +41,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				gIds.add(j.getString("group"));
 			}
 			if (gIds.size() > 0) {
+				// Delete (CASCADE) all shares from thread_shares and members tables
 				String query = "DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(gIds.toArray());
 				Sql.getInstance().prepared(query, gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
 					@Override
@@ -63,6 +64,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			final JsonArray teacherIds = new JsonArray();
 			final JsonArray studentIds = new JsonArray();
 			final JsonArray relativeIds = new JsonArray();
+			// Divide users ids by profiles
 			for (Object u : users) {
 				if (!(u instanceof JsonObject)) continue;
 				final JsonObject j = (JsonObject) u;
@@ -83,7 +85,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				}
 			}
 
-			// For each profile, replace the owner id with the the an anonymous id of the profile.
+			// Replace the owner id by an anonymous id of the same profile.
 			if (personnelIds.size() > 0){
 				this.anonymizeOwner(personnelIds, ANONYMOUS_PERSONNEL_ID);
 			}
@@ -100,6 +102,8 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 	}
 
 	private void anonymizeOwner(final JsonArray usersIds, String anonymousId){
+		// Anonymize owner in thread, info, comment, thread_shares and info_shares tables
+		// Delete (CASCADE) users from users and members tables
 		if (usersIds != null && usersIds.size() > 0) {
 			SqlStatementsBuilder statementsBuilder = new SqlStatementsBuilder();
 			statementsBuilder.prepared("UPDATE actualites.thread SET owner = ? WHERE owner IN " + Sql.listPrepared(usersIds.toArray()), new JsonArray(anonymousId).add(usersIds));
@@ -107,7 +111,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			statementsBuilder.prepared("UPDATE actualites.comment SET owner = ? WHERE owner IN " + Sql.listPrepared(usersIds.toArray()), new JsonArray(anonymousId).add(usersIds));
 
 			statementsBuilder.prepared("UPDATE actualites.thread_shares SET member_id = ? WHERE member_id IN " + Sql.listPrepared(usersIds.toArray()), new JsonArray(anonymousId).add(usersIds));
-			statementsBuilder.prepared("UPDATE actualites.info_shares SET member_id = ? WHERE member_id IN " + Sql.listPrepared(usersIds.toArray()), usersIds);
+			statementsBuilder.prepared("UPDATE actualites.info_shares SET member_id = ? WHERE member_id IN " + Sql.listPrepared(usersIds.toArray()), new JsonArray(anonymousId).add(usersIds));
 
 			statementsBuilder.prepared("DELETE FROM actualites.users WHERE id IN " + Sql.listPrepared(usersIds.toArray()), usersIds);
 
