@@ -20,7 +20,7 @@ actualitesWidget.updateInfos  = function(){
 
 if(actualitesWidget.resultSize === undefined){
 	http().get('/userbook/preference/maxInfos').done(function(maxInfos){
-		if(maxInfos.preference){
+		if(!maxInfos.preference){
 			actualitesWidget.resultSize = 5; // Default size value
 		} else {
 			actualitesWidget.resultSize = parseInt(maxInfos.preference);
