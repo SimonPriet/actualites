@@ -6,14 +6,12 @@ import net.atos.entng.actualites.controllers.ThreadController;
 import net.atos.entng.actualites.controllers.DisplayController;
 import net.atos.entng.actualites.services.impl.ActualitesRepositoryEvents;
 
-import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.http.filter.ShareAndOwner;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
-import org.entcore.common.user.RepositoryHandler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 
@@ -33,10 +31,8 @@ public class Actualites extends BaseServer {
 		super.start();
 		final EventBus eb = getEventBus(vertx);
 
-		EventStoreFactory eventStoreFactory = EventStoreFactory.getFactory();
-		eventStoreFactory.setContainer(container);
-		eventStoreFactory.setVertx(vertx);
-		vertx.eventBus().registerHandler("user.repository", new RepositoryHandler(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false))));
+		// Subscribe to events published for transition
+		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false)));
 
 		addController(new DisplayController());
 

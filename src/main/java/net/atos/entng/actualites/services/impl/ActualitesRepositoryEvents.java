@@ -29,7 +29,8 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 
 	@Override
 	public void exportResources(String exportId, String userId, JsonArray groups, String exportPath, String locale) {
-
+		// TODO Implement exportResources
+		log.warn("[ActualitesRepositoryEvents] exportResources is not implemented");
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 						@Override
 						public void handle(Either<String, JsonObject> event) {
 							if (event.isRight()) {
-								log.info("The groups " + gIds.toList().toString() + " and their shares are deleted");
+								log.info("[ActualitesRepositoryEvents][deleteGroups]The groups " + gIds.toList().toString() + " and their shares are deleted");
 							} else {
 								log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting these groups " + gIds.toList().toString()
 										+ " and their shares. Message : " + event.left().getValue());
@@ -59,10 +60,10 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				}
 			} else {
 				// TODO Implement shareOldGroupsToUsers
-				log.error("[ActualitesRepositoryEvents][deleteGroups] Case (shareOldGroupsToUsers) for Event is not implemented");
+				log.warn("[ActualitesRepositoryEvents][deleteGroups] Case (shareOldGroupsToUsers) for Event is not implemented");
 			}
 		} else {
-			log.error("[ActualitesRepositoryEvents][deleteGroups] groups is empty");
+			log.warn("[ActualitesRepositoryEvents][deleteGroups] groups is null or empty");
 		}
 	}
 
@@ -107,7 +108,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				this.cleanDataBase(relativeIds, ANONYMOUS_RELATIVE_ID);
 			}
 		} else {
-			log.error("[ActualitesRepositoryEvents][deleteUsers] users is empty");
+			log.warn("[ActualitesRepositoryEvents][deleteUsers] users is empty");
 		}
 	}
 
@@ -137,14 +138,15 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				@Override
 				public void handle(Either<String, JsonObject> event) {
 					if (event.isRight()) {
-						log.info("The resources created by these users " + usersIds.toList().toString() + " are deleted");
+						log.info("[ActualitesRepositoryEvents][cleanDataBase] The resources created by these users " + usersIds.toList().toString() + " are deleted");
 					} else {
-						log.error("Error deleting the resources created by these users " + usersIds.toList().toString() + ". Message : " + event.left().getValue());
+						log.error("[ActualitesRepositoryEvents][cleanDataBase] Error deleting the resources created by these users " + usersIds.toList().toString()
+								+ ". Message : " + event.left().getValue());
 					}
 				}
 			}));
 		} else {
-			log.error("[ActualitesRepositoryEvents][anonymizeOwner] usersIds is empty");
+			log.warn("[ActualitesRepositoryEvents][cleanDataBase] usersIds is null or empty");
 		}
 	}
 
