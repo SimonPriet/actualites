@@ -1,5 +1,7 @@
 package net.atos.entng.actualites.services.impl;
 
+import static net.atos.entng.actualites.Actualites.MANAGE_RIGHT_ACTION;
+
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
@@ -16,12 +18,6 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 
 	private static final Logger log = LoggerFactory.getLogger(ActualitesRepositoryEvents.class);
 	private final boolean shareOldGroupsToUsers;
-
-	private static final String ANONYMOUS_PERSONNEL_ID = "1";
-	private static final String ANONYMOUS_TEACHER_ID = "2";
-	private static final String ANONYMOUS_STUDENT_ID = "3";
-	private static final String ANONYMOUS_RELATIVE_ID = "4";
-	private static final String MANAGE_RIGHT_ACTION = "net-atos-entng-actualites-controllers-ThreadController|updateThread";
 
 	public ActualitesRepositoryEvents(boolean shareOldGroupsToUsers) {
 		this.shareOldGroupsToUsers = shareOldGroupsToUsers;
@@ -50,10 +46,9 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 						@Override
 						public void handle(Either<String, JsonObject> event) {
 							if (event.isRight()) {
-								log.info("[ActualitesRepositoryEvents][deleteGroups]The groups " + gIds.toList().toString() + " and their shares are deleted");
+								log.info("[ActualitesRepositoryEvents][deleteGroups]The groups and their shares are deleted");
 							} else {
-								log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting these groups " + gIds.toList().toString()
-										+ " and their shares. Message : " + event.left().getValue());
+								log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting the groups and their shares. Message : " + event.left().getValue());
 							}
 						}
 					}));
@@ -69,58 +64,21 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 
 	@Override
 	public void deleteUsers(JsonArray users) {
+		// TODO : make the user anonymous
 		if (users != null && users.size() > 0) {
-			final JsonArray personnelIds = new JsonArray();
-			final JsonArray teacherIds = new JsonArray();
-			final JsonArray studentIds = new JsonArray();
-			final JsonArray relativeIds = new JsonArray();
-			// Divide users ids by profiles
+			final JsonArray uIds = new JsonArray();
 			for (Object u : users) {
 				if (!(u instanceof JsonObject)) continue;
 				final JsonObject j = (JsonObject) u;
-				if("Personnel".equals(j.getString("type"))) {
-					personnelIds.add(j.getString("id"));
-				} else {
-					if ("Teacher".equals(j.getString("type"))) {
-						teacherIds.add(j.getString("id"));
-					} else {
-						if ("Student".equals(j.getString("type"))) {
-							studentIds.add(j.getString("id"));
-						} else {
-							if ("Relative".equals(j.getString("type"))) {
-								relativeIds.add(j.getString("id"));
-							}
-						}
-					}
-				}
+				uIds.add(j.getString("id"));
 			}
-			// Clean the database after the users are artificially deleted.
-			if (personnelIds.size() > 0) {
-				this.cleanDataBase(personnelIds, ANONYMOUS_PERSONNEL_ID);
-			}
-			if (teacherIds.size() > 0) {
-				this.cleanDataBase(teacherIds, ANONYMOUS_TEACHER_ID);
-			}
-			if (studentIds.size() > 0) {
-				this.cleanDataBase(studentIds, ANONYMOUS_STUDENT_ID);
-			}
-			if (relativeIds.size() > 0) {
-				this.cleanDataBase(relativeIds, ANONYMOUS_RELATIVE_ID);
-			}
-		} else {
-			log.warn("[ActualitesRepositoryEvents][deleteUsers] users is empty");
-		}
-	}
-
-	private void cleanDataBase(final JsonArray usersIds, String anonymousId) {
-		if (usersIds != null && usersIds.size() > 0) {
 			SqlStatementsBuilder statementsBuilder = new SqlStatementsBuilder();
 			// Remove all thread shares from thread_shares table
-			statementsBuilder.prepared("DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(usersIds.toArray()), usersIds);
+			statementsBuilder.prepared("DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(uIds.toArray()), uIds);
 			// Remove all news shares from info_shares table
-			statementsBuilder.prepared("DELETE FROM actualites.info_shares WHERE member_id IN " + Sql.listPrepared(usersIds.toArray()), usersIds);
+			statementsBuilder.prepared("DELETE FROM actualites.info_shares WHERE member_id IN " + Sql.listPrepared(uIds.toArray()), uIds);
 			// Delete users (Set deleted = true in users table)
-			statementsBuilder.prepared("UPDATE actualites.users SET deleted = true WHERE id IN " + Sql.listPrepared(usersIds.toArray()), usersIds);
+			statementsBuilder.prepared("UPDATE actualites.users SET deleted = true WHERE id IN " + Sql.listPrepared(uIds.toArray()), uIds);
 			// Delete all threads where the owner is deleted and no manager rights shared on these resources
 			// Cascade delete : the news that belong to these threads will be deleted too
 			// thus, no need to delete news that do not have a manager because the thread owner is still there
@@ -133,21 +91,21 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 										  " GROUP BY t.id, ts.action" +
 										  " HAVING count(ts.action) = 0 OR ts.action != ?" +
 									  ")"
-								  	  , new JsonArray(MANAGE_RIGHT_ACTION));
+								  	  , new JsonArray().add(MANAGE_RIGHT_ACTION));
 			Sql.getInstance().transaction(statementsBuilder.build(), SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
 				@Override
 				public void handle(Either<String, JsonObject> event) {
 					if (event.isRight()) {
-						log.info("[ActualitesRepositoryEvents][cleanDataBase] The resources created by these users " + usersIds.toList().toString() + " are deleted");
+						log.info("[ActualitesRepositoryEvents][cleanDataBase] The resources created by users are deleted");
 					} else {
-						log.error("[ActualitesRepositoryEvents][cleanDataBase] Error deleting the resources created by these users " + usersIds.toList().toString()
-								+ ". Message : " + event.left().getValue());
+						log.error("[ActualitesRepositoryEvents][cleanDataBase] Error deleting the resources created by users. Message : " + event.left().getValue());
 					}
 				}
 			}));
 		} else {
-			log.warn("[ActualitesRepositoryEvents][cleanDataBase] usersIds is null or empty");
+			log.warn("[ActualitesRepositoryEvents][deleteUsers] users is empty");
 		}
 	}
+
 
 }

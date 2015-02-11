@@ -16,15 +16,17 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 
 public class Actualites extends BaseServer {
-	public static final String THREAD_RESOURCE_ID = "threadid";
+	public final static String THREAD_RESOURCE_ID = "threadid";
 	public final static String THREAD_TABLE = "thread";
 	public final static String THREAD_SHARE_TABLE = "thread_shares";
 
-	public static final String INFO_RESOURCE_ID = "infoid";
+	public final static String INFO_RESOURCE_ID = "infoid";
 	public final static String INFO_TABLE = "info";
 	public final static String INFO_SHARE_TABLE = "info_shares";
 
 	public final static String COMMENT_TABLE = "comment";
+
+	public final static String MANAGE_RIGHT_ACTION = "net-atos-entng-actualites-controllers-ThreadController|updateThread";
 
 	@Override
 	public void start() {
