@@ -21,16 +21,8 @@
 <div ng-repeat="info in infos.all | orderBy:[sortByIsHeadline,'modified.$date']:true">
 	<div class="row vertical-spacing"></div>
 	<div ng-if="isInfoVisible(info)" class="illustrated-article" ng-class="{headline: info.is_headline}">
-		<div class="illustration" ng-click="openThread(info.thread_id, info.thread_title)">
-			<div class="image">
-				<img ng-src="[[info.thread_icon]]?thumbnail=150x150" ng-if="info.thread_icon" />
-				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread_icon" />
-			</div>
-			<legend>
-				<strong>[[info.thread_title]]</strong>
-			</legend>
-		</div>
-		<article class="illustrated-text">
+
+		<article class="illustrated-text header">
 			<div ng-if="currentInfo._id !== info._id">
 				<div ng-include="template.containers.infoView"></div>
 			</div>
