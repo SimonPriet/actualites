@@ -1,6 +1,6 @@
 var actualitesBehaviours = {
 	resources: {
-		view: {
+		viewThread: {
 			right: 'net-atos-entng-actualites-controllers-ThreadController|getThread'
 		},
 		editThread: {

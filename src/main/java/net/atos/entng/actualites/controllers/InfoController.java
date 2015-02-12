@@ -100,7 +100,7 @@ public class InfoController extends ControllerHelper {
 	@Get("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/infos")
 	@ApiDoc("Get infos in thread by thread id.")
 	@ResourceFilter(ThreadFilter.class)
-	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void listInfosByThreadId(final HttpServerRequest request) {
 		// TODO IMPROVE : Security on Infos visibles by statuses / dates is not enforced
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);

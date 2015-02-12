@@ -76,7 +76,7 @@ public class ThreadController extends ControllerHelper {
 	@Get("/thread/:" + Actualites.THREAD_RESOURCE_ID)
 	@ApiDoc("Get Thread by id.")
 	@ResourceFilter(ThreadFilter.class)
-	@SecuredAction(value = "thread.read", type = ActionType.RESOURCE)
+	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
 	public void getThread(final HttpServerRequest request) {
 		final String threadId = request.params().get(Actualites.THREAD_RESOURCE_ID);
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {

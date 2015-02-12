@@ -11,7 +11,6 @@ import net.atos.entng.actualites.Actualites;
 import net.atos.entng.actualites.filters.InfoFilter;
 import net.atos.entng.actualites.services.InfoService;
 import net.atos.entng.actualites.services.impl.InfoServiceSqlImpl;
-import net.atos.entng.actualites.services.impl.ThreadServiceSqlImpl;
 
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
