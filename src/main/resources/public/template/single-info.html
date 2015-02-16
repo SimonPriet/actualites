@@ -7,16 +7,7 @@
 
 	<div class="row vertical-spacing"></div>
 	<div class="illustrated-article" ng-class="{headline: info.is_headline}">
-		<div class="illustration">
-			<div class="image">
-				<img ng-src="[[info.thread_icon]]?thumbnail=150x150" ng-if="info.thread_icon" />
-				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread_icon" />
-			</div>
-			<legend>
-				<strong>[[info.thread_title]]</strong>
-			</legend>
-		</div>
-		<article class="illustrated-text">
+		<article class="illustrated-text header">
 			<div ng-if="currentInfo !== info">
 				<div ng-include="template.containers.infoView"></div>
 			</div>
