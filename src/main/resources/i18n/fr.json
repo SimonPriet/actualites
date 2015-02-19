@@ -101,7 +101,7 @@
     "thread.list.view": "Gestion des fils d'actualités",
     "thread.list.view.error.401": "Vous n'avez pas les droits d'accès pour ce contenu.",
     "thread.list.view.error.404": "Ce contenu n'existe plus.",
-    "thread.manager": "Gestion",
+    "thread.manager": "Gérer",
     "thread.publish": "Publier",
     "thread.read": "Lire",
     "thread.title": "Titre du fil d'actualités",
