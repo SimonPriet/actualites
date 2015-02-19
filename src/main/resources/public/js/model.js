@@ -359,6 +359,9 @@ Thread.prototype.remove = function(){
 
 model.build = function(){
 
+	// custom directives loading
+	loader.loadFile('/actualites/public/js/additional.js');
+
 	model.me.workflow.load(['actualites']);
 	this.makeModels([Info, Thread, Comment]);
 

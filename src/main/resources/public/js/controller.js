@@ -1,6 +1,3 @@
-// custom loading
-loader.loadFile('/actualites/public/js/additional.js');
-
 routes.define(function($routeProvider){
     $routeProvider
         .when('/view/thread/:threadId', {
