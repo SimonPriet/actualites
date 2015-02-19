@@ -186,14 +186,14 @@ Info.prototype.unsubmit = function(){
 
 Info.prototype.publish = function(){
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title });
+	http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title, owner: this.owner, username: this.username });
 };
 
 Info.prototype.unpublish = function(canSkipPendingStatus){
 	var that = this;
 	if(!canSkipPendingStatus) {
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', { title: this.title });
+		http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', { title: this.title, owner: this.owner, username: this.username });
 	}
 	else {
 		this.unsubmit();

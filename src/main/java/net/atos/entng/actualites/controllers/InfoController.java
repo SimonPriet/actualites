@@ -387,11 +387,14 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject body) {
 						final String title = body.getString("title");
+						final UserInfos owner = new UserInfos();
+						owner.setUserId(body.getString("owner"));
+						owner.setUsername(body.getString("username"));
 						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
 							@Override
 							public void handle(Either<String, JsonObject> event) {
 								if (event.isRight()) {
-									notifyTimeline(request, user, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
+									notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
 									JsonObject error = new JsonObject().putString("error", event.left().getValue());
@@ -422,11 +425,14 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject body) {
 						final String title = body.getString("title");
+						final UserInfos owner = new UserInfos();
+						owner.setUserId(body.getString("owner"));
+						owner.setUsername(body.getString("username"));
 						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
 							@Override
 							public void handle(Either<String, JsonObject> event) {
 								if (event.isRight()) {
-									notifyTimeline(request, user, threadId, infoId, title, NEWS_UNPUBLISH_EVENT_TYPE);
+									notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_UNPUBLISH_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
 									JsonObject error = new JsonObject().putString("error", event.left().getValue());
@@ -591,8 +597,14 @@ public class InfoController extends ControllerHelper {
 	public void shareInfoRemove(final HttpServerRequest request) {
 		removeShare(request, false);
 	}
-
+	
 	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType){
+		// the news owner is behind the action
+		UserInfos owner = user;
+		notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
+	}
+
+	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final UserInfos owner, final String threadId, final String infoId, final String title, final String eventType){
 		if (eventType.equals(NEWS_SUBMIT_EVENT_TYPE)) {
 			threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
 				@Override
@@ -600,7 +612,7 @@ public class InfoController extends ControllerHelper {
 					if (event.isRight()) {
 						// get all ids
 						JsonArray shared = event.right().getValue();
-						extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-submitted.html");
+						extractUserIds(request, shared, user, owner, threadId, infoId, title, eventType, "notify-news-submitted.html");
 					}
 				}
 			});
@@ -613,7 +625,7 @@ public class InfoController extends ControllerHelper {
 						if (event.isRight()) {
 							// get all ids
 							JsonArray shared = event.right().getValue();
-							extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-unsubmitted.html");
+							extractUserIds(request, shared, user, owner, threadId, infoId, title, eventType, "notify-news-unsubmitted.html");
 						}
 					}
 				});
@@ -626,7 +638,7 @@ public class InfoController extends ControllerHelper {
 							if (event.isRight()) {
 								// get all ids
 								JsonArray shared = event.right().getValue();
-								extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-published.html");
+								extractUserIds(request, shared, user, owner, threadId, infoId, title, eventType, "notify-news-published.html");
 							}
 						}
 					});
@@ -639,7 +651,7 @@ public class InfoController extends ControllerHelper {
 								if (event.isRight()) {
 									// get all ids
 									JsonArray shared = event.right().getValue();
-									extractUserIds(request, shared, user, threadId, infoId, title, eventType, "notify-news-unpublished.html");
+									extractUserIds(request, shared, user, owner, threadId, infoId, title, eventType, "notify-news-unpublished.html");
 								}
 							}
 						});
@@ -649,7 +661,7 @@ public class InfoController extends ControllerHelper {
 		}
 	}
 
-	private void extractUserIds(final HttpServerRequest request, final JsonArray shared, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType, final String template){
+	private void extractUserIds(final HttpServerRequest request, final JsonArray shared, final UserInfos user, final UserInfos owner, final String threadId, final String infoId, final String title, final String eventType, final String template){
 		final List<String> ids = new ArrayList<String>();
 		if (shared.size() > 0) {
 			JsonObject jo = null;
@@ -661,7 +673,7 @@ public class InfoController extends ControllerHelper {
 				jo = (JsonObject) shared.get(i);
 				if(jo.containsField("userId")){
 					id = jo.getString("userId");
-					if(!ids.contains(id) && !(user.getUserId().equals(id))){
+					if(!ids.contains(id) && !(user.getUserId().equals(id)) && !(owner.getUserId().equals(id))){
 						ids.add(id);
 					}
 					remaining.getAndDecrement();
@@ -678,13 +690,13 @@ public class InfoController extends ControllerHelper {
 										for (Object o : event) {
 											if (!(o instanceof JsonObject)) continue;
 											userId = ((JsonObject) o).getString("id");
-											if(!ids.contains(userId) && !(user.getUserId().equals(userId))){
+											if(!ids.contains(userId) && !(user.getUserId().equals(userId)) && !(owner.getUserId().equals(userId))){
 												ids.add(userId);
 											}
 										}
 									}
 									if (remaining.decrementAndGet() < 1) {
-										sendNotify(request, ids, user, threadId, infoId, title, eventType, template);
+										sendNotify(request, ids, owner, threadId, infoId, title, eventType, template);
 									}
 								}
 							});
@@ -693,19 +705,19 @@ public class InfoController extends ControllerHelper {
 				}
 			}
 			if (remaining.get() < 1) {
-				sendNotify(request, ids, user, threadId, infoId, title, eventType, template);
+				sendNotify(request, ids, owner, threadId, infoId, title, eventType, template);
 			}
 		}
 	}
 
-	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType, final String template){
-		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && user != null) {
+	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos owner, final String threadId, final String infoId, final String title, final String eventType, final String template){
+		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && owner != null) {
 			JsonObject params = new JsonObject()
-				.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
-				.putString("username", user.getUsername())
+				.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
+				.putString("username", owner.getUsername())
 				.putString("info", title)
 				.putString("actuUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
-			notification.notifyTimeline(request, user, EVENT_TYPE, eventType, ids, infoId, template, params);
+			notification.notifyTimeline(request, owner, EVENT_TYPE, eventType, ids, infoId, template, params);
 		}
 	}
 
