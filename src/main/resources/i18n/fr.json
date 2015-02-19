@@ -78,7 +78,7 @@
     "actualites.widget.title": "Actualités",
     "filters.drafts": "Brouillons",
     "filters.published": "Publiées",
-    "filters.submitted": "Soumises",
+    "filters.submitted": "A publier",
     "group.AdminLocal": "Tous les administrateurs locaux",
     "group.Personnel": "Tous les personnels du groupe {0}.",
     "group.Relative": "Tous les parents du groupe {0}.",
