@@ -58,7 +58,8 @@ public class InfoController extends ControllerHelper {
 	private static final String NEWS_UNPUBLISH_EVENT_TYPE = EVENT_TYPE + "_UNPUBLISH";
 
 
-	// TRASH: 1; DRAFT: 1; PENDING: 2; PUBLISHED: 3
+	// TODO : refactor code to use enums or constants for statuses
+	// TRASH: 0; DRAFT: 1; PENDING: 2; PUBLISHED: 3
 	private static final List<Integer> status_list = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3));
 
 	protected final InfoService infoService;

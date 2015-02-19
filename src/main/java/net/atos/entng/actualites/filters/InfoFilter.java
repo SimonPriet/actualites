@@ -40,9 +40,10 @@ public class InfoFilter implements ResourcesProvider {
 			// Groups and users
 			final List<String> groupsAndUserIds = new ArrayList<>();
 			groupsAndUserIds.add(user.getUserId());
-			if (user.getProfilGroupsIds() != null) {
-				groupsAndUserIds.addAll(user.getProfilGroupsIds());
+			if (user.getGroupsIds() != null) {
+				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
+
 			// Query
 			StringBuilder query = new StringBuilder();
 			JsonArray values = new JsonArray();
@@ -51,24 +52,52 @@ public class InfoFilter implements ResourcesProvider {
 				.append(" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id")
 				.append(" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id")
 				.append(" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id")
-				.append(" WHERE i.id = ? ")
-				.append(" AND ((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ios.action = ? AND i.status > 2))")
-				.append(" OR  ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1))");
+				.append(" WHERE i.id = ? ");
 			values.add(Sql.parseId(id));
+
+			query.append(" AND (");
+			if(isInfoShareSubmitOrRemove(binding)) {
+				// info's owner can change shares (i.e. choose readers) only if status is different from published
+				query.append("((i.owner = ? AND i.status != 3)");
+			}
+			else {
+				query.append("(i.owner = ? ");
+			}
 			values.add(user.getUserId());
+
+			query.append(" OR (ios.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
+				.append(" AND ios.action = ? AND i.status > 2))");
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
 			values.add(sharedMethod);
+
+
+			query.append(" OR")
+				.append(" ((t.owner = ?");
 			values.add(user.getUserId());
+
+			query.append("OR (ts.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()));
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
 			if(isInfoAction(binding) || isInfoPending(binding)){
-				values.add("net-atos-entng-actualites-controllers-InfoController|publish");
+				// Authorize if user is a publisher or a manager
+				query.append(" AND ts.action = 'net-atos-entng-actualites-controllers-InfoController|publish'");
+			} else if (isInfoShareSubmitOrRemove(binding)) {
+				// An info's owner, who's not a publisher nor a manager, can change shares (i.e. choose readers) only if status is different from published
+				query.append(" AND ((ts.action = ? AND i.status != 3)");
+				values.add(sharedMethod);
+
+				// A publisher or manager can change shares, whatever the status
+				query.append(" OR ts.action = 'net-atos-entng-actualites-controllers-InfoController|publish')");
 			} else {
+				query.append(" AND ts.action = ?");
 				values.add(sharedMethod);
 			}
+
+			query.append(")) AND i.status > 1))");
+
 			// Execute
 			Sql.getInstance().prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
 				@Override
@@ -93,10 +122,14 @@ public class InfoFilter implements ResourcesProvider {
 
 	private boolean isInfoShare(final Binding binding) {
 		return ("net.atos.entng.actualites.controllers.InfoController|shareInfo".equals(binding.getServiceMethod()) ||
-				 "net.atos.entng.actualites.controllers.InfoController|shareInfoSubmit".equals(binding.getServiceMethod()) ||
+				isInfoShareSubmitOrRemove(binding));
+	}
+
+	private boolean isInfoShareSubmitOrRemove(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|shareInfoSubmit".equals(binding.getServiceMethod()) ||
 				 "net.atos.entng.actualites.controllers.InfoController|shareInfoRemove".equals(binding.getServiceMethod() )
 				);
-	}
+	};
 
 	private boolean isInfoPending(final Binding binding) {
 		return ("net.atos.entng.actualites.controllers.InfoController|unsubmit".equals(binding.getServiceMethod()) ||
