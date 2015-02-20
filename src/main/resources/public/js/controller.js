@@ -608,6 +608,23 @@ function ActualitesController($scope, template, route, model){
 		return false;
 	};
 
+	// return true if user can view shares, but not change them. Return false otherwise
+	$scope.canOnlyViewInfoShares = function(info){
+		if(info === undefined || info.thread === undefined) {
+			return true;
+		}
+
+		if(info.thread.owner === model.me.userId || $scope.canPublish(info.thread)) {
+			// a manager or publisher can change info's shares
+			return false;
+		}
+		else if (info.owner === model.me.userId && info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED) {
+			// info's owner cannot change shares if info is already published
+			return true;
+		}
+		return false;
+	};
+
 	// A moderator can validate his own drafts (he does not need to go through status 'pending')
 	$scope.canSkipPendingStatus = function(info){
 		return (info && info.owner === model.me.userId && 

@@ -36,7 +36,9 @@
 <!-- Lightbox : Info share -->
 <div ng-if="infoToShare._id === info._id">
 	<lightbox show="display.showInfoSharePanel" on-close="cancelShareInfo()">
-		<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare"></share-panel>
+		<div ng-class="{'read-only': canOnlyViewInfoShares(infoToShare)}">
+			<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare" ></share-panel>
+		</div>
 	</lightbox>
 </div>
 <!-- Lightbox : Info delete -->
