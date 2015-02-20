@@ -12,12 +12,16 @@
 
 	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> <i18n>actualites.create.date.publish</i18n></label>
-		<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker-actu>
+		<span ng-show="currentInfo.hasPublicationDate">
+			<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker-actu>
+		</span>
 	</div>
 
 	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> <i18n>actualites.create.date.expire</i18n></label>
-		<date-picker-actu min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker-actu>
+		<span ng-show="currentInfo.hasExpirationDate">
+			<date-picker-actu min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker-actu>
+		</span>
 	</div>
 	<div class="row">
 		<label class="three cell"><input ng-model="currentInfo.is_headline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
