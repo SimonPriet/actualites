@@ -114,7 +114,7 @@ public class InfoFilter implements ResourcesProvider {
 
 	private boolean isInfoAction(final Binding binding) {
 		return ("net.atos.entng.actualites.controllers.InfoController|getInfo".equals(binding.getServiceMethod()) ||
-				 "net.atos.entng.actualites.controllers.CommentController|Comment".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.CommentController|comment".equals(binding.getServiceMethod()) ||
 				 "net.atos.entng.actualites.controllers.CommentController|updateComment".equals(binding.getServiceMethod()) ||
 				 "net.atos.entng.actualites.controllers.CommentController|deleteComment".equals(binding.getServiceMethod() )
 				);
