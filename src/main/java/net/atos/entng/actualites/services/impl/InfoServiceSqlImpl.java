@@ -179,7 +179,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
 					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
-					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date >= NOW())))" +
+					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date + interval '1 days' >= NOW())))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY date DESC" +
 				" LIMIT ?";
@@ -219,7 +219,7 @@ public class InfoServiceSqlImpl implements InfoService {
 				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
 					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
 				" AND (i.status = 3" +
-					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date >= NOW())))" +
+					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date + interval '1 days' >= NOW())))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.title";
 			for(String value : groupsAndUserIds){

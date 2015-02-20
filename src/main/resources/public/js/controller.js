@@ -179,7 +179,7 @@ function ActualitesController($scope, template, route, model){
                 }
             }
             if (info.hasExpirationDate === true) {
-                if (moment().isAfter(getDateAsMoment(info.expiration_date))) {
+                if (moment().isAfter(getDateAsMoment(info.expiration_date).add(1, 'days'))) {
                     return false;
                 }
             }
@@ -357,7 +357,7 @@ function ActualitesController($scope, template, route, model){
     			// label (A venir)
     			return "actualites.edition.status.4" ;
     		}
-    		if(info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date)) ){
+    		if(info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date).add(1, 'days')) ){
     			// label (Expiree)
     			return "actualites.edition.status.5" ;
     		}
