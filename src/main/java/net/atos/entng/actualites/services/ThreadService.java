@@ -11,8 +11,10 @@ public interface ThreadService {
 
 	public void list(UserInfos user, Handler<Either<String, JsonArray>> handler);
 
+	public void retrieve(String id, Handler<Either<String, JsonObject>> handler);
+	
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
-	public void getPublishSharedWithIds(String categoryId, UserInfos user, Handler<Either<String, JsonArray>> handler);
+	public void getPublishSharedWithIds(String threadId, Handler<Either<String, JsonArray>> handler);
 
 }

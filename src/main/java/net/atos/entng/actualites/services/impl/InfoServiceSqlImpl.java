@@ -18,6 +18,34 @@ public class InfoServiceSqlImpl implements InfoService {
 	private static final String THREAD_PUBLISH = "net-atos-entng-actualites-controllers-InfoController|publish";
 
 	@Override
+	public void retrieve(String id, Handler<Either<String, JsonObject>> handler) {
+			String query;
+			JsonArray values = new JsonArray();
+			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
+				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
+				", (SELECT json_agg(cr.*) FROM (" +
+					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
+					" FROM actualites.comment AS c" +
+					" LEFT JOIN actualites.users AS au ON c.owner = au.id" +
+					" WHERE i.id = c.info_id" +
+					" ORDER BY c.modified ASC) cr)" +
+					" AS comments" +
+				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
+				", array_to_json(array_agg(group_id)) as groups" +
+				" FROM actualites.info AS i" +
+				" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id" +
+				" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
+				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
+				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
+				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
+				" WHERE i.id = ? " +
+				" GROUP BY i.id, u.username, t.id" +
+				" ORDER BY i.modified DESC";
+			values.add(Sql.parseId(id));
+			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseSharedUnique(handler));
+	}
+	
+	@Override
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler) {
 		if (user != null) {
 			String query;
@@ -236,8 +264,8 @@ public class InfoServiceSqlImpl implements InfoService {
 	}
 
 	@Override
-	public void getSharedWithIds(String infoId, UserInfos user, final Handler<Either<String, JsonArray>> handler) {
-		this.retrieve(infoId, user, new Handler<Either<String, JsonObject>>() {
+	public void getSharedWithIds(String infoId, final Handler<Either<String, JsonArray>> handler) {
+		this.retrieve(infoId, new Handler<Either<String, JsonObject>>() {
 			@Override
 			public void handle(Either<String, JsonObject> event) {
 				JsonArray sharedWithIds = new JsonArray();

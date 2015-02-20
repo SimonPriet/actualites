@@ -16,6 +16,26 @@ import net.atos.entng.actualites.services.ThreadService;
 public class ThreadServiceSqlImpl implements ThreadService {
 
 	@Override
+	public void retrieve(String id, Handler<Either<String, JsonObject>> handler) {
+		String query;
+		JsonArray values = new JsonArray();
+		if (id != null) {
+			query = "SELECT t.id as _id, t.title, t.icon, t.mode, t.created, t.modified, t.owner, u.username" +
+				", json_agg(row_to_json(row(ts.member_id, ts.action)::actualites.share_tuple)) as shared" +
+				", array_to_json(array_agg(group_id)) as groups" +
+				" FROM actualites.thread AS t" +
+				" LEFT JOIN actualites.users AS u ON t.owner = u.id" +
+				" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
+				" LEFT JOIN actualites.members AS m ON (ts.member_id = m.id AND m.group_id IS NOT NULL)" +
+				" WHERE t.id = ? " +
+				" GROUP BY t.id, u.username" +
+				" ORDER BY t.modified DESC";
+			values.add(Sql.parseId(id));
+			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseSharedUnique(handler));
+		}
+	}
+	
+	@Override
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler) {
 		String query;
 		JsonArray values = new JsonArray();
@@ -74,8 +94,8 @@ public class ThreadServiceSqlImpl implements ThreadService {
 	}
 
 	@Override
-	public void getPublishSharedWithIds(String threadId, UserInfos user, final Handler<Either<String, JsonArray>> handler) {
-		this.retrieve(threadId, user, new Handler<Either<String, JsonObject>>() {
+	public void getPublishSharedWithIds(String threadId, final Handler<Either<String, JsonArray>> handler) {
+		this.retrieve(threadId, new Handler<Either<String, JsonObject>>() {
 			@Override
 			public void handle(Either<String, JsonObject> event) {
 				JsonArray sharedWithIds = new JsonArray();

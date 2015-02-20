@@ -9,6 +9,8 @@ import fr.wseduc.webutils.Either;
 
 public interface InfoService {
 
+	public void retrieve(String id, Handler<Either<String, JsonObject>> handler);
+	
 	public void retrieve(String id, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
 	public void list(UserInfos user, Handler<Either<String, JsonArray>> handler);
@@ -19,6 +21,6 @@ public interface InfoService {
 
 	public void listForLinker(UserInfos user, Handler<Either<String, JsonArray>> handler);
 
-	public void getSharedWithIds(String infoId, UserInfos user, Handler<Either<String, JsonArray>> handler);
+	public void getSharedWithIds(String infoId, Handler<Either<String, JsonArray>> handler);
 
 }

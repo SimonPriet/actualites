@@ -602,12 +602,12 @@ public class InfoController extends ControllerHelper {
 	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final String threadId, final String infoId, final String title, final String eventType){
 		// the news owner is behind the action
 		UserInfos owner = user;
-		notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
+		notifyTimeline(request, user, owner, threadId, infoId, title, eventType);
 	}
 
 	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final UserInfos owner, final String threadId, final String infoId, final String title, final String eventType){
 		if (eventType.equals(NEWS_SUBMIT_EVENT_TYPE)) {
-			threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+			threadService.getPublishSharedWithIds(threadId, new Handler<Either<String, JsonArray>>() {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
 					if (event.isRight()) {
@@ -620,7 +620,7 @@ public class InfoController extends ControllerHelper {
 		}
 		else {
 			if(eventType.equals(NEWS_UNSUBMIT_EVENT_TYPE)){
-				threadService.getPublishSharedWithIds(threadId, user, new Handler<Either<String, JsonArray>>() {
+				threadService.getPublishSharedWithIds(threadId, new Handler<Either<String, JsonArray>>() {
 					@Override
 					public void handle(Either<String, JsonArray> event) {
 						if (event.isRight()) {
@@ -633,7 +633,7 @@ public class InfoController extends ControllerHelper {
 			}
 			else{
 				if(eventType.equals(NEWS_PUBLISH_EVENT_TYPE)){
-					infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
+					infoService.getSharedWithIds(infoId, new Handler<Either<String, JsonArray>>() {
 						@Override
 						public void handle(Either<String, JsonArray> event) {
 							if (event.isRight()) {
@@ -646,7 +646,7 @@ public class InfoController extends ControllerHelper {
 				}
 				else{
 					if(eventType.equals(NEWS_UNPUBLISH_EVENT_TYPE)){
-						infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
+						infoService.getSharedWithIds(infoId, new Handler<Either<String, JsonArray>>() {
 							@Override
 							public void handle(Either<String, JsonArray> event) {
 								if (event.isRight()) {

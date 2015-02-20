@@ -117,7 +117,7 @@ public class CommentController extends ControllerHelper {
 
 	private void notifyTimeline(final HttpServerRequest request, final UserInfos user, final String infoId, final String commentId, final String title, final String commentText, final String eventType){
 		if (eventType.equals(NEWS_COMMENT_EVENT_TYPE)) {
-			infoService.getSharedWithIds(infoId, user, new Handler<Either<String, JsonArray>>() {
+			infoService.getSharedWithIds(infoId, new Handler<Either<String, JsonArray>>() {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
 					if (event.isRight()) {
