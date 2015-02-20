@@ -304,7 +304,9 @@ Thread.prototype.toJSON = function(){
 
 Thread.prototype.saveModifications = function(){
 	this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
-	http().putJson('/actualites/thread/' + this._id, this);
+	http().putJson('/actualites/thread/' + this._id, this).done(function(){
+		model.infos.sync();
+	});
 };
 
 Thread.prototype.save = function(){
@@ -354,7 +356,9 @@ Thread.prototype.pushPublishedInfo = function(info){
 };
 
 Thread.prototype.remove = function(){
-	http().delete('/actualites/thread/' + this._id);
+	http().delete('/actualites/thread/' + this._id).done(function(){
+		model.infos.sync();
+	});
 };
 
 model.build = function(){
@@ -383,7 +387,7 @@ model.build = function(){
 			this.selection().forEach(function(thread){
 				thread.remove();
 			});
-
+			model.infos.sync();
 			Collection.prototype.removeSelection.call(this);
 		}
 	});
