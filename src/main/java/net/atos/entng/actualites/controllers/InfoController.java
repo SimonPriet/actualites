@@ -242,6 +242,12 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						resource.putNumber("status", status_list.get(1));
+						if(!resource.containsField("expiration_date")){
+						    resource.putString("expiration_date", null);
+						}
+						if(!resource.containsField("publication_date")){
+                            resource.putString("publication_date", null);
+                        }
 						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
@@ -262,6 +268,12 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						resource.putNumber("status", status_list.get(2));
+						if(!resource.containsField("expiration_date")){
+                            resource.putString("expiration_date", null);
+                        }
+                        if(!resource.containsField("publication_date")){
+                            resource.putString("publication_date", null);
+                        }
 						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
@@ -282,6 +294,12 @@ public class InfoController extends ControllerHelper {
 					@Override
 					public void handle(JsonObject resource) {
 						resource.putNumber("status", status_list.get(3));
+						if(!resource.containsField("expiration_date")){
+                            resource.putString("expiration_date", null);
+                        }
+                        if(!resource.containsField("publication_date")){
+                            resource.putString("publication_date", null);
+                        }
 						crudService.update(infoId, resource, user, notEmptyResponseHandler(request));
 					}
 				});
