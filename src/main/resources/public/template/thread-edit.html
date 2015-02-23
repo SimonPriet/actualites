@@ -5,24 +5,24 @@
 	<div class="two cell">
 		<image-select ng-model="currentThread.icon" default="/img/illustrations/actualites-default.png" thumbnails="[{ width: 290, height: 290 }]" class="absolute"></image-select>
 	</div>
-	<div class="six cell height-two left-two">
+	<form class="ten cell height-two left-two" ng-submit="saveThread()">
 		<div class="absolute">
 			<div class="row">
 				<div class="twelve cell horizontal-spacing-twice">
 					<div class="row">
 						<label class="four cell"><i18n>thread.title</i18n></label>
-						<input type="text" class="eight cell" ng-model="currentThread.title" />
+						<input type="text" required class="eight cell" ng-model="currentThread.title" />
 					</div>
 				</div>
 			</div>
 			<div class="row bottom-locked">
 				<div class="twelve cell horizontal-spacing-twice">
-					<button class="right-magnet" ng-click="saveThread()"><i18n>save</i18n></button>
+					<input type="submit" class="right-magnet" i18n-value="save" />
 					<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelEditThread()" />
 				</div>
 			</div>
 		</div>
 
-	</div>
+	</form>
 
 </article>
