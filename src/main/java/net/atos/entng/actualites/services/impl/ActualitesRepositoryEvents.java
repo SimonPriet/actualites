@@ -82,15 +82,17 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			// Delete all threads where the owner is deleted and no manager rights shared on these resources
 			// Cascade delete : the news that belong to these threads will be deleted too
 			// thus, no need to delete news that do not have a manager because the thread owner is still there
-			statementsBuilder.prepared("DELETE FROM actualites.thread WHERE id IN (" +
-										  " SELECT DISTINCT t.id" +
+			statementsBuilder.prepared("DELETE FROM actualites.thread" +
+									  " USING (" +
+										  " SELECT DISTINCT t.id, count(ts.member_id) AS managers" +
 										  " FROM actualites.thread AS t" +
-										  " lEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
-										  " LEFT JOIN actualites.users AS u ON t.owner = u.id" +
+										  " LEFT OUTER JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id AND ts.action = ?" +
+										  " LEFT OUTER JOIN actualites.users AS u ON t.owner = u.id" +
 										  " WHERE u.deleted = true" +
-										  " GROUP BY t.id, ts.action" +
-										  " HAVING count(ts.action) = 0 OR ts.action != ?" +
-									  ")"
+										  " GROUP BY t.id" +
+									 " ) a" +
+									 " WHERE actualites.thread.id = a.id" +
+									 " AND a.managers = 0"
 								  	  , new JsonArray().add(MANAGE_RIGHT_ACTION));
 			Sql.getInstance().transaction(statementsBuilder.build(), SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
 				@Override
