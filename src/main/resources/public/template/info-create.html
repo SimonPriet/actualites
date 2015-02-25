@@ -7,7 +7,7 @@
 
 	<div class="row">
 		<label class="three cell"><i18n>actualites.create.thread</i18n></label>
-		<select ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]" ng-options="thread as thread.title for thread in threads.filter(checkThreadsRightsFilter)" ng-model="currentInfo.thread" class="nine cell"></select>
+		<select ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]" ng-options="thread as thread.title for thread in threads.filter(checkThreadsRightsFilter) | orderBy:'title':false" ng-model="currentInfo.thread" class="nine cell"></select>
 	</div>
 
 	<div class="row">
