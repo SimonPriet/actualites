@@ -176,6 +176,10 @@ db.actualites.threads.find().forEach(function(thread){
 					if(info.comments){
 						info.comments.forEach(function(comment){
 							if(comment.comment && comment.author){
+                // Insert user if not exist
+                var user_query = "SELECT actualites.insert_user('" +
+                comment.author.replace(/'/g, "''") + "', '" + comment.authorName.replace(/'/g, "''") + "');";
+                print(user_query);
 								var comment_query = "INSERT INTO actualites.comment (owner, created, modified, comment, info_id) VALUES ('"
 									+ comment.author.replace(/'/g, "''") + "', '"
 									+ comment.posted.toISOString() + "', '"
