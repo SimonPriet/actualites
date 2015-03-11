@@ -578,9 +578,9 @@ public class InfoController extends ControllerHelper {
 										// notify only when info is published
 										setTimelineEventType(EVENT_TYPE);
 										JsonObject params = new JsonObject()
-											.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+											.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 											.putString("username", user.getUsername())
-											.putString("resourceUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+											.putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
 										String date = info.getString("publication_date");
 										if(date != null && !date.trim().isEmpty()){
@@ -732,10 +732,10 @@ public class InfoController extends ControllerHelper {
 	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos owner, final String threadId, final String infoId, final String title, final String eventType, final String template){
 		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && owner != null) {
 			JsonObject params = new JsonObject()
-				.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
+				.putString("profilUri", "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
 				.putString("username", owner.getUsername())
 				.putString("info", title)
-				.putString("actuUri", container.config().getString("host") + pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+				.putString("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 			notification.notifyTimeline(request, owner, EVENT_TYPE, eventType, ids, infoId, template, params);
 		}
 	}

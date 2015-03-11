@@ -188,10 +188,10 @@ public class CommentController extends ControllerHelper {
 			}
 			overview = overview.concat("</p>");
 			JsonObject params = new JsonObject()
-				.putString("profilUri", container.config().getString("host") + "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+				.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 				.putString("username", user.getUsername())
 				.putString("info", title)
-				.putString("actuUri", container.config().getString("host") + pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
+				.putString("actuUri", pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
 				.putString("overview", overview);
 			notification.notifyTimeline(request, user, EVENT_TYPE, eventType, ids, infoId, template, params);
 		}
