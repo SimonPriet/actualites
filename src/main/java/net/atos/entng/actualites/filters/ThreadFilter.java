@@ -40,8 +40,8 @@ public class ThreadFilter implements ResourcesProvider {
 			// Groups and users
 			final List<String> groupsAndUserIds = new ArrayList<>();
 			groupsAndUserIds.add(user.getUserId());
-			if (user.getProfilGroupsIds() != null) {
-				groupsAndUserIds.addAll(user.getProfilGroupsIds());
+			if (user.getGroupsIds() != null) {
+				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
 			// Query
 			StringBuilder query = new StringBuilder();

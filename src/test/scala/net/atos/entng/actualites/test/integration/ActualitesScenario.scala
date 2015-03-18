@@ -57,7 +57,7 @@ object ActualitesScenario {
   // *****************************************************************
   // **                            News                             **
   // *****************************************************************/
-  // Tests done using a theacher account who is the thread owner
+  // Tests done using a teacher account who is the thread owner
 
   // Create news
   .exec(http("Info Create")
@@ -65,6 +65,12 @@ object ActualitesScenario {
     .body(StringBody("""{"thread_id" : ${threadId}, "title" : "info created", "content": "info content created", "status": 42}""")) // status to check it is ignored
     .check(status.is(200),
         jsonPath("$.id").find.saveAs("infoId")
+      ))
+  .exec(http("Info Create")
+    .post("/actualites/thread/${threadId}/info")
+    .body(StringBody("""{"thread_id" : ${threadId}, "title" : "info created", "content": "info content created", "status": 42}""")) // status to check it is ignored
+    .check(status.is(200),
+        jsonPath("$.id").find.saveAs("otherInfoId")
       ))
   // Get the news created
   .exec(http("Info Get")
@@ -103,6 +109,10 @@ object ActualitesScenario {
     .put("/actualites/thread/${threadId}/info/${infoId}/submit")
 	.body(StringBody("""{"title" : "info updated", "owner": {"userId": "${teacherId}"}}"""))
     .check(status.is(200)))
+  .exec(http("Info Submit")
+    .put("/actualites/thread/${threadId}/info/${otherInfoId}/submit")
+  .body(StringBody("""{"title" : "info updated", "owner": {"userId": "${teacherId}"}}"""))
+    .check(status.is(200)))
   // Check if the news was submitted
   .exec(http("Info Get submitted")
     .get("/actualites/thread/${threadId}/info/${infoId}")
@@ -114,9 +124,18 @@ object ActualitesScenario {
     .put("/actualites/thread/${threadId}/info/${infoId}/publish")
 	.body(StringBody("""{"title" : "info updated", "owner": "${teacherId}", "username": "${teacherLogin}" }"""))
     .check(status.is(200)))
+  .exec(http("Info Publish")
+    .put("/actualites/thread/${threadId}/info/${otherInfoId}/publish")
+  .body(StringBody("""{"title" : "info updated", "owner": "${teacherId}", "username": "${teacherLogin}" }"""))
+    .check(status.is(200)))
   // Check if the news was published
   .exec(http("Info Get published")
     .get("/actualites/thread/${threadId}/info/${infoId}")
+    .check(status.is(200),
+        jsonPath("$.status").find.is("3")
+      ))
+  .exec(http("Info Get published")
+    .get("/actualites/thread/${threadId}/info/${otherInfoId}")
     .check(status.is(200),
         jsonPath("$.status").find.is("3")
       ))
@@ -219,11 +238,16 @@ object ActualitesScenario {
     .get("/actualites/thread/${threadId}/info/share/json/${infoId}")
     .check(status.is(200)))
 
-  // The theacher (news owner) shares read right with the student on the news
+  // The teacher (news owner) shares read right with the student on the news
   .exec(http("Share Read permission with Student as a Person")
     .put("/actualites/thread/${threadId}/info/share/json/${infoId}")
     .bodyPart(StringBodyPart("userId", "${studentId}"))
     .bodyPart(StringBodyPart("actions", "net-atos-entng-actualites-controllers-InfoController|getInfo"))
+    .check(status.is(200)))
+  // Publish the news, so that the student can read it
+  .exec(http("Info Publish")
+    .put("/actualites/thread/${threadId}/info/${infoId}/publish")
+  .body(StringBody("""{"title" : "info updated", "owner": "${teacherId}", "username": "${teacherLogin}" }"""))
     .check(status.is(200)))
   .exec(http("Logout 3 - teacher")
     .get("""/auth/logout""")
@@ -252,13 +276,18 @@ object ActualitesScenario {
     .post("/actualites/thread/${threadId}/info")
     .body(StringBody("""{"thread_id" : ${threadId}, "title" : "info not created", "content": "info not created"}"""))
     .check(status.is(401)))
+  .exec(http("Info List")
+    .get("/actualites/infos")
+    .check(status.is(200),
+      jsonPath("$[?(@._id == ${infoId})].status").is("3")
+      ))
   .exec(http("Info Get (nr)")
     .get("/actualites/thread/${threadId}/info/${infoId}")
     .check(status.is(200),
         jsonPath("$._id").find.is("${infoId}"),
-        jsonPath("$.title").find.is("info created"),
-        jsonPath("$.content").find.is("info content created"),
-        jsonPath("$.status").find.is("1")
+        jsonPath("$.title").find.is("info updated"),
+        jsonPath("$.content").find.is("info content updated"),
+        jsonPath("$.status").find.is("3")
       ))
   .exec(http("Info Update (nr)")
     .put("/actualites/thread/${threadId}/info/${infoId}/draft")
@@ -298,7 +327,7 @@ object ActualitesScenario {
     .formParam("""password""", """blipblop""")
     .check(status.is(302)))
 
-  // The theacher (news owner) shares comment right with the student on the news
+  // The teacher (news owner) shares comment right with the student on the news
   .exec(http("Share Comment permission with Student as a Person")
     .put("/actualites/thread/${threadId}/info/share/json/${infoId}")
     .bodyPart(StringBodyPart("userId", "${studentId}"))
@@ -341,7 +370,7 @@ object ActualitesScenario {
     .formParam("""password""", """blipblop""")
     .check(status.is(302)))
 
-  // The theacher (thread owner) shares contirb right with the student on the thread
+  // The teacher (thread owner) shares contrib right with the student on the thread
   .exec(http("Share Contrib permission with Student as a Person")
     .put("/actualites/thread/share/json/${threadId}")
     .bodyPart(StringBodyPart("userId", "${studentId}"))
@@ -359,10 +388,10 @@ object ActualitesScenario {
     .bodyPart(StringBodyPart("actions", "net-atos-entng-actualites-controllers-ThreadController|getThread"))
     .check(status.is(200)))
   // publication
-  .exec(http("Info Submit")
+/*  .exec(http("Info Submit")
     .put("/actualites/thread/${threadId}/info/${infoId}/submit")
 	.body(StringBody("""{"title" : "info updated shared contrib", "owner": {"userId": "${teacherId}"}}"""))
-    .check(status.is(200)))
+    .check(status.is(200))) */
   .exec(http("Logout 7 - teacher")
     .get("""/auth/logout""")
     .check(status.is(302)))
@@ -437,7 +466,7 @@ object ActualitesScenario {
     .formParam("""password""", """blipblop""")
     .check(status.is(302)))
 
-  // The theacher (thread owner) shares publish right with the student on the thread
+  // The teacher (thread owner) shares publish right with the student on the thread
   .exec(http("Share publish permission with Student as a Person")
     .put("/actualites/thread/share/json/${threadId}")
     .bodyPart(StringBodyPart("userId", "${studentId}"))
@@ -521,7 +550,7 @@ object ActualitesScenario {
     .formParam("""password""", """blipblop""")
     .check(status.is(302)))
 
-  // The theacher (thread owner) shares manage right with the student on the thread
+  // The teacher (thread owner) shares manage right with the student on the thread
   .exec(http("Share manage permission with Student as a Person")
     .put("/actualites/thread/share/json/${threadId}")
     .bodyPart(StringBodyPart("userId", "${studentId}"))
@@ -574,16 +603,20 @@ object ActualitesScenario {
     .put("/actualites/thread/${threadId}/info/${infoId}/unsubmit")
 	.body(StringBody("""{"title" : "info updated", "owner": {"userId": "${teacherId}"}}"""))
     .check(status.is(200)))
-  // Deletes cant see it
+
+  // Deletes
   .exec(http("Delete Info (sm)")
     .delete("/actualites/thread/${threadId}/info/${infoId}")
+    .check(status.is(401))) // manager cannot delete a draft
+  .exec(http("Delete Info (sm)")
+    .delete("/actualites/thread/${threadId}/info/${otherInfoId}")
     .check(status.is(200)))
   .exec(http("Delete Thread (sm)")
     .delete("/actualites/thread/${threadId}")
     .check(status.is(200)))
   .exec(http("Get Thread deleted (sm)")
     .get("/actualites/thread/${threadId}")
-    .check(status.is(401))) // sould SharedAndOwner Filter let pass and return 404 ?
+    .check(status.is(401))) // should filter let pass and return 404 ?
   .exec(http("Logout 12 - student")
     .get("""/auth/logout""")
     .check(status.is(302)))

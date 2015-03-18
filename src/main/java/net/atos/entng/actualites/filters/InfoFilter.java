@@ -77,7 +77,7 @@ public class InfoFilter implements ResourcesProvider {
 				.append(" ((t.owner = ?");
 			values.add(user.getUserId());
 
-			query.append("OR (ts.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()));
+			query.append(" OR (ts.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()));
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
@@ -96,7 +96,7 @@ public class InfoFilter implements ResourcesProvider {
 				values.add(sharedMethod);
 			}
 
-			query.append(")) AND i.status > 1))");
+			query.append(")) AND i.status > 1))"); // do not authorize actions on draft by managers/publishers
 
 			// Execute
 			Sql.getInstance().prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
