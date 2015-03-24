@@ -56,32 +56,36 @@ public class InfoFilter implements ResourcesProvider {
 			values.add(Sql.parseId(id));
 
 			query.append(" AND (");
-			if(isInfoShareSubmitOrRemove(binding)) {
-				// info's owner can change shares (i.e. choose readers) only if status is different from published
-				query.append("((i.owner = ? AND i.status != 3)");
-			}
-			else {
-				query.append("(i.owner = ? ");
-			}
-			values.add(user.getUserId());
+			if (! isInfoPublishing(binding)) {
+				// info's owner is irrelevant for publishing right
 
-			query.append(" OR (ios.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
-				.append(" AND ios.action = ? AND i.status > 2))");
-			for(String value : groupsAndUserIds){
-				values.add(value);
+				if(isInfoShareSubmitOrRemove(binding)) {
+					// info's owner can change shares (i.e. choose readers) only if status is different from published
+					query.append("((i.owner = ? AND i.status != 3) ");
+				}
+				else {
+					query.append("(i.owner = ? ");
+				}
+				values.add(user.getUserId());
+
+				query.append(" OR (ios.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
+					.append(" AND ios.action = ? AND i.status > 2)");
+				for(String value : groupsAndUserIds){
+					values.add(value);
+				}
+				values.add(sharedMethod);
+				query.append(") OR (");
 			}
-			values.add(sharedMethod);
 
 
-			query.append(" OR")
-				.append(" ((t.owner = ?");
+			query.append("(t.owner = ?");
 			values.add(user.getUserId());
 
 			query.append(" OR (ts.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()));
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
-			if(isInfoAction(binding) || isInfoPending(binding)){
+			if(isInfoAction(binding) || isInfoPendingOrPublished(binding)){
 				// Authorize if user is a publisher or a manager
 				query.append(" AND ts.action = 'net-atos-entng-actualites-controllers-InfoController|publish'");
 			} else if (isInfoShareSubmitOrRemove(binding)) {
@@ -96,7 +100,14 @@ public class InfoFilter implements ResourcesProvider {
 				values.add(sharedMethod);
 			}
 
-			query.append(")) AND i.status > 1))"); // do not authorize actions on draft by managers/publishers
+			query.append(")) AND (i.status > 1"); // do not authorize actions on draft by managers/publishers
+			query.append(" OR i.owner = ?))"); // unless it's theirs
+			values.add(user.getUserId());
+
+			if (! isInfoPublishing(binding)) {
+				// missing parenthesis
+				query.append(")");
+			}
 
 			// Execute
 			Sql.getInstance().prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
@@ -131,8 +142,17 @@ public class InfoFilter implements ResourcesProvider {
 				);
 	};
 
-	private boolean isInfoPending(final Binding binding) {
-		return ("net.atos.entng.actualites.controllers.InfoController|unsubmit".equals(binding.getServiceMethod()) ||
+	private boolean isInfoPendingOrPublished(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|publish".equals(binding.getServiceMethod()) ||
+				"net.atos.entng.actualites.controllers.InfoController|unpublish".equals(binding.getServiceMethod()) ||
+				"net.atos.entng.actualites.controllers.InfoController|unsubmit".equals(binding.getServiceMethod()) ||
+				"net.atos.entng.actualites.controllers.InfoController|updatePublished".equals(binding.getServiceMethod()) ||
 				"net.atos.entng.actualites.controllers.InfoController|updatePending".equals(binding.getServiceMethod()));
+	}
+
+	private boolean isInfoPublishing(final Binding binding) {
+		return ("net.atos.entng.actualites.controllers.InfoController|publish".equals(binding.getServiceMethod()) ||
+				 "net.atos.entng.actualites.controllers.InfoController|updatePublished".equals(binding.getServiceMethod() )
+				);
 	}
 }
