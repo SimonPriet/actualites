@@ -375,7 +375,7 @@ public class InfoController extends ControllerHelper {
 							@Override
 							public void handle(Either<String, JsonObject> event) {
 								if (event.isRight()) {
-									notifyTimeline(request, user, threadId, infoId, title, NEWS_UNSUBMIT_EVENT_TYPE);
+									// notifyTimeline(request, user, threadId, infoId, title, NEWS_UNSUBMIT_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
 									JsonObject error = new JsonObject().putString("error", event.left().getValue());
