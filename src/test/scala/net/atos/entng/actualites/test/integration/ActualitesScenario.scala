@@ -436,10 +436,10 @@ object ActualitesScenario {
     .put("/actualites/thread/${threadId}/info/${studentContribInfoId}/submit")
     .body(StringBody("""{"title" : "info updated", "owner": {"userId": "${studentId}"}}"""))
     .check(status.is(200)))
-  /* TODO - currently returns 200 instead of 401 : .exec(http("Info try Publish")
+  .exec(http("Info try Publish")
     .put("/actualites/thread/${threadId}/info/${studentContribInfoId}/publish")
     .body(StringBody("""{"title" : "info updated", "owner": "${studentId}", "username": "${studentLogin}" }"""))
-    .check(status.is(401)))*/
+    .check(status.is(401)))
   .exec(http("Logout 7 - student")
     .get("""/auth/logout""")
     .check(status.is(302)))
