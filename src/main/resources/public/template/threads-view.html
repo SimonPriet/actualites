@@ -1,63 +1,64 @@
-<div class="row contextual-buttons ng-scope">
-	<div class="action-buttons" >
-		<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
+<div class="cell right-magnet">
+	<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
+</div>
+
+<div class="row rigid-grid">
+	<div class="ten centered">
+		<div class="six cell">
+			<nav class="vertical half-stamps">
+				<div ng-repeat="thread in threads.editable() | limitTo:threads.length() / 2" class="row">
+						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
+							<div class="clip">
+									<image-select ng-model="thread.icon"
+												  ng-change="thread.save()"
+												  default="/img/illustrations/actualites-default.png"
+												  thumbnails="[{ width: 150, height: 150 }]"></image-select>
+							</div>
+							<div>
+									<input type="text" ng-model="thread.title" complete-change="thread.save()" />
+							</div>
+						</article>
+						<input type="checkbox" ng-model="thread.selected" class="one cell right-magnet" />
+				</div>
+			</nav>
+		</div>
+		<div class="six cell">
+			<nav class="vertical half-stamps">
+				<div ng-repeat="thread in threads.editable().slice(threads.length() / 2)" class="row">
+						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
+							<div class="clip">
+								<image-select ng-model="thread.icon"
+											  ng-change="thread.save()"
+											  default="/img/illustrations/actualites-default.png"
+											  thumbnails="[{ width: 150, height: 150 }]"></image-select>
+							</div>
+							<div>
+									<input type="text" ng-model="thread.title" complete-change="thread.save()" />
+							</div>
+						</article>
+						<input type="checkbox" ng-model="thread.selected" class="one cell right-magnet" />
+				</div>
+			</nav>
+		</div>
 	</div>
 </div>
 
-<div class="cell twelve list-view">
-	<table class="twelve">
-		<thead>
-			<tr>
-				<th class="one"><input type="checkbox" ng-model="display.selectAllThreads" ng-change="switchAllThreads()" ng-if="hasRightsOnAllThreads()" /></th>
-				<th class="six">Titre</th>
-				<th class="one">Image</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat="thread in threads.all">
-				<td><input type="checkbox" ng-model="thread.selected" ng-if="hasRightsOnThread(thread)" /></td>
-				<td ng-if="currentThread !== thread">[[thread.title]]</td>
-				<td ng-if="currentThread === thread">
-					<input translate attr="placeholder" placeholder="actualites.edition.thread.field.title.placeholder" ng-model="currentThread.title" type="text"/>
-				</td>
-
-				<td>
-					<img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" class="seven cell" />
-					<img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" class="seven cell" />
-				</td>
-			</tr>
-		
-			<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
-				<div class="toggle block-container">
-					<div class="row">
-						<behaviour name="editThread" resource="threads.selection()" class="cell">
-							<button
-									ng-if="threads.selection().length === 1"
-									ng-click="editSelectedThread()"
-									>
-								<i18n>edit</i18n>
-							</button>
-						</behaviour>
-						<behaviour name="deleteThread" resource="threads.selection()" class="cell">
-							<button 
-									ng-click="threads.removeSelection()"
-									>
-								<i18n>remove</i18n>
-							</button>
-						</behaviour>
-						<behaviour name="share" resource="threads.selection()" class="cell">
-							<button ng-click="display.showPanel = true">
-								<i18n>share</i18n>
-							</button>
-						</behaviour>
-					</div>
-				</div>
-			</section>
-		</tbody>
-	</table>
-
-	<hr />
-</div>
+<section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
+	<div class="toggle">
+			<resource-right name="deleteThread" resource="threads.selection()" class="cell">
+				<button
+						ng-click="threads.removeSelection()"
+						>
+					<i18n>remove</i18n>
+				</button>
+			</resource-right>
+			<resource-right name="share" resource="threads.selection()" class="cell">
+				<button ng-click="display.showPanel = true">
+					<i18n>share</i18n>
+				</button>
+			</resource-right>
+	</div>
+</section>
 			
 <!-- Lightbox : Thread share -->
 <div ng-if="display.showPanel">

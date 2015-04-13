@@ -1,34 +1,39 @@
-<div class="row">
-	<label class="three cell"><i18n>actualites.edit.title</i18n></label>
-	<input ng-model="currentInfo.title" type="text" class="nine cell" />
-</div>
-
-<div class="row">
-	<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> <i18n>actualites.edit.date.publish</i18n></label>
-	<span ng-show="currentInfo.hasPublicationDate">
-		<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker>
-	</span>
-</div>
-
-<div class="row">
-	<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> <i18n>actualites.edit.date.expire</i18n></label>
-	<span ng-show="currentInfo.hasExpirationDate">
-		<date-picker-actu min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker>
-	</span>
-</div>
-<div class="row">
-	<label class="three cell"><input ng-model="currentInfo.setAsHeadline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
-</div>
-
-<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
-	<label class="cell">&nbsp;</label>
-</div>
-
-<div class="row">
-	<html-editor ng-model="currentInfo.content"></html-editor>
-</div>
-
-<div class="row">
-	<button ng-click="saveInfo()" translate content="actualites.edition.infos.save" class="right-magnet"></button>
-	<button ng-click="cancelEditInfo()" translate content="actualites.edition.infos.cancel" class="right-magnet cancel"></button>
-</div>
+<article  class="preview twelve cell"
+		  ng-class="{ expanded: info.expanded, important: info.is_headline }" style="height: auto;">
+	<div class="three cell">
+		<label class="twelve cell">
+			<input ng-model="info.hasPublicationDate" type="checkbox"/>
+			<i18n>actualites.create.date.publish</i18n>
+		</label>
+		<div class="row" ng-show="info.hasPublicationDate">
+			<date-picker past="true" min-date="startDate" exp="true" exp-object="info.expiration_date" ng-model="info.publication_date" ng-change="showDate = true"></date-picker>
+		</div>
+		<label class="twelve cell">
+			<input ng-model="info.hasExpirationDate" type="checkbox"/>
+			<i18n>actualites.create.date.expire</i18n>
+		</label>
+		<div class="twelve cell" ng-show="info.hasExpirationDate">
+			<date-picker min-date="info.publication_date" past="true" ng-model="info.expiration_date" ng-change="showDate = true"></date-picker>
+		</div>
+		<label class="twelve cell">
+			<input ng-model="info.is_headline" type="checkbox"/>
+			<i18n>actualites.set.as.headline</i18n>
+		</label>
+	</div>
+	<div class="nine cell">
+		<div class="row">
+			<input ng-model="info.title" type="text" class="twelve cell" i18n-placeholder="actualites.create.title" />
+		</div>
+		<div class="row">
+			<html-editor ng-model="info.content"></html-editor>
+		</div>
+		<div class="row">
+			<button ng-click="info.save();" class="right-magnet">
+				<i18n>actualites.edition.infos.save</i18n>
+			</button>
+			<button ng-click="info.edit = false;" class="right-magnet cancel">
+				<i18n>actualites.edition.infos.cancel</i18n>
+			</button>
+		</div>
+	</div>
+</article>

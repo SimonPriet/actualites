@@ -1,50 +1,57 @@
-<article class="row reduce-block-six">
-	<h2><i18n>actualites.title.new</i18n></h2>
-	<div class="row">
-		<label class="three cell"><i18n>actualites.create.title</i18n></label>
-		<input ng-model="currentInfo.title" type="text" class="nine cell" />
-	</div>
-
-	<div class="row">
-		<label class="three cell"><i18n>actualites.create.thread</i18n></label>
-		<select ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]" ng-options="thread as thread.title for thread in threads.filter(checkThreadsRightsFilter) | orderBy:'title':false" ng-model="currentInfo.thread" class="nine cell"></select>
-	</div>
-
-	<div class="row">
-		<label class="three cell"><input ng-model="currentInfo.hasPublicationDate" type="checkbox"/> <i18n>actualites.create.date.publish</i18n></label>
-		<span ng-show="currentInfo.hasPublicationDate">
-			<date-picker-actu past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker-actu>
-		</span>
-	</div>
-
-	<div class="row">
-		<label class="three cell"><input ng-model="currentInfo.hasExpirationDate" type="checkbox"/> <i18n>actualites.create.date.expire</i18n></label>
-		<span ng-show="currentInfo.hasExpirationDate">
-			<date-picker-actu min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker-actu>
-		</span>
-	</div>
-	<div class="row">
-		<label class="three cell"><input ng-model="currentInfo.is_headline" type="checkbox"/> <i18n>actualites.set.as.headline</i18n></label>
-	</div>
-	<div class="row" ng-if="!isInfoPublishable(currentInfo) && currentInfo._id">
-		<label class="cell">&nbsp;</label>
-	</div>
-
-	<div class="row">
-		<html-editor ng-model="currentInfo.content"></html-editor>
-	</div>
-
-	<div class="row">
-		<button ng-click="saveInfo();" class="right-magnet" translate content="actualites.edition.infos.save"></button>
-		<div ng-if="currentInfo.thread !== undefined">
-		<behaviour name="createPending" resource="currentInfo.thread">
-			<button ng-click="saveSubmitted();" class="right-magnet" ng-if="!canPublish(currentInfo.thread)" translate content="actualites.edition.infos.submit"></button>
-		</behaviour>
-		<behaviour name="createPublished" resource="currentInfo.thread">
-			<button ng-click="savePublished();" class="right-magnet" translate content="actualites.edition.infos.publish"></button>
-		</behaviour>
+<article class="row">
+	<div class="three cell">
+		<div class="row">
+			<label><i18n>actualites.create.thread</i18n></label>
 		</div>
-		<button ng-click="cancelEditInfo();" class="right-magnet cancel" translate content="actualites.edition.infos.cancel"></button>
+		<div class="row">
+			<select
+					ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]"
+					ng-options="thread as thread.title for thread in threads.writable() | orderBy:'title':false"
+					ng-model="currentInfo.thread" class="nine cell">
+					</select>
+		</div>
+		<label class="twelve cell">
+			<input ng-model="currentInfo.hasPublicationDate" type="checkbox"/>
+			<i18n>actualites.create.date.publish</i18n>
+		</label>
+		<div class="row" ng-show="currentInfo.hasPublicationDate">
+			<date-picker past="true" min-date="startDate" exp="true" exp-object="currentInfo.expiration_date" ng-model="currentInfo.publication_date" ng-change="showDate = true"></date-picker>
+		</div>
+		<label class="twelve cell">
+			<input ng-model="currentInfo.hasExpirationDate" type="checkbox"/>
+			<i18n>actualites.create.date.expire</i18n>
+		</label>
+		<div class="twelve cell" ng-show="currentInfo.hasExpirationDate">
+			<date-picker min-date="currentInfo.publication_date" past="true" ng-model="currentInfo.expiration_date" ng-change="showDate = true"></date-picker>
+		</div>
+		<label class="twelve cell">
+			<input ng-model="currentInfo.is_headline" type="checkbox"/>
+			<i18n>actualites.set.as.headline</i18n>
+		</label>
 	</div>
-	<div class="row"></div>
+	<div class="nine cell">
+		<div class="row">
+			<input ng-model="currentInfo.title" type="text" class="twelve cell" i18n-placeholder="actualites.create.title" />
+		</div>
+		<div class="row">
+			<html-editor ng-model="currentInfo.content"></html-editor>
+		</div>
+		<div class="row">
+
+			<div ng-if="currentInfo.thread !== undefined">
+				<button ng-click="saveDraft();" class="right-magnet">
+					<i18n>actualites.edition.infos.save</i18n>
+				</button>
+				<button ng-click="saveSubmitted();" class="right-magnet" ng-if="currentInfo.allow('submit')">
+					<i18n>actualites.edition.infos.submit</i18n>
+				</button>
+				<button ng-click="savePublished();" class="right-magnet" ng-if="currentInfo.allow('publish')">
+					<i18n>actualites.edition.infos.publish</i18n>
+				</button>
+			</div>
+			<button ng-click="cancelCreateInfo();" class="right-magnet cancel">
+				<i18n>actualites.edition.infos.cancel</i18n>
+			</button>
+		</div>
+	</div>
 </article>

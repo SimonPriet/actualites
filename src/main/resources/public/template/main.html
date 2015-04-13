@@ -1,0 +1,97 @@
+<div class="right-magnet cell">
+	<button ng-if="oneContribRight()" ng-click="createInfo()">
+		<i18n>actualites.edition.infos.create</i18n>
+	</button>
+</div>
+<div class="row rigid-grid">
+	<div class="four cell">
+		<nav class="vertical half-stamps">
+			<h2 ng-if="threads.all.length > 0">Filtrer les fils</h2>
+			<div ng-repeat="thread in threads.all">
+				<article ng-click="thread.selected = !thread.selected" ng-class="{ selected: thread.selected }">
+					<div>
+						<img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
+						<img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
+					</div>
+					<div>
+						<h3>[[thread.title]]</h3>
+					</div>
+				</article>
+
+			</div>
+			<a class="classic-link cell" workflow="actualites.admin" ng-click="threadsView()">
+				<i18n>thread.list.view</i18n>
+			</a>
+		</nav>
+	</div>
+
+	<section class="margin-four">
+		<div class="twelve cell">
+			<container ng-if="oneContribRight()" template="filters"></container>
+			<div ng-if="display.emptyThread" class="row">
+				<h2><i18n>actualites.thread.empty</i18n></h2>
+			</div>
+
+			<div class="twelve cell">
+				<container template="createInfo"></container>
+			</div>
+
+			<div class="previews">
+				<h4 class="row" ng-if="infos.thisWeek().length > 0">Cette semaine</h4>
+				<div ng-repeat="info in infos.thisWeek() | orderBy:[sortByIsHeadline,'modified.$date']:true | filter:filterByThreads">
+					<div ng-if="!info.edit">
+						<container template="infoView"></container>
+					</div>
+					<div ng-if="info.edit">
+						<container template="infoEdit"></container>
+					</div>
+				</div>
+				<h4 class="row" ng-if="infos.beforeThisWeek().length > 0">Avant</h4>
+				<div ng-repeat="info in infos.beforeThisWeek() | orderBy:[sortByIsHeadline,'modified.$date']:true | filter:filterByThreads">
+					<div ng-if="!info.edit">
+						<container template="infoView"></container>
+					</div>
+					<div ng-if="info.edit">
+						<container template="infoEdit"></container>
+					</div>
+				</div>
+			</div>
+			</div>
+	</section>
+</div>
+
+<lightbox show="display.showConfirmRemove" on-close="display.showConfirmRemove = false">
+	<h2>Supprimer les actualités</h2>
+	<p>Voulez-vous vraiment supprimer ces actualités ?</p>
+	<div class="row">
+		<button ng-click="infos.remove(); display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
+		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelDeleteInfo()" />
+	</div>
+</lightbox>
+
+<div ng-if="infos.selection().length === 1">
+	<lightbox show="display.showInfoSharePanel" on-close="display.showInfoSharePanel = false">
+		<div ng-class="{'read-only': allowForSelection('viewShare')}">
+			<share-panel app-prefix="'actualites/thread/' + infos.selection()[0].thread_id + '/info'" resources="infos.selection()[0]" ></share-panel>
+		</div>
+	</lightbox>
+</div>
+
+
+<div class="toggle-buttons" ng-class="{ hide: infos.selection().length === 0 }">
+	<div class="row toggle">
+		<div ng-if="infos.selection().length === 1 && (allowForSelection('share') || allowForSelection('viewShare'))" class="cell">
+			<button ng-click="display.showInfoSharePanel = true"><i18n>share</i18n></button>
+		</div>
+
+		<button ng-if="infos.selection().length === 1 && allowForSelection('edit')" ng-click="editInfo(infos.selection()[0])">
+			<i18n>edit</i18n>
+		</button>
+
+		<button ng-click="infos.unsubmit()" ng-if="allowForSelection('unsubmit')"><i18n>unsubmit</i18n></button>
+		<button ng-click="infos.unpublish()" ng-if="allowForSelection('unpublish')"><i18n>unpublish</i18n></button>
+		<button ng-click="infos.submit()" ng-if="allowForSelection('submit')"><i18n>submit</i18n></button>
+		<button ng-click="infos.publish()" ng-if="allowForSelection('publish')"><i18n>publish</i18n></button>
+		<button ng-click="display.showConfirmRemove = true" ng-if="allowForSelection('remove')"><i18n>remove</i18n></button>
+	</div>
+</div>

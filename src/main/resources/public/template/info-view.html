@@ -1,87 +1,39 @@
-
-<legend>
-
-	<strong class="cell" ng-click="openThread(info.thread_id, info.thread_title)">[[info.thread_title]]</strong>
-	<div class="right-magnet cell">
-		<a ng-if="canShareInfo(info)" ng-click="showShareInfo(info)"><i18n>share</i18n></a>
-		&nbsp;
-		<a ng-if="canEditInfo(info)" ng-click="editInfo(info)">modifier</a>
-		&nbsp;
-		<a ng-if="canDeleteInfo(info)" ng-click="showDeleteInfo(info)">supprimer</a>
-	</div>
-</legend>
-
-<h1 class="cell upper-title">
-		<span translate content="[[getState(info)]]" class="warning-text">
-		&nbsp;</span>[[info.title]]
-</h1>
-<div class="row lower-title" ng-if="info.hasExpirationDate">
-	<span class="cell" translate content="actualites.info.label.author"></span>
-	<a ng-href="/userbook/annuaire#[[info.owner]]">&nbsp;<span class="cell info-metadata" translate content="[[info.username]]"></span></a>
-	<span class="cell" translate content="actualites.info.label.initialDate"></span>
-	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publication_date) : formatDate(info.modified))]]&nbsp;</span>
-	<span class="cell" translate content="actualites.info.label.expiration"></span>
-	<span class="cell info-metadata">&nbsp;[[formatDate(info.expiration_date)]]</span>
-</div>
-
-<div class="row lower-title" ng-if="!info.hasExpirationDate">
-	<span class="cell" translate content="actualites.info.label.author"></span>
-	<a ng-href="/userbook/annuaire#[[info.owner]]">&nbsp;<span class="cell info-metadata" translate content="[[info.username]]"></span></a>
-	<span class="cell" translate content="actualites.info.label.publication"></span>
-	<span class="cell info-metadata">&nbsp;[[(info.hasPublicationDate ? formatDate(info.publication_date) : formatDate(info.modified))]]</span>
-</div>
-<img ng-src="[[info.thread_icon]]?thumbnail=150x150" ng-if="info.thread_icon" ng-click="openThread(info.thread_id, info.thread_title)" class="illustration" />
-<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread_icon" ng-click="openThread(info.thread_id, info.thread_title)" class="illustration" />
-
-<!-- Lightbox : Info share -->
-<div ng-if="infoToShare._id === info._id">
-	<lightbox show="display.showInfoSharePanel" on-close="cancelShareInfo()">
-		<div ng-class="{'read-only': canOnlyViewInfoShares(infoToShare)}">
-			<share-panel app-prefix="'actualites/thread/' + infoToShare.thread_id + '/info'" resources="infoToShare" ></share-panel>
+<article  class="preview twelve cell"
+		  ng-class="{ expanded: info.expanded, important: info.is_headline }">
+	<div class="rigid-grid row">
+		<em class="two cell metadata">
+			Par <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
+			<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDate(info.modified))]]
+			<br />
+			<label>
+				<input type="checkbox" ng-model="info.selected" />
+				<span></span>
+			</label>
+		</em>
+		<div class="one cell horizontal-spacing" ng-click="info.expanded = !info.expanded">
+			<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
+			<img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
 		</div>
-	</lightbox>
-</div>
-<!-- Lightbox : Info delete -->
-<lightbox show="display.showConfirmRemove" on-close="cancelDeleteInfo()">
-	<h2>Supprimer l'actualité</h2>
-	<p>Voulez-vous vraiment supprimer cette actualité ?</p>
-	<div class="row">
-		<button ng-click="deleteInfo()" class="right-magnet">Supprimer</button>
-		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelDeleteInfo()" />
+		<div class="margin-three" ng-click="info.expanded = !info.expanded">
+			<h2><span translate content="[[getState(info)]]" class="warning-text"></span>[[info.title]]</h2>
+			<div ng-show="!info.expanded">
+				<div class="twelve cell" bind-html="info.preview"></div>
+			</div>
+			<div ng-show="info.expanded">
+				<div class="twelve cell" bind-html="info.content"></div>
+			</div>
+		</div>
 	</div>
-</lightbox>
-
-
-<div class="row"></div>
-<div class="row vertical-spacing" bind-html="info.content">
-</div>
-<hr class="row"></div>
-<div class="row">
-	<div ng-if="info.thread !== undefined" class="right-magnet cell">
-		<behaviour name="submit" resource="info.thread" class="cell">
-			<button ng-click="info.submit()" ng-if="isInfoSubmitable(info)" translate content="actualites.edition.infos.submit"></button>
-		</behaviour>
-		<behaviour name="unsubmit" resource="info.thread" class="cell">
-			<button ng-click="info.unsubmit()" ng-if="isInfoSubmitted(info)" translate content="actualites.edition.infos.unsubmit"></button>
-		</behaviour>
-		<behaviour name="publish" resource="info.thread" class="cell">
-			<button ng-click="info.publish()" ng-if="isInfoPublishable(info)" translate content="actualites.edition.infos.publish"></button>
-		</behaviour>
-		<behaviour name="unpublish" resource="info.thread" class="cell">
-			<button ng-click="info.unpublish(canSkipPendingStatus(info))" ng-if="isInfoUnpublishable(info)" translate content="actualites.edition.infos.unpublish"></button>
-		</behaviour>
-	</div>
-	<div class="cell" ng-if="isInfoUnpublishable(info)">
-		<a ng-click="display.commentInfo = info" ng-if="display.commentInfo !== info">
-			<span ng-if="info.comments.all.length > 0"><i18n>actualites.info.label.comments.many</i18n> ([[info.comments.all.length]])</span>
-			<span ng-if="info.comments.all.length === 0 &&  canComment(info)"><i18n>actualites.info.label.comments.none</i18n></span>
+	<div class="cell right-magnet" ng-if="info.allow('comment') || info.comments.length() > 0">
+		<a ng-click="info.displayComments = true; info.expanded = true;" ng-show="!info.displayComments">
+			<i18n>actualites.info.label.comments</i18n> ([[info.comments.all.length]])
 		</a>
-		<a ng-click="display.commentInfo = undefined" ng-if="display.commentInfo === info"><i18n>actualites.info.label.comments.close</i18n></a>
+		<a ng-click="info.displayComments = false" ng-show="info.displayComments">
+			<i18n>actualites.info.label.comments.close</i18n>
+		</a>
 	</div>
-	<div class="row" ng-if="display.commentInfo === info">
-		<div class="cell twelve" ng-include="template.containers.comments"></div>
+	<div class="row" ng-show="info.displayComments">
+		<container template="comments"></container>
 	</div>
-	<div class="row"></div>
-
-</div>
+</article>
 

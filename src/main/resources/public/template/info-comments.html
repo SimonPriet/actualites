@@ -1,7 +1,3 @@
-<div class="row" ng-if="info.comments.length() === 0">
-	<span class="cell" translate content=""></span>
-</div>
-
 <article class="row comment" ng-repeat="comment in info.comments.all">
 	<div class="lower-title">
 		<a href="/userbook/annuaire#/[[comment.owner]]"><span translate content="[[comment.username]]"></span></a>
@@ -13,8 +9,9 @@
 	</div>
 </article>
 
-<div ng-if="canComment(info)" class="row">
+<div ng-if="info.allow('comment')" class="row">
 	<textarea class="cell vertical-spacing" ng-model="newComment.comment"></textarea>
-	<button ng-click="postInfoComment(info)" translate content="actualites.info.label.comments.submit" class="right-magnet"></button>
-	<div class="clear"></div>
+	<button ng-click="postInfoComment(info)" class="right-magnet">
+		<i18n>actualites.info.label.comments.submit</i18n>
+	</button>
 </div>

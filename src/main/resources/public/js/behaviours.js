@@ -9,6 +9,9 @@ var actualitesBehaviours = {
 		deleteThread: {
 			right: 'net-atos-entng-actualites-controllers-ThreadController|deleteThread'
 		},
+		manager: {
+			right: 'net-atos-entng-actualites-controllers-ThreadController|deleteThread'
+		},
 		share: {
 			right: 'net-atos-entng-actualites-controllers-ThreadController|shareThread'
 		},
