@@ -51,7 +51,7 @@ function Comment(){
 function Info(data){
 	this.collection(Comment);
 	if(data){
-		this.preview = $(data.content).text().substring(0, 200) + '...';
+		this.preview = $(data.content).text().substring(0, 150) + '...';
 	}
 	else{
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
