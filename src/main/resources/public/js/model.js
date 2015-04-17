@@ -1,4 +1,20 @@
 /* Constants */
+
+var getDateAsMoment = function(date){
+	var momentDate;
+	if(moment.isMoment(date)) {
+		momentDate = date;
+	}
+	else if (date.$date) {
+		momentDate = moment(date.$date);
+	} else if (typeof date === "number"){
+		momentDate = moment.unix(date);
+	} else {
+		momentDate = moment(date);
+	}
+	return momentDate;
+};
+
 var ACTUALITES_CONFIGURATION = {
 	applicationName: 'actualites',
 	infosCollectionName: 'infos',
@@ -209,9 +225,11 @@ Info.prototype.deleteComment = function(comment, index){
 Info.prototype.allow = function(action){
 	if(action === 'view'){
 		//Hide when I don't have publish rights and I'm not author if : the info was submitted or the info is outside its lifespan
-		return !(this.hasPublicationDate && moment().isBefore(getDateAsMoment(this.publication_date))) &&
-			!(this.hasExpirationDate && moment().isAfter(getDateAsMoment(this.expiration_date).add(1, 'days'))) &&
-			!(this.author !== model.me.userId && !this.thread.myRights.publish);
+		return (this.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED &&
+			!(this.hasPublicationDate && moment().isBefore(getDateAsMoment(this.publication_date)) &&
+			!(this.hasExpirationDate && moment().isAfter(getDateAsMoment(this.expiration_date).add(1, 'days')))))
+			|| this.owner === model.me.userId
+			|| this.thread.myRights.publish;
 
 	}
 	if(action === 'comment'){
@@ -335,7 +353,11 @@ model.build = function(){
 
 	this.collection(Thread, {
 		behaviours: 'actualites',
-		sync: '/actualites/threads',
+		sync: function(){
+			http().get('/actualites/threads').done(function(result){
+				this.addRange(result);
+			}.bind(this));
+		},
 		removeSelection: function(){
 			this.selection().forEach(function(thread){
 				thread.remove();
@@ -405,9 +427,19 @@ model.build = function(){
 				var that = this;
 				this.all = [];
 				infos.forEach(function(info){
-					info.thread = model.threads.select(function(item){
+					var thread = model.threads.find(function(item){
 						return item._id === info.thread_id;
-					})[0];
+					});
+					if(!thread){
+						thread = new Thread();
+						thread._id = info.thread_id;
+						thread.title = info.thread_title;
+						thread.icon = info.thread_icon;
+						thread.selected = true;
+						thread.shared = [];
+						model.threads.push(thread);
+					}
+					info.thread = thread;
 					if(info.comments !== "[null]"){
 						info.comments = JSON.parse(info.comments);
 					}

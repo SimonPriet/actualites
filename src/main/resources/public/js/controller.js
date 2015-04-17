@@ -47,9 +47,13 @@ function ActualitesController($scope, template, route, model, $location){
 						return info._id === parseInt(params.infoId);
 					});
 					if ($scope.info !== undefined) {
-						if(!$scope.info.allow('view')) {
+						if($scope.info.allow('view')) {
 							$scope.notFound = false;
-							template.open('main', 'single-info');
+							$scope.info.expanded = true;
+							$scope.info.thread.selected = true;
+							setTimeout(function(){
+								window.location.href = window.location.href;
+							},100);
 						}
 						else {
 							$scope.notFound = true;
@@ -290,21 +294,6 @@ function ActualitesController($scope, template, route, model, $location){
     	var momentDate = getDateAsMoment(date);
 		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').calendar();
     };
-    
-    var getDateAsMoment = function(date){
-    	var momentDate;
-    	if(moment.isMoment(date)) {
-    		momentDate = date;
-    	}
-    	else if (date.$date) {
-			momentDate = moment(date.$date);
-		} else if (typeof date === "number"){
-			momentDate = moment.unix(date);
-		} else {
-			momentDate = moment(date);
-		}
-    	return momentDate;
-    };
 	
 	$scope.oneContribRight = function(){
 		return model.threads.find(function(thread){
@@ -325,7 +314,9 @@ function ActualitesController($scope, template, route, model, $location){
 	};
 
 	$scope.filterByThreads = function(info){
-		return $scope.display['show' + info.status] && _.findWhere($scope.threads.selection(), { _id: info.thread_id });
+		return $scope.display['show' + info.status]
+			&& _.findWhere($scope.threads.selection(), { _id: info.thread_id })
+			&& info.allow('view');
 	};
 	
     this.initialize();
