@@ -73,7 +73,7 @@
 	<p>Voulez-vous vraiment supprimer ces actualités ?</p>
 	<div class="row">
 		<button ng-click="infos.remove(); display.showConfirmRemove = false;" class="right-magnet">Supprimer</button>
-		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="cancelDeleteInfo()" />
+		<input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="display.showConfirmRemove = false" />
 	</div>
 </lightbox>
 

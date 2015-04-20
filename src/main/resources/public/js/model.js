@@ -356,6 +356,7 @@ model.build = function(){
 		sync: function(){
 			http().get('/actualites/threads').done(function(result){
 				this.addRange(result);
+				this.selectAll();
 			}.bind(this));
 		},
 		removeSelection: function(){
