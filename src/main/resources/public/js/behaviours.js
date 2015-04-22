@@ -112,7 +112,7 @@ Behaviours.register('actualites', {
 		http().get('/actualites/linker/infos').done(function(infos) {
 			var infosArray = _.map(infos, function(info){
 				var threadIcon;
-				if (typeof (info.thread_icon) === 'undefined' || info.thread_icon === '' ) {
+				if (!info.thread_icon) {
 					threadIcon = '/img/icons/glyphicons_036_file.png';
 				}
 				else {
