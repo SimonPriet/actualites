@@ -114,5 +114,6 @@
     "user.personnel.deleted": "Ancien personnel",
     "user.relative.deleted": "Ancien parent",
     "user.student.deleted": "Ancien élève",
-    "user.teacher.deleted": "Ancien enseignant"
+    "user.teacher.deleted": "Ancien enseignant",
+    "title.missing": "Veuillez renseigner un titre"
 }

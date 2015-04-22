@@ -178,21 +178,24 @@ function ActualitesController($scope, template, route, model, $location){
     };
 
     $scope.saveDraft = function(){
-    	template.close('createInfo');
-		$scope.currentInfo.save();
-		$scope.currentInfo = new Info();
+		if($scope.currentInfo.save()){
+			template.close('createInfo');
+			$scope.currentInfo = new Info();
+		}
     };
     
     $scope.saveSubmitted = function(){
-    	template.close('createInfo');
-		$scope.currentInfo.createPending();
-		$scope.currentInfo = new Info();
+		if($scope.currentInfo.createPending()){
+			template.close('createInfo');
+			$scope.currentInfo = new Info();
+		}
     };
     
     $scope.savePublished = function(){
-    	template.close('createInfo');
-		$scope.currentInfo.createPublished();
-		$scope.currentInfo = new Info();
+		if($scope.currentInfo.createPublished()){
+			template.close('createInfo');
+			$scope.currentInfo = new Info();
+		}
     };
 
 	$scope.cancelCreateInfo = function(){

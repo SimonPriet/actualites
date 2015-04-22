@@ -114,24 +114,39 @@ Info.prototype.toJSON = function(){
 };
 
 Info.prototype.create = function(){
+	if(!this.title){
+		notify.info('title.missing');
+		return false;
+	}
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info', this).done(function(response){
 		model.infos.sync();
 	}.bind(this));
+	return true;
 };
 
 Info.prototype.createPending = function(){
+	if(!this.title){
+		notify.info('title.missing');
+		return false;
+	}
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info/pending', this).done(function(response){
 		model.infos.sync();
 	}.bind(this));
+	return true;
 };
 
 Info.prototype.createPublished = function(){
+	if(!this.title){
+		notify.info('title.missing');
+		return false;
+	}
 	this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
 	http().postJson('/actualites/thread/' + this.thread._id + '/info/published', this).done(function(response){
 		model.infos.sync();
 	}.bind(this));
+	return true;
 };
 
 Info.prototype.saveModifications = function(){
@@ -146,7 +161,7 @@ Info.prototype.save = function(){
 		this.saveModifications();
 	}
 	else{
-		this.create();
+		return this.create();
 	}
 };
 
