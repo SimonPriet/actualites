@@ -312,7 +312,7 @@ Thread.prototype.createThread = function(){
 	this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
 
 	http().postJson('/actualites/thread', this).done(function(e){
-		model.threads.sync();
+		model.syncAll();
 	}.bind(this));
 };
 
@@ -366,12 +366,18 @@ model.build = function(){
 		title: ACTUALITES_CONFIGURATION.threadTypes.latest
 	});
 
+	this.syncAll = function(){
+		this.threads.all = [];
+		this.infos.all = [];
+		this.threads.sync();
+		this.infos.sync();
+	};
+
 	this.collection(Thread, {
 		behaviours: 'actualites',
 		sync: function(){
 			http().get('/actualites/threads').done(function(result){
 				this.addRange(result);
-				this.selectAll();
 			}.bind(this));
 		},
 		removeSelection: function(){

@@ -12,6 +12,9 @@ routes.define(function($routeProvider){
 		.when('/default', {
 			action: 'main'
 		})
+		.when('/admin', {
+			action: 'admin'
+		})
         .otherwise({
         	redirectTo: '/default'
         });
@@ -98,11 +101,22 @@ function ActualitesController($scope, template, route, model, $location){
 				model.infos.sync();
             },
             main: function(params){
+				$scope.info = undefined;
+				$scope.currentInfo = undefined;
             	template.open('main', 'main');
+				model.threads.selectAll();
+
 				model.one('threads.sync', function(){
 					model.threads.selectAll();
 				});
-            }
+				model.one('infos.sync', function(){
+					model.threads.selectAll();
+				});
+            },
+			admin: function(params){
+				model.threads.deselectAll();
+				template.open('main', 'threads-view');
+			}
         });
 
         // Model
@@ -147,10 +161,7 @@ function ActualitesController($scope, template, route, model, $location){
 	};
 
     $scope.openMainPage = function(){
-    	delete $scope.info;
-    	delete $scope.currentInfo;
-    	window.location.hash = '';
-    	template.open('main', 'main');
+    	$location.path('/default');
 	};
 
 	$scope.allowForSelection = function(action){
@@ -266,8 +277,7 @@ function ActualitesController($scope, template, route, model, $location){
     
     // Threads
     $scope.threadsView = function(){
-		model.threads.deselectAll();
-		template.open('main', 'threads-view');
+		$location.path('/admin');
 	};
 
 	$scope.newThreadView = function(){
