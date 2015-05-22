@@ -56,7 +56,7 @@ function ActualitesController($scope, template, route, model, $location){
 							$scope.info.thread.selected = true;
 							setTimeout(function(){
 								window.location.href = window.location.href;
-							},100);
+							},500);
 						}
 						else {
 							$scope.notFound = true;
@@ -67,6 +67,12 @@ function ActualitesController($scope, template, route, model, $location){
 						$scope.notFound = true;
 						template.open('error', '404');
 					}
+				});
+				model.one('threads.sync', function(){
+					model.threads.selectAll();
+				});
+				model.one('infos.sync', function(){
+					model.threads.selectAll();
 				});
 				model.infos.sync();
             },
