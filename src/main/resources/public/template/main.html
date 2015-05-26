@@ -8,7 +8,7 @@
 		<nav class="vertical half-stamps">
 			<h2 ng-if="threads.all.length > 0">Filtrer les fils</h2>
 			<div ng-repeat="thread in threads.all">
-				<article ng-click="thread.selected = !thread.selected" ng-class="{ selected: thread.selected }">
+				<article ng-click="switchSselectThread(thread)" ng-class="{ selected: thread.selected }">
 					<div>
 						<img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
 						<img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />

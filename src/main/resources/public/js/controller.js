@@ -230,6 +230,20 @@ function ActualitesController($scope, template, route, model, $location){
 		$scope.threads.findWhere({ _id: thread_id }).selected = true;
 	};
 
+	$scope.switchSselectThread = function(thread){
+		thread.selected = !thread.selected;
+		if(thread.selected){
+			return;
+		}
+		model.infos.forEach(function(info){
+			if(info.thread_id === thread._id){
+				info.selected = false;
+			}
+		});
+		model.thisWeekInfos = model.thisWeek();
+		model.beforeThisWeekInfos = model.thisWeek();
+	};
+
     $scope.getState = function(info){
     	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
     		if(info.hasPublicationDate && moment().isBefore(getDateAsMoment(info.publication_date)) ){
