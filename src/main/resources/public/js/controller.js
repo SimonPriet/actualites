@@ -107,6 +107,8 @@ function ActualitesController($scope, template, route, model, $location){
 				model.infos.sync();
             },
             main: function(params){
+				model.infos.unbind('sync');
+				model.threads.unbind('sync');
 				$scope.info = undefined;
 				$scope.currentInfo = undefined;
             	template.open('main', 'main');
@@ -120,8 +122,17 @@ function ActualitesController($scope, template, route, model, $location){
 				});
             },
 			admin: function(params){
+				model.infos.unbind('sync');
+				model.threads.unbind('sync');
 				model.threads.deselectAll();
 				template.open('main', 'threads-view');
+
+				model.one('threads.sync', function(){
+					model.threads.deselectAll();
+				});
+				model.one('infos.sync', function(){
+					model.threads.deselectAll();
+				});
 			}
         });
 

@@ -468,7 +468,6 @@ model.build = function(){
 						thread._id = info.thread_id;
 						thread.title = info.thread_title;
 						thread.icon = info.thread_icon;
-						thread.selected = true;
 						thread.shared = [];
 						model.threads.push(thread);
 					}
