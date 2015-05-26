@@ -240,8 +240,6 @@ function ActualitesController($scope, template, route, model, $location){
 				info.selected = false;
 			}
 		});
-		model.thisWeekInfos = model.thisWeek();
-		model.beforeThisWeekInfos = model.thisWeek();
 	};
 
     $scope.getState = function(info){
