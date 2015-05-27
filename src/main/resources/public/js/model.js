@@ -254,7 +254,7 @@ Info.prototype.allow = function(action){
 		return this.thread.myRights.publish || (model.me.userId === this.owner && (this.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT || this.status))
 	}
 	if(action === 'viewShare'){
-		return false;//return this.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
+		return false;
 	}
 	if(action === 'unpublish'){
 		return this.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED && this.thread.myRights.publish && !(model.me.userId === this.owner);

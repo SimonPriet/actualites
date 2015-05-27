@@ -5,7 +5,7 @@
 			Par <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
 			<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDate(info.modified))]]
 			<br />
-			<label>
+			<label ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')">
 				<input type="checkbox" ng-model="info.selected" />
 				<span></span>
 			</label>
