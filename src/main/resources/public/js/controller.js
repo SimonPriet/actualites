@@ -341,6 +341,10 @@ function ActualitesController($scope, template, route, model, $location){
     	var momentDate = getDateAsMoment(date);
 		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').calendar();
     };
+
+	$scope.formatDateLocale = function(date){
+		return moment(date, "YYYY-MM-DDTHH:mm:ss.SSS").lang('fr').calendar();
+	};
 	
 	$scope.oneContribRight = function(){
 		return model.threads.find(function(thread){

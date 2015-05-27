@@ -3,7 +3,7 @@
 	<div class="rigid-grid row">
 		<em class="two cell metadata">
 			Par <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
-			<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDate(info.modified))]]
+			<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
 			<br />
 			<label ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')">
 				<input type="checkbox" ng-model="info.selected" />
