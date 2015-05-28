@@ -1,6 +1,16 @@
 <article  class="preview twelve cell"
 		  ng-class="{ expanded: info.expanded, important: info.is_headline }" style="height: auto;">
 	<div class="three cell">
+		<div class="row">
+			<label><i18n>actualites.create.thread</i18n></label>
+		</div>
+		<div class="row">
+			<select
+					ng-init="currentInfo.thread = (currentInfo.thread) ? currentInfo.thread : threads.all[0]"
+					ng-options="thread as thread.title for thread in threads.writable() | orderBy:'title':false"
+					ng-model="info.thread" class="nine cell">
+			</select>
+		</div>
 		<label class="twelve cell">
 			<input ng-model="info.hasPublicationDate" type="checkbox"/>
 			<i18n>actualites.create.date.publish</i18n>
