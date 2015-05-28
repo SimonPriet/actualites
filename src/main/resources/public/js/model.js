@@ -348,9 +348,14 @@ Thread.prototype.save = function(){
 	}
 };
 
-Thread.prototype.remove = function(){
+Thread.prototype.remove = function(callback){
 	http().delete('/actualites/thread/' + this._id).done(function(){
-		model.infos.sync();
+		if(typeof callback === 'function'){
+			callback();
+		}
+		else{
+			model.infos.sync();
+		}
 	});
 };
 
@@ -381,11 +386,15 @@ model.build = function(){
 			}.bind(this));
 		},
 		removeSelection: function(){
+			var all = this.selection().length;
 			this.selection().forEach(function(thread){
-				thread.remove();
+				thread.remove(function(){
+					all --;
+					if(all === 0){
+						model.syncAll();
+					}
+				});
 			});
-			model.infos.sync();
-			Collection.prototype.removeSelection.call(this);
 		},
 		writable: function(){
 			return this.filter(function(thread){
