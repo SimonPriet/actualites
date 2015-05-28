@@ -20,7 +20,7 @@ routes.define(function($routeProvider){
         });
 });
 
-function ActualitesController($scope, template, route, model, $location){
+function ActualitesController($scope, template, route, model, date, $location){
 
     this.initialize = function(){
     	$scope.notFound = false;
@@ -161,7 +161,7 @@ function ActualitesController($scope, template, route, model, $location){
 			limit: 8
 		};
         
-        $scope.startDate = moment();
+        $scope.startDate = new Date();
         $scope.appPrefix = 'actualites';
         $scope.currentThread = {};
 

@@ -76,6 +76,9 @@ function Info(data){
 	if(data && data.comments){
 		this.comments.load(data.comments);
 	}
+	if(!data){
+		this.publication_date = new Date();
+	}
 }
 
 Info.prototype.toJSON = function(){
