@@ -67,7 +67,7 @@ function Comment(){
 function Info(data){
 	this.collection(Comment);
 	if(data){
-		this.preview = $(data.content).text().substring(0, 150) + '...';
+		this.preview = $('<div>' + data.content + '</div>').text().substring(0, 150) + '...';
 	}
 	else{
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
@@ -444,6 +444,8 @@ model.build = function(){
 			});
 			this.removeSelection();
 		},
+		thisWeekInfos: [],
+		beforeThisWeekInfos: [],
 		sync: function(){
 			http().get('/actualites/infos').done(function(infos){
 				var that = this;
@@ -480,6 +482,8 @@ model.build = function(){
 					info.modified += "Z";
 					that.push(info);
 				});
+				this.thisWeekInfos = this.thisWeek();
+				this.beforeThisWeekInfos = this.beforeThisWeek();
 				this.trigger('sync');
 			}.bind(this))
 		},

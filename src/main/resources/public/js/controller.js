@@ -140,7 +140,8 @@ function ActualitesController($scope, template, route, model, $location){
 			showComments: false,
 			show1: true,
 			show2: true,
-			show3: true
+			show3: true,
+			limit: 8
 		};
         
         $scope.startDate = moment();
@@ -159,6 +160,10 @@ function ActualitesController($scope, template, route, model, $location){
 	$scope.sortByIsHeadline = function(info) {
 		return info.is_headline;
 	};
+
+	$scope.increaseLimit = function(){
+		$scope.display.limit += 5;
+	}
 
     $scope.openMainPage = function(){
     	$location.path('/default');
