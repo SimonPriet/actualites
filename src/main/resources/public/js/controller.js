@@ -24,7 +24,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 
     this.initialize = function(){
     	$scope.notFound = false;
-    	
+
     	route({
     		// Routes viewThread, viewInfo adn viewComment are used by notifications
             viewThread: function(params){
@@ -155,12 +155,15 @@ function ActualitesController($scope, template, route, model, date, $location){
 			emptyThread: false,
 			showCommentsPanel: false,
 			showComments: false,
-			show1: true,
-			show2: true,
-			show3: true,
+			filters: {
+				show1: true,
+				show2: true,
+				show3: true,
+				all: true
+			},
 			limit: 8
 		};
-        
+
         $scope.startDate = new Date();
         $scope.appPrefix = 'actualites';
         $scope.currentThread = {};
@@ -173,7 +176,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 		template.open('filters', 'filters');
 		template.open('main', 'main');
     };
-    
+
 	$scope.sortByIsHeadline = function(info) {
 		return info.is_headline;
 	};
@@ -201,11 +204,11 @@ function ActualitesController($scope, template, route, model, date, $location){
 		$scope.currentInfo = new Info();
 		template.open('createInfo', 'info-create');
     };
-    
+
     $scope.showShareInfo = function(info) {
     	$scope.display.showInfoSharePanel = true;
     };
-    
+
     $scope.cancelShareInfo = function() {
     	$scope.display.showInfoSharePanel = false;
     };
@@ -216,14 +219,14 @@ function ActualitesController($scope, template, route, model, date, $location){
 			$scope.currentInfo = new Info();
 		}
     };
-    
+
     $scope.saveSubmitted = function(){
 		if($scope.currentInfo.createPending()){
 			template.close('createInfo');
 			$scope.currentInfo = new Info();
 		}
     };
-    
+
     $scope.savePublished = function(){
 		if($scope.currentInfo.createPublished()){
 			template.close('createInfo');
@@ -269,7 +272,20 @@ function ActualitesController($scope, template, route, model, date, $location){
     	}
     	return "actualites.edition.status." + info.status;
     };
-	
+
+	$scope.switchAll = function(){
+		for(var filter in $scope.display.filters){
+			$scope.display.filters[filter] = $scope.display.filters.all;
+		}
+	};
+
+	$scope.checkAll = function(){
+		$scope.display.filters.all = true;
+		for(var filter in $scope.display.filters){
+			$scope.display.filters.all = $scope.display.filters[filter] && $scope.display.filters.all;
+		}
+	};
+
 	$scope.setFilter = function(state){
     	switch(state) {
 			case ACTUALITES_CONFIGURATION.infoStatus.DRAFT:
@@ -308,7 +324,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 		$scope.newComment = new Comment();
 
     };
-    
+
     // Threads
     $scope.threadsView = function(){
 		$location.path('/admin');
@@ -345,7 +361,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 	$scope.formatDateLocale = function(date){
 		return moment(date, "YYYY-MM-DDTHH:mm:ss.SSS").lang('fr').calendar();
 	};
-	
+
 	$scope.oneContribRight = function(){
 		return model.threads.find(function(thread){
 			return thread.myRights.contrib;
@@ -365,10 +381,9 @@ function ActualitesController($scope, template, route, model, date, $location){
 	};
 
 	$scope.filterByThreads = function(info){
-		return $scope.display['show' + info.status]
+		return ($scope.display.filters['show' + info.status || $scope.display.filters.all])
 			&& _.findWhere($scope.threads.selection(), { _id: info.thread_id })
 			&& info.allow('view');
 	};
-	
     this.initialize();
 }

@@ -1,4 +1,5 @@
 {
+    "actualites.filter": "Filtrer",
     "actualites.create.date.expire": "Date d'expiration",
     "actualites.create.date.publish": "Date de publication",
     "actualites.create.thread": "Fil d'actualité",
@@ -60,7 +61,7 @@
     "actualites.threads.latest": "Dernières actualités",
     "actualites.threads.pending": "En attente d'approbation",
     "actualites.threads.title": "Fils d'actualités",
-    "actualites.threads.title.admin": "Gestion des fils d'actualités",
+    "actualites.threads.title.admin": "Gérer les fils",
     "actualites.threads.trash": "Corbeille",
     "actualites.title": "Actualités",
     "actualites.title.admin": "Administration des actualités",
@@ -77,6 +78,7 @@
     "actualites.widget.empty": "Aucune actualité",
     "actualites.widget.thread": "Fil",
     "actualites.widget.title": "Actualités",
+    "filters.all": "Tous",
     "filters.drafts": "Brouillons",
     "filters.published": "Publiées",
     "filters.submitted": "A publier",
@@ -116,7 +118,7 @@
     "user.student.deleted": "Ancien élève",
     "user.teacher.deleted": "Ancien enseignant",
     "title.missing": "Veuillez renseigner le titre.",
-	"this.week": "Actualités de la semaine",
-	"before.this.week": "Actualités précédentes",
+	"this.week": "Cette semaine",
+	"before.this.week": "Avant",
 	"this.week.empty": "Il n'y a pas de nouvelles actualités cette semaine"
 }

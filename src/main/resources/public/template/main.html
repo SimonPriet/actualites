@@ -1,12 +1,7 @@
-<div class="right-magnet cell">
-	<button ng-if="oneContribRight()" ng-click="createInfo()">
-		<i18n>actualites.edition.infos.create</i18n>
-	</button>
-</div>
 <div class="row rigid-grid">
 	<div class="four cell">
+		<h1 style="width:165px" class="cell"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
 		<nav class="vertical half-stamps">
-			<h2 ng-if="threads.all.length > 0">Filtrer les fils</h2>
 			<div ng-repeat="thread in threads.all">
 				<article ng-click="switchSselectThread(thread)" ng-class="{ selected: thread.selected }">
 					<div>
@@ -28,6 +23,13 @@
 	<section class="margin-four">
 		<div class="twelve cell">
 			<container ng-if="oneContribRight()" template="filters"></container>
+
+			<div class="right-magnet cell">
+				<button ng-if="oneContribRight()" ng-click="createInfo()">
+					<i18n>actualites.edition.infos.create</i18n>
+				</button>
+			</div>
+
 			<div ng-if="display.emptyThread" class="row">
 				<h2><i18n>actualites.thread.empty</i18n></h2>
 			</div>

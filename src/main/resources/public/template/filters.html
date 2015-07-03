@@ -1,21 +1,31 @@
-<filters>
-	<h4>Filtrer les états</h4>
-	<li ng-class="{ selected: display.show3 }">
-		<label>
-			<i class="published type" tooltip="filters.published"></i>
-			<input type="checkbox" ng-model="display.show3" />
-		</label>
-	</li>
-	<li ng-class="{ selected: display.show1 }">
-		<label>
-			<i class="draft type" tooltip="filters.drafts"></i>
-			<input type="checkbox" ng-model="display.show1" />
-		</label>
-	</li>
-	<li ng-class="{ selected: display.show2 }">
-		<label>
-			<i class="submitted type" tooltip="filters.submitted"></i>
-			<input type="checkbox" ng-model="display.show2" />
-		</label>
-	</li>
-</filters>
+
+<div class="checkbox-filters">
+	<div class="cell">
+		<i18n>actualites.filter</i18n>
+	</div>
+	<div class="cell checkbox-filters">
+		<ul>
+			<li>
+				<label class="checkbox cell"><input type="checkbox" ng-model="display.filters.all" ng-change="switchAll()" />
+					<i18n>filters.all</i18n>
+				</label>
+			</li>
+			<li>
+				<label class="checkbox cell"><input type="checkbox" ng-model="display.filters.show3" ng-change="checkAll()" />
+					<i18n>filters.published</i18n>
+				</label>
+			</li>
+			<li>
+				<label class="checkbox cell"><input type="checkbox" ng-model="display.filters.show1" ng-change="checkAll()" />
+					<i18n>filters.drafts</i18n>
+				</label>
+			</li>
+			<li>
+				<label class="checkbox cell"><input type="checkbox" ng-model="display.filters.show2" ng-change="checkAll()" />
+					<i18n>filters.submitted</i18n>
+				</label>
+			</li>
+		</ul>
+	</div>
+</div>
+
