@@ -1,6 +1,6 @@
 <div class="row rigid-grid">
 	<div class="four cell">
-		<h1 style="width:165px" class="cell"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+		<h1 style="width:165px"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
 		<nav class="vertical half-stamps">
 			<div ng-repeat="thread in threads.all">
 				<article ng-click="switchSselectThread(thread)" ng-class="{ selected: thread.selected }">
