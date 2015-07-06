@@ -359,7 +359,20 @@ function ActualitesController($scope, template, route, model, date, $location){
     };
 
 	$scope.formatDateLocale = function(date){
-		return moment(date, "YYYY-MM-DDTHH:mm:ss.SSS").lang('fr').calendar();
+
+		if(moment(date).format('L') === (moment().format('L') )){
+			return "aujourd'hui";
+
+		}else if(moment(date)=== (moment().subtract('days', 1) )){
+			return "hier";
+
+		}else if(moment(date) < moment().subtract('days', 2) ){
+			return moment(date).fromNow();
+
+		}else if(moment(date) < moment().subtract('days', 7) ){
+			return moment(date).format('L');
+		};
+
 	};
 
 	$scope.oneContribRight = function(){
@@ -380,10 +393,14 @@ function ActualitesController($scope, template, route, model, date, $location){
 		return _threadsInSelection;
 	};
 
-	$scope.filterByThreads = function(info){
-		return ($scope.display.filters['show' + info.status || $scope.display.filters.all])
-			&& _.findWhere($scope.threads.selection(), { _id: info.thread_id })
-			&& info.allow('view');
-	};
+	$scope.filterByThreads = function(unpublished){
+		return function(info){
+			return ((unpublished && info.status <= 2) || (!unpublished && info.status > 2))
+				&& ($scope.display.filters['show' + info.status || $scope.display.filters.all])
+				&& _.findWhere($scope.threads.selection(), { _id: info.thread_id })
+				&& info.allow('view');
+		};
+	}
+
     this.initialize();
 }
