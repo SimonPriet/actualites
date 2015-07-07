@@ -359,20 +359,13 @@ function ActualitesController($scope, template, route, model, date, $location){
     };
 
 	$scope.formatDateLocale = function(date){
+		if(moment(date) > moment().add(-1, 'days').startOf('day') && moment(date) < moment().endOf('day'))
+			return moment(date).calendar();
 
-		if(moment(date).format('L') === (moment().format('L') )){
-			return "aujourd'hui";
+		if(moment(date) > moment().add(-7, 'days').startOf('day') && moment(date) < moment().endOf('day'))
+			return moment(date).fromNow(); //this week
 
-		}else if(moment(date)=== (moment().subtract('days', 1) )){
-			return "hier";
-
-		}else if(moment(date) < moment().subtract('days', 2) ){
-			return moment(date).fromNow();
-
-		}else if(moment(date) < moment().subtract('days', 7) ){
-			return moment(date).format('L');
-		};
-
+		return moment(date).format("L");
 	};
 
 	$scope.oneContribRight = function(){
