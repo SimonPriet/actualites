@@ -39,6 +39,7 @@
 			</div>
 
 			<div class="previews">
+				<h4 class="row"></h4>
 				<div ng-repeat="info in infos.all | orderBy:[sortByIsHeadline,'modified.$date']:true | filter:filterByThreads(true)">
 					<div ng-if="!info.edit">
 						<container
