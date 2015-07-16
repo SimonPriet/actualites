@@ -1,5 +1,8 @@
-<div class="cell right-magnet">
-	<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
+<div class="row">
+	<h1 class="cell" style="width:165px"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+	<div class="cell right-magnet">
+		<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
+	</div>
 </div>
 
 <div class="row rigid-grid">
@@ -59,7 +62,7 @@
 			</resource-right>
 	</div>
 </section>
-			
+
 <!-- Lightbox : Thread share -->
 <div ng-if="display.showPanel">
 	<lightbox show="display.showPanel" on-close="display.showPanel = false;">
