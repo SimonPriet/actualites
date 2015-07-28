@@ -67,7 +67,7 @@ function Comment(){
 function Info(data){
 	this.collection(Comment);
 	if(data){
-		this.preview = $('<div>' + data.content + '</div>').text().substring(0, 150) + '...';
+		this.preview = '<div>' + $('<div>' + data.content + '</div>').text().substring(0, 150) + '...' + '</div>';
 	}
 	else{
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
