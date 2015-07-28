@@ -7,7 +7,7 @@ routes.define(function($routeProvider){
             action: 'viewInfo'
         })
         .when('/view/info/:infoId/comment/:commentId', {
-            action: 'viewComment'
+            action: 'viewInfo'
         })
 		.when('/default', {
 			action: 'main'
