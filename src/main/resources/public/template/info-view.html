@@ -1,4 +1,5 @@
-<article class="preview twelve cell" ng-class="{ slided: info.slided }">
+<article class="preview twelve cell"
+		 ng-class="{ slided: info.slided, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
 
 	<div class="rigid-grid row">
 		<em class="two cell metadata">
