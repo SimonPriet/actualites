@@ -1,5 +1,5 @@
 <article class="preview twelve cell"
-		 ng-class="{ slided: info.slided, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
+		 ng-class="{ expanded: info.expanded, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
 
 	<div class="rigid-grid row">
 		<em class="two cell metadata">
@@ -15,12 +15,18 @@
 			</label>
 		</div>
 		<div class="margin-three">
-			<h2 ng-click="info.slided = info.slided ? false : true "><span translate content="[[getState(info)]]" class="warning-text"></span>[[info.title]]<i class="small-arrow d270"></i></h2>
-
-			<div slide="info.slided">
-				<div class="twelve cell" bind-html="info.content"> </div>
+			<h2 ng-click="info.expanded = !info.expanded">
+				<i class="small-arrow" ng-class="{ d90: info.expanded, d270: !info.expanded }"></i>
+				<span translate content="[[getState(info)]]" class="warning-text"></span>[[info.title]]
+			</h2>
+			<div class="margin-three" ng-click="info.expanded = !info.expanded">
+				<div ng-show="!info.expanded">
+					<div class="twelve cell" bind-html="info.preview"></div>
+				</div>
+				<div ng-show="info.expanded">
+						<div class="twelve cell" bind-html="info.content"></div>
+				</div>
 			</div>
-
 		</div>
 	</div>
 	<div class="cell right-magnet" ng-if="info.allow('comment') || info.comments.length() > 0">
