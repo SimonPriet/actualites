@@ -385,6 +385,9 @@ model.build = function(){
 		behaviours: 'actualites',
 		sync: function(){
 			http().get('/actualites/threads').done(function(result){
+				result = _.filter(result, function(thread){
+					return !model.threads.findWhere({ _id: thread._id });
+				});
 				this.addRange(result);
 			}.bind(this));
 		},
