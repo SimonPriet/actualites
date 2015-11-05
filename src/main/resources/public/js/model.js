@@ -475,7 +475,7 @@ model.build = function(){
 						thread.title = info.thread_title;
 						thread.icon = info.thread_icon;
 						thread.shared = [];
-						model.threads.push(thread);
+						model.threads.push(thread, false);
 					}
 					info.thread = thread;
 					if(info.comments !== "[null]"){
@@ -494,7 +494,7 @@ model.build = function(){
 					}
 					info.created += "Z";
 					info.modified += "Z";
-					that.push(info);
+					that.push(info, false);
 				});
 				this.thisWeekInfos = this.thisWeek();
 				this.beforeThisWeekInfos = this.beforeThisWeek();
