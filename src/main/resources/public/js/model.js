@@ -243,9 +243,11 @@ Info.prototype.deleteComment = function(comment, index){
 Info.prototype.allow = function(action){
 	if(action === 'view'){
 		//Hide when I don't have publish rights and I'm not author if : the info was submitted or the info is outside its lifespan
-		return (this.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED &&
-			!(this.hasPublicationDate && moment().isBefore(getDateAsMoment(this.publication_date)) &&
-			!(this.hasExpirationDate && moment().isAfter(getDateAsMoment(this.expiration_date).add(1, 'days')))))
+		return (
+				this.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED &&
+				!(this.hasPublicationDate && moment().isBefore(getDateAsMoment(this.publication_date))) &&
+				!(this.hasExpirationDate && moment().isAfter(getDateAsMoment(this.expiration_date).add(1, 'days')))
+			)
 			|| this.owner === model.me.userId
 			|| this.thread.myRights.publish;
 
