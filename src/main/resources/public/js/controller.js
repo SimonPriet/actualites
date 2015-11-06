@@ -196,6 +196,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 	};
 
 	$scope.editInfo = function(info){
+		model.infos.deselectAll();
 		info.edit = true;
 		info.expanded = true;
 	};
