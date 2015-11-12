@@ -43,7 +43,7 @@ var ACTUALITES_CONFIGURATION = {
 	threadTypes: {
 		latest: 0
 	},
-	momentFormat: "YYYY-MM-DDTHH:mm:ss.SSSZ",
+	momentFormat: "YYYY-MM-DDTHH:mm:ss",
 	statusNameFromId: function(statusId) {
 		if (statusId === ACTUALITES_CONFIGURATION.infoStatus.DRAFT) {
 			return ACTUALITES_CONFIGURATION.threadStatus.DRAFT;
@@ -487,15 +487,15 @@ model.build = function(){
 						info.comments = undefined;
 					}
 					if (info.publication_date) {
-						info.publication_date += "Z";
+						info.publication_date = info.publication_date.split('.')[0];
 						info.hasPublicationDate = true;
 					}
 					if (info.expiration_date) {
-						info.expiration_date += "Z";
+						info.expiration_date = info.expiration_date.split('.')[0];
 						info.hasExpirationDate = true;
 					}
-					info.created += "Z";
-					info.modified += "Z";
+					info.created = info.created.split('.')[0];
+					info.modified = info.modified.split('.')[0];
 					that.push(info, false);
 				});
 				this.thisWeekInfos = this.thisWeek();
