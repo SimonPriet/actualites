@@ -356,7 +356,7 @@ function ActualitesController($scope, template, route, model, date, $location){
     /* Util */
     $scope.formatDate = function(date){
     	var momentDate = getDateAsMoment(date);
-		return moment(momentDate, ACTUALITES_CONFIGURATION.momentFormat).lang('fr').calendar();
+		return moment(momentDate).calendar();
     };
 
 	$scope.formatDateLocale = function(date){

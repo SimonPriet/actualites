@@ -88,6 +88,7 @@ Info.prototype.toJSON = function(){
 		if(!moment.isMoment(pubDate)) {
 			pubDate = moment(pubDate);
 		}
+		pubDate.hour(2);
 		pubDate = pubDate.toISOString();
 	}
 	
