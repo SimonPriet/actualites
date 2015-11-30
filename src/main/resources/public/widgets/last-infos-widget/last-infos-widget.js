@@ -1,4 +1,4 @@
-var actualitesWidget = model.widgets.findWidget("actualites");
+var actualitesWidget = model.widgets.findWidget("last-infos-widget");
 actualitesWidget.resultSizeValues = [1,2,3,4,5,6,7,8,9,10];
 actualitesWidget.display = {
 	edition: false
@@ -8,11 +8,11 @@ actualitesWidget.updateInfos  = function(){
 	http().get('/actualites/infos/last/' + actualitesWidget.resultSize).done(function(infos){
 		var enrichedInfos = _.chain(infos).map(function(info){
 			info.relativeDate = moment(info.date).lang('fr').fromNow();
-			info.tooltip = lang.translate('actualites.widget.thread') + ' : ' + info.thread_title + 
+			info.tooltip = lang.translate('actualites.widget.thread') + ' : ' + info.thread_title +
 				' | ' + lang.translate('actualites.widget.author') + ' : ' + info.username;
 			return info;
 		}).value();
-		
+
 		actualitesWidget.infos = enrichedInfos;
 		model.widgets.apply();
 	});
