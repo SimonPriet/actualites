@@ -1,7 +1,17 @@
+<div class="row">
+	<div class="right-magnet cell">
+		<button ng-if="oneContribRight()" ng-click="createInfo()">
+			<i18n>actualites.edition.infos.create</i18n>
+		</button>
+	</div>
+	<h1 data-reload class="application-title">
+		<i class="actualites"></i>
+		<i18n ng-click="openMainPage()">actualites.title</i18n>
+	</h1>
+</div>
 <div class="row rigid-grid">
-	<div class="four cell side-col">
-		<h1><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
-		<nav class="vertical half-stamps">
+	<div class="four cell side-col twelve-mobile">
+		<nav class="vertical half-stamps mobile-navigation" side-nav>
 			<div ng-repeat="thread in threads.all">
 				<article ng-click="switchSselectThread(thread)" ng-class="{ selected: thread.selected }">
 					<div>
@@ -23,12 +33,6 @@
 	<section class="margin-four main-col">
 		<div class="twelve cell">
 			<container ng-if="oneContribRight()" template="filters"></container>
-
-			<div class="right-magnet cell">
-				<button ng-if="oneContribRight()" ng-click="createInfo()">
-					<i18n>actualites.edition.infos.create</i18n>
-				</button>
-			</div>
 
 			<div ng-if="display.emptyThread" class="row">
 				<h2><i18n>actualites.thread.empty</i18n></h2>

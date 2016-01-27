@@ -1,13 +1,13 @@
 <div class="row">
-	<h1 class="cell" style="width:165px"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+	<h1 data-reload class="cell application-title no-opener" ><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
 	<div class="cell right-magnet">
 		<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
 	</div>
 </div>
 
 <div class="row rigid-grid">
-	<div class="ten centered">
-		<div class="six cell">
+	<div class="centered">
+		<div class="six cell twelve-mobile">
 			<nav class="vertical half-stamps">
 				<div ng-repeat="thread in threads.editable() | limitTo:threads.length() / 2" class="row">
 						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
@@ -25,7 +25,7 @@
 				</div>
 			</nav>
 		</div>
-		<div class="six cell">
+		<div class="six cell twelve-mobile">
 			<nav class="vertical half-stamps">
 				<div ng-repeat="thread in threads.editable().slice(threads.length() / 2)" class="row">
 						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
