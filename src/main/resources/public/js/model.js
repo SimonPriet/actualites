@@ -88,10 +88,11 @@ Info.prototype.toJSON = function(){
 		if(!moment.isMoment(pubDate)) {
 			pubDate = moment(pubDate);
 		}
-		pubDate.hour(2);
-		pubDate = pubDate.toISOString();
+        if(!pubDate.isSame(moment(), 'd'))
+		      pubDate.hour(1);
+		pubDate = pubDate.format();
 	}
-	
+
 	var expDate = null;
 	if(this.hasExpirationDate) {
 		expDate = this.expiration_date;
@@ -100,7 +101,7 @@ Info.prototype.toJSON = function(){
 		}
 		expDate = expDate.toISOString();
 	}
-	
+
 	var exportThis = {
 		title: this.title,
 		content: this.content,
@@ -197,7 +198,7 @@ Info.prototype.unpublish = function(canSkipPendingStatus){
 };
 
 Info.prototype.trash = function(){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/trash';	
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/trash';
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
@@ -205,7 +206,7 @@ Info.prototype.trash = function(){
 }
 
 Info.prototype.restore = function(){
-	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/restore';	
+	var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/restore';
 	var info = this;
 	http().put(resourceUrl).done(function(){
 		info.load(thread);
