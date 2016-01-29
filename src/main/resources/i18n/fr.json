@@ -107,7 +107,7 @@
     "user.student.deleted": "Ancien élève",
     "user.teacher.deleted": "Ancien enseignant",
     "title.missing": "Veuillez renseigner le titre.",
-	"this.week": "Cette semaine",
-	"before.this.week": "Avant",
-	"this.week.empty": "Il n'y a pas de nouvelles actualités cette semaine"
+	"this.week": "Actualités de la semaine",
+	"before.this.week": "Actualités précédentes",
+	"this.week.empty": "Il n'y a pas de nouvelle actualité cette semaine"
 }
