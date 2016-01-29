@@ -1,7 +1,7 @@
 <h2 ng-if="currentThread._id === undefined"><i18n>thread.title.new</i18n></h2>
 <h2 ng-if="currentThread._id !== undefined"><i18n>thread.title.edit</i18n></h2>
 <article class="row rigid-grid">
-	<div class="two cell clip height-two">
+	<div class="two cell clip height-two three-mobile">
 		<image-select ng-model="currentThread.icon" default="/img/illustrations/actualites-default.png" thumbnails="[{ width: 290, height: 290 }]"></image-select>
 	</div>
 	<div class="margin-two height-two">
@@ -10,8 +10,8 @@
 				<div class="row">
 					<div class="twelve cell horizontal-spacing-twice">
 						<div class="row">
-							<label class="four cell"><i18n>thread.title</i18n></label>
-							<input type="text" required class="eight cell" ng-model="currentThread.title" />
+							<label class="four cell twelve-mobile"><i18n>thread.title</i18n></label>
+							<input type="text" required class="eight cell twelve-mobile" ng-model="currentThread.title" />
 						</div>
 					</div>
 				</div>
