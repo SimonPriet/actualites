@@ -1,6 +1,11 @@
 <article class="preview twelve cell"
 		 ng-class="{ expanded: info.expanded, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
 
+	 <label ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')">
+		 <input type="checkbox" ng-model="info.selected" />
+		 <span></span>
+	 </label>
+	 
 	<div class="rigid-grid row">
 		<em class="two cell metadata">
 			Par <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
@@ -9,10 +14,6 @@
 		<div class="one cell horizontal-spacing">
 			<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
 			<img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
-			<label ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')">
-				<input type="checkbox" ng-model="info.selected" />
-				<span></span>
-			</label>
 		</div>
 		<div class="margin-three">
 			<h2 ng-click="info.expanded = !info.expanded">
@@ -40,4 +41,3 @@
 		<container template="comments"></container>
 	</div>
 </article>
-
