@@ -3,7 +3,7 @@
 		Par <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
 		<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
 	</em>
-	
+
 	<article class="preview twelve cell"
 			 ng-class="{ expanded: info.expanded, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
 
@@ -13,7 +13,7 @@
 		 </label>
 
 		<div class="rigid-grid row">
-			<div class="one cell horizontal-spacing">
+			<div ng-class="{ allowcheck: info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')}" class="one cell horizontal-spacing">
 				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
 				<img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
 			</div>
