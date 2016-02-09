@@ -1,5 +1,7 @@
 <div class="row">
-	<h1 data-reload class="cell application-title no-opener" ><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+	<app-title>
+		<h1 data-reload class="cell no-opener"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+	</app-title>
 	<div class="cell right-magnet">
 		<button ng-click="newThreadView()"><i18n>actualites.edition.thread.new</i18n></button>
 	</div>

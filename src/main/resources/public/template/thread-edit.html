@@ -1,3 +1,9 @@
+<div class="row">
+	<app-title>
+		<h1 data-reload class="cell no-opener"><i class="actualites"></i><i18n ng-click="openMainPage()">actualites.title</i18n></h1>
+	</app-title>
+</div>
+
 <h2 ng-if="currentThread._id === undefined"><i18n>thread.title.new</i18n></h2>
 <h2 ng-if="currentThread._id !== undefined"><i18n>thread.title.edit</i18n></h2>
 <article class="row rigid-grid">
