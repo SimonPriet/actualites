@@ -11,6 +11,14 @@
 		</h1>
 	</app-title>
 </div>
+<lightbox show="display.infoRead" on-close="display.infoRead = false;">
+    <div ng-if="!notFound" class="row">
+        <container template="info-read" class="hash-magnet row"></container>
+    </div>
+    <div ng-if="notFound" class="row">
+        <container template="error"></container>
+    </div>
+</lightbox>
 <div class="row rigid-grid">
 	<div class="four cell side-col twelve-mobile">
 		<nav class="vertical half-stamps mobile-navigation" side-nav>
@@ -53,8 +61,7 @@
 					<div ng-if="!info.edit">
 						<container
 								template="infoView"
-								class="hash-magnet row"
-								id="/view/thread/[[info.thread_id]]/info/[[info._id]]">
+								class="hash-magnet row">
 						</container>
 					</div>
 					<div ng-if="info.edit">

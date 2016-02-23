@@ -22,6 +22,8 @@ routes.define(function($routeProvider){
 
 function ActualitesController($scope, template, route, model, date, $location){
 
+    template.open('info-read', 'info-read');
+
     this.initialize = function(){
     	$scope.notFound = false;
 
@@ -52,18 +54,17 @@ function ActualitesController($scope, template, route, model, date, $location){
 					if ($scope.info !== undefined) {
 						if($scope.info.allow('view')) {
 							$scope.notFound = false;
-							$scope.info.expanded = true;
 							$scope.info.thread.selected = true;
-							setTimeout(function(){
-								window.location.href = window.location.href;
-							},500);
+							$scope.display.infoRead = true;
 						}
 						else {
+						    $scope.display.infoRead = true;
 							$scope.notFound = true;
 							template.open('error', '401');
 						}
 					}
 					else {
+					    $scope.display.infoRead = true;
 						$scope.notFound = true;
 						template.open('error', '404');
 					}

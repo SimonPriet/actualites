@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<title>{{#i18n}}actualites.title{{/i18n}}</title>
@@ -12,15 +12,7 @@
 </head>
 <body ng-controller="ActualitesController" bottom-scroll="increaseLimit()">
 <portal>
-
-	<div ng-if="notFound === false" class="row">
-		<container template="main"></container>
-	</div>
-
-	<div ng-if="notFound">
-		<container template="error"></container>
-	</div>
-
+	<container template="main"></container>
 </portal>
 </body>
 </html>
