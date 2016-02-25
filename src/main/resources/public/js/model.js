@@ -65,7 +65,8 @@ function Comment(){
 }
 
 function Info(data){
-	this.collection(Comment);
+    this.collection(Comment);
+    this.newComment = new Comment();
 	if(data){
 		this.preview = '<p>' + $('<div>' + data.content + '</div>').text().substring(0, 70) + '...' + '</p>';
 	}

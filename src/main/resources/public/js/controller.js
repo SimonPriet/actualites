@@ -151,7 +151,6 @@ function ActualitesController($scope, template, route, model, date, $location){
         // Variables
         $scope.infos = model.infos;
         $scope.currentInfo = new Info();
-        $scope.newComment = new Comment();
         $scope.display = {
 			emptyThread: false,
 			showCommentsPanel: false,
@@ -318,12 +317,12 @@ function ActualitesController($scope, template, route, model, date, $location){
     };
 
     $scope.postInfoComment = function(info){
-        if ((! _.isString($scope.newComment.comment)) || ($scope.newComment.comment.trim() === "")) {
+        if ((!_.isString(info.newComment.comment)) || (info.newComment.comment.trim() === "")) {
             return;
         }
 
-        info.comment($scope.newComment.comment);
-		$scope.newComment = new Comment();
+        info.comment(info.newComment.comment);
+        info.newComment = new Comment();
 
     };
 
