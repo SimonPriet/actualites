@@ -22,7 +22,7 @@
 			<input ng-model="info.hasExpirationDate" type="checkbox"/>
 			<i18n>actualites.create.date.expire</i18n>
 		</label>
-		<div class="twelve cell" ng-show="info.hasExpirationDate">
+		<div class="row" ng-show="info.hasExpirationDate">
 			<date-picker min-date="info.publication_date" ng-model="info.expiration_date" ng-change="showDate = true"></date-picker>
 		</div>
 		<label class="twelve cell">
