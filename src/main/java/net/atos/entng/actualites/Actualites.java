@@ -6,9 +6,11 @@ import net.atos.entng.actualites.controllers.ThreadController;
 import net.atos.entng.actualites.controllers.DisplayController;
 import net.atos.entng.actualites.services.impl.ActualitesRepositoryEvents;
 
+import net.atos.entng.actualites.services.impl.ActualitesSearchingEvents;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.http.filter.ShareAndOwner;
 import org.entcore.common.service.impl.SqlCrudService;
+import org.entcore.common.service.impl.SqlSearchService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
@@ -35,6 +37,7 @@ public class Actualites extends BaseServer {
 
 		// Subscribe to events published for transition
 		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false)));
+		setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE)));
 
 		addController(new DisplayController());
 
