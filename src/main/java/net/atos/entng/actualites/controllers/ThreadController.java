@@ -189,7 +189,7 @@ public class ThreadController extends ControllerHelper {
 					JsonObject params = new JsonObject()
 						.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
-						.putString("resourceUri", pathPrefix + "#/view/thread/" + threadId);
+						.putString("resourceUri", pathPrefix + "#/admin");
 					shareJsonSubmit(request, "notify-thread-shared.html", false, params, "title");
 				} else {
 					unauthorized(request);
