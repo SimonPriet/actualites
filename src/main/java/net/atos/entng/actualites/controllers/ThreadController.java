@@ -185,12 +185,11 @@ public class ThreadController extends ControllerHelper {
 			            badRequest(request);
 			            return;
 			        }
-					setTimelineEventType(EVENT_TYPE);
 					JsonObject params = new JsonObject()
 						.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
 						.putString("resourceUri", pathPrefix + "#/default");
-					shareJsonSubmit(request, "notify-thread-shared.html", false, params, "title");
+					shareJsonSubmit(request, "actualites.thread-shared", false, params, "title");
 				} else {
 					unauthorized(request);
 				}

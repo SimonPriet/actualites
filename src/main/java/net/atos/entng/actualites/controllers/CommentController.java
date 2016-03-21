@@ -123,14 +123,14 @@ public class CommentController extends ControllerHelper {
 					if (event.isRight()) {
 						// get all ids
 						JsonArray shared = event.right().getValue();
-						extractUserIds(request, shared, user, infoId, commentId, title, commentText, eventType, "notify-news-comment.html");
+						extractUserIds(request, shared, user, infoId, commentId, title, commentText, "actualites.news-comment");
 					}
 				}
 			});
 		}
 	}
 
-	private void extractUserIds(final HttpServerRequest request, final JsonArray shared, final UserInfos user, final String infoId, final String commentId, final String title, final String commentText, final String eventType, final String template){
+	private void extractUserIds(final HttpServerRequest request, final JsonArray shared, final UserInfos user, final String infoId, final String commentId, final String title, final String commentText, final String notificationName){
 		final List<String> ids = new ArrayList<String>();
 		if (shared.size() > 0) {
 			JsonObject jo = null;
@@ -165,7 +165,7 @@ public class CommentController extends ControllerHelper {
 										}
 									}
 									if (remaining.decrementAndGet() < 1) {
-										sendNotify(request, ids, user, infoId, commentId, title, commentText, eventType, template);
+										sendNotify(request, ids, user, infoId, commentId, title, commentText, notificationName);
 									}
 								}
 							});
@@ -174,12 +174,12 @@ public class CommentController extends ControllerHelper {
 				}
 			}
 			if (remaining.get() < 1) {
-				sendNotify(request, ids, user, infoId, commentId, title, commentText, eventType, template);
+				sendNotify(request, ids, user, infoId, commentId, title, commentText, notificationName);
 			}
 		}
 	}
 
-	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos user, final String infoId, final String commentId, final String title, String commentText, final String eventType, final String template){
+	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos user, final String infoId, final String commentId, final String title, String commentText, final String notificationName){
 		if (infoId != null && !infoId.isEmpty() && commentId != null && !commentId.isEmpty() && user != null && !commentText.isEmpty()) {
 			String overview = commentText.replaceAll("<br>", "");
 			overview = "<p>".concat(overview);
@@ -193,7 +193,7 @@ public class CommentController extends ControllerHelper {
 				.putString("info", title)
 				.putString("actuUri", pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
 				.putString("overview", overview);
-			notification.notifyTimeline(request, user, EVENT_TYPE, eventType, ids, infoId, template, params);
+			notification.notifyTimeline(request, notificationName, user, ids, infoId, params);
 		}
 	}
 
