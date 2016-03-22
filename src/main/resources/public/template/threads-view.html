@@ -9,10 +9,12 @@
 
 <div class="row rigid-grid">
 	<div class="centered">
-		<div class="six cell twelve-mobile">
-			<nav class="vertical half-stamps">
-				<div ng-repeat="thread in threads.editable() | limitTo:threads.length() / 2" class="row">
-						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
+		<div class="twelve cell">
+			<nav class="vertical half-stamps eleven centered twelve-mobile">
+
+				<div ng-repeat="thread in threads.editable()" class="cell">
+
+						<article ng-class="{ selected: thread.selected }" class="cell">
 							<div class="clip">
 									<image-select ng-model="thread.icon"
 												  ng-change="thread.save()"
@@ -25,24 +27,7 @@
 						</article>
 						<input type="checkbox" ng-model="thread.selected" class="one cell right-magnet" />
 				</div>
-			</nav>
-		</div>
-		<div class="six cell twelve-mobile">
-			<nav class="vertical half-stamps">
-				<div ng-repeat="thread in threads.editable().slice(threads.length() / 2)" class="row">
-						<article ng-class="{ selected: thread.selected }" class="eleven cell right-magnet">
-							<div class="clip">
-								<image-select ng-model="thread.icon"
-											  ng-change="thread.save()"
-											  default="/img/illustrations/actualites-default.png"
-											  thumbnails="[{ width: 150, height: 150 }]"></image-select>
-							</div>
-							<div>
-									<input type="text" ng-model="thread.title" complete-change="thread.save()" />
-							</div>
-						</article>
-						<input type="checkbox" ng-model="thread.selected" class="one cell right-magnet" />
-				</div>
+
 			</nav>
 		</div>
 	</div>
