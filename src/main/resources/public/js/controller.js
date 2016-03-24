@@ -177,6 +177,16 @@ function ActualitesController($scope, template, route, model, date, $location){
 		template.open('main', 'main');
     };
 
+	$scope.checkMinExpirationDate = function(info) {
+        if(!info.publication_date || !info.expiration_date)
+            return;
+        var publicationDateMin = moment(info.publication_date).add('day', 1)
+        var expirationDate = moment(info.expiration_date)
+        if(expirationDate.isBefore(publicationDateMin)){
+            info.expiration_date = publicationDateMin.toISOString()
+        }
+	};
+
 	$scope.sortByIsHeadline = function(info) {
 		return info.is_headline;
 	};
