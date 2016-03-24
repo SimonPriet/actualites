@@ -421,17 +421,19 @@ model.build = function(){
 
 	this.collection(Info, {
 		thisWeek: function(){
-			return model.infos.filter(function(info){
-				return moment(
+		    return model.infos.filter(function (info) {
+		        var infoMoment = moment(
 					info.publication_date || info.created, ACTUALITES_CONFIGURATION.momentFormat
-					).week() === moment().week();
+				);
+				return infoMoment.week() === moment().week() && infoMoment.year() === moment().year();
 			});
 		},
 		beforeThisWeek: function(){
-			return model.infos.filter(function(info){
-				return moment(
-						info.publication_date || info.created, ACTUALITES_CONFIGURATION.momentFormat
-					).week() !== moment().week();
+		    return model.infos.filter(function (info) {
+		        var infoMoment = moment(
+					info.publication_date || info.created, ACTUALITES_CONFIGURATION.momentFormat
+				);
+		        return infoMoment.year() !== moment().year() || infoMoment.week() !== moment().week();
 			});
 		},
 		unsubmit: function(){
