@@ -123,7 +123,7 @@ public class CommentController extends ControllerHelper {
 					if (event.isRight()) {
 						// get all ids
 						JsonArray shared = event.right().getValue();
-						extractUserIds(request, shared, user, infoId, commentId, title, commentText, "actualites.news-comment");
+						extractUserIds(request, shared, user, infoId, commentId, title, commentText, "news.news-comment");
 					}
 				}
 			});

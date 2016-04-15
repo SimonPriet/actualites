@@ -592,7 +592,7 @@ public class InfoController extends ControllerHelper {
 												e.printStackTrace();
 											}
 										}
-										shareJsonSubmit(request, "actualites.info-shared", false, params, "title");
+										shareJsonSubmit(request, "news.info-shared", false, params, "title");
 									} else {
 										shareJsonSubmit(request, null, false, null, null);
 									}
@@ -629,7 +629,7 @@ public class InfoController extends ControllerHelper {
 					if (event.isRight()) {
 						// get all ids
 						JsonArray shared = event.right().getValue();
-						extractUserIds(request, shared, user, owner, threadId, infoId, title, "actualites.news-submitted");
+						extractUserIds(request, shared, user, owner, threadId, infoId, title, "news.news-submitted");
 					}
 				}
 			});
@@ -642,7 +642,7 @@ public class InfoController extends ControllerHelper {
 						if (event.isRight()) {
 							// get all ids
 							JsonArray shared = event.right().getValue();
-							extractUserIds(request, shared, user, owner, threadId, infoId, title, "actualites.news-unsubmitted");
+							extractUserIds(request, shared, user, owner, threadId, infoId, title, "news.news-unsubmitted");
 						}
 					}
 				});
@@ -655,7 +655,7 @@ public class InfoController extends ControllerHelper {
 							if (event.isRight()) {
 								// get all ids
 								JsonArray shared = event.right().getValue();
-								extractUserIds(request, shared, user, owner, threadId, infoId, title, "actualites.news-published");
+								extractUserIds(request, shared, user, owner, threadId, infoId, title, "news.news-published");
 							}
 						}
 					});
@@ -668,7 +668,7 @@ public class InfoController extends ControllerHelper {
 								if (event.isRight()) {
 									// get all ids
 									JsonArray shared = event.right().getValue();
-									extractUserIds(request, shared, user, owner, threadId, infoId, title, "actualites.news-unpublished");
+									extractUserIds(request, shared, user, owner, threadId, infoId, title, "news.news-unpublished");
 								}
 							}
 						});
@@ -730,10 +730,12 @@ public class InfoController extends ControllerHelper {
 	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos owner, final String threadId, final String infoId, final String title, final String notificationName){
 		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && owner != null) {
 			JsonObject params = new JsonObject()
-				.putString("profilUri", "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
+				.putString("profilUri", container.config().getString("host", "http://localhost:8090") +
+                    "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
 				.putString("username", owner.getUsername())
 				.putString("info", title)
-				.putString("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+				.putString("actuUri", container.config().getString("host", "http://localhost:8090") +
+                    pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 			notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
 		}
 	}
