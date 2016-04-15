@@ -182,11 +182,9 @@ public class CommentController extends ControllerHelper {
 	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos user, final String infoId, final String commentId, final String title, String commentText, final String notificationName){
 		if (infoId != null && !infoId.isEmpty() && commentId != null && !commentId.isEmpty() && user != null && !commentText.isEmpty()) {
 			String overview = commentText.replaceAll("<br>", "");
-			overview = "<p>".concat(overview);
 			if(overview.length() > OVERVIEW_LENGTH){
 				overview = overview.substring(0, OVERVIEW_LENGTH);
 			}
-			overview = overview.concat("</p>");
 			JsonObject params = new JsonObject()
 				.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 				.putString("username", user.getUsername())
