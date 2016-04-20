@@ -189,7 +189,7 @@ public class ThreadController extends ControllerHelper {
 						.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
 						.putString("resourceUri", pathPrefix + "#/default");
-					shareJsonSubmit(request, "actualites.thread-shared", false, params, "title");
+					shareJsonSubmit(request, "news.thread-shared", false, params, "title");
 				} else {
 					unauthorized(request);
 				}
