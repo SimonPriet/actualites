@@ -111,7 +111,7 @@ function ActualitesController($scope, template, route, model, date, $location){
 				model.infos.unbind('sync');
 				model.threads.unbind('sync');
 				$scope.info = undefined;
-				$scope.currentInfo = undefined;
+				$scope.currentInfo = new Info();
             	template.open('main', 'main');
 				model.threads.selectAll();
 
