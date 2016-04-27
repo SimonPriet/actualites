@@ -576,9 +576,11 @@ public class InfoController extends ControllerHelper {
 								if(info != null && info.containsField("status")){
 									if(info.getInteger("status") > 2){
 										JsonObject params = new JsonObject()
-											.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+											.putString("profilUri", container.config().getString("host", "http://localhost:8090") +
+												"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 											.putString("username", user.getUsername())
-											.putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+											.putString("resourceUri", container.config().getString("host", "http://localhost:8090") +
+												pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
 										String date = info.getString("publication_date");
 										if(date != null && !date.trim().isEmpty()){
@@ -736,6 +738,8 @@ public class InfoController extends ControllerHelper {
 				.putString("info", title)
 				.putString("actuUri", container.config().getString("host", "http://localhost:8090") +
                     pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+			params.putString("resourceUri", params.getString("actuUri"));
+
 			notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
 		}
 	}

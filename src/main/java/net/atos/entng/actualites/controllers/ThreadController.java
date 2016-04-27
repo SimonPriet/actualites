@@ -186,9 +186,12 @@ public class ThreadController extends ControllerHelper {
 			            return;
 			        }
 					JsonObject params = new JsonObject()
-						.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+						.putString("profilUri", container.config().getString("host", "http://localhost:8090") +
+							"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 						.putString("username", user.getUsername())
-						.putString("resourceUri", pathPrefix + "#/default");
+						.putString("resourceUri", container.config().getString("host", "http://localhost:8090") +
+							pathPrefix + "#/default");
+
 					shareJsonSubmit(request, "news.thread-shared", false, params, "title");
 				} else {
 					unauthorized(request);
