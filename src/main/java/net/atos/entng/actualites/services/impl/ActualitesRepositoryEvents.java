@@ -38,25 +38,20 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				final JsonObject j = (JsonObject) o;
 				gIds.add(j.getString("group"));
 			}
-			if (!shareOldGroupsToUsers) {
-				if (gIds.size() > 0) {
-					// Delete the groups. Cascade delete : delete from members, thread_shares and info_shares too
-					Sql.getInstance().prepared("DELETE FROM actualites.groups WHERE id IN " + Sql.listPrepared(gIds.toArray())
-							, gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
-						@Override
-						public void handle(Either<String, JsonObject> event) {
-							if (event.isRight()) {
-								log.info("[ActualitesRepositoryEvents][deleteGroups]The groups and their shares are deleted");
-							} else {
-								log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting the groups and their shares. Message : " + event.left().getValue());
-							}
-						}
-					}));
-				}
-			} else {
-				// TODO Implement shareOldGroupsToUsers
-				log.warn("[ActualitesRepositoryEvents][deleteGroups] Case (shareOldGroupsToUsers) for Event is not implemented");
-			}
+            if (gIds.size() > 0) {
+                // Delete the groups. Cascade delete : delete from members, thread_shares and info_shares too
+                Sql.getInstance().prepared("DELETE FROM actualites.groups WHERE id IN " + Sql.listPrepared(gIds.toArray())
+                        , gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
+                    @Override
+                    public void handle(Either<String, JsonObject> event) {
+                        if (event.isRight()) {
+                            log.info("[ActualitesRepositoryEvents][deleteGroups]The groups and their shares are deleted");
+                        } else {
+                            log.error("[ActualitesRepositoryEvents][deleteGroups] Error deleting the groups and their shares. Message : " + event.left().getValue());
+                        }
+                    }
+                }));
+            }
 		} else {
 			log.warn("[ActualitesRepositoryEvents][deleteGroups] groups is null or empty");
 		}
@@ -64,7 +59,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 
 	@Override
 	public void deleteUsers(JsonArray users) {
-		// TODO : make the user anonymous
+        //FIXME: anonymization is not relevant
 		if (users != null && users.size() > 0) {
 			final JsonArray uIds = new JsonArray();
 			for (Object u : users) {
@@ -99,7 +94,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 				public void handle(Either<String, JsonObject> event) {
 					if (event.isRight()) {
 						log.info("[ActualitesRepositoryEvents][cleanDataBase] The resources created by users are deleted");
-					} else {
+                    } else {
 						log.error("[ActualitesRepositoryEvents][cleanDataBase] Error deleting the resources created by users. Message : " + event.left().getValue());
 					}
 				}
@@ -108,6 +103,4 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			log.warn("[ActualitesRepositoryEvents][deleteUsers] users is empty");
 		}
 	}
-
-
 }
