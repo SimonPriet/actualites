@@ -13,7 +13,7 @@
 		gradle copyMod
 </pre>
 
-## Déploier dans ent-core
+## Déployer dans ent-core
 
 
 ## Configuration
@@ -72,13 +72,13 @@ Déclarer l'application dans la liste des widgets :
 ## Fonctionnalités
 
 Actualités est une application de création, de publication et de consultation d'actualités.
-Les actualités sont organisées en fils d'actualités (ou Catégories). 
-Les actualités sont soumises à un workflow simple de publication. 
-Elles ont donc un état ("Brouillon", "En attende de validation", "Publiée") qui conditionne leur visibilité finale dans le fil. 
+Les actualités sont organisées en fils d'actualités (ou Catégories).
+Les actualités sont soumises à un workflow simple de publication.
+Elles ont donc un état ("Brouillon", "En attende de validation", "Publiée") qui conditionne leur visibilité finale dans le fil.
 Des dates de publication et d'expiration peuvent de plus être définies.
-Des permissions sur les différentes actions possibles sur les fils d'actualités, dont la publication, sont configurées dans ces fils (via des partages Ent-core). 
-Le droit de lecture/commentaire, correspondant à qui peut consulter/commenter les actualités est également configuré de cette manière. 
-
+Des permissions sur les différentes actions possibles sur les fils d'actualités, dont la publication, sont configurées dans ces fils (via des partages Ent-core).
+Le droit de lecture/commentaire, correspondant à qui peut consulter/commenter les actualités est également configuré de cette manière.
+Les actualités mettent en œuvre un comportement de recherche sur le titre et le contenu de celles-ci.
 
 ## Modèle de persistance
 
@@ -111,7 +111,12 @@ Les contrôleurs étendent les classes du framework Ent-core exploitant les Crud
 Pour manipulations spécifiques, des classes de Service sont utilisées :
  * `ThreadService` : concernant les fils d'actualités
  * `InfoService` : concernant les Actualités
- 
+
+ Le module serveur met en œuvre deux évènements issus du framework Ent-core  :
+ * `ActualitesRepositoryEvents` : Logique de changement d'année scolaire
+ * `ActualitesSearchingEvents` : Logique de recherche
+
+
 Des jsonschemas permettent de vérifier les données reçues par le serveur, ils se trouvent dans le dossier "src/main/resources/jsonschema".
 
 ## Modèle front-end
@@ -123,4 +128,5 @@ Le modèle Front-end manipule 2 objets model :
 Il y a 2 Collections globales :
  * `model.threads` : objets `Thread` synchronisée depuis le serveur.
  * `model.infos` : objets `Info` synchronisée depuis le serveur.
- 
+
+
