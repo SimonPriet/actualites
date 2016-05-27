@@ -43,7 +43,7 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 	}
 
 	@Override
-	public void searchResource(List<String> appFilters, String userId, JsonArray groupIds, JsonArray searchWords, Integer page, Integer limit, final JsonArray columnsHeader,
+	public void searchResource(List<String> appFilters, final String userId, JsonArray groupIds, JsonArray searchWords, Integer page, Integer limit, final JsonArray columnsHeader,
 							   final String locale, final Handler<Either<String, JsonArray>> handler) {
 		if (appFilters.contains(ActualitesSearchingEvents.class.getSimpleName())) {
 			final List<String> returnFields = new ArrayList<String>();
@@ -62,7 +62,7 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
 					if (event.isRight()) {
-						final JsonArray res = formatSearchResult(event.right().getValue(), columnsHeader);
+						final JsonArray res = formatSearchResult(event.right().getValue(), columnsHeader, userId);
 						handler.handle(new Right<String, JsonArray>(res));
 					} else {
 						handler.handle(new Either.Left<String, JsonArray>(event.left().getValue()));
@@ -77,14 +77,14 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 		}
 	}
 
-	private JsonArray formatSearchResult(final JsonArray results, final JsonArray columnsHeader) {
+	private JsonArray formatSearchResult(final JsonArray results, final JsonArray columnsHeader, final String userId) {
 		final List<String> aHeader = columnsHeader.toList();
 		final JsonArray traity = new JsonArray();
 
 		for (int i=0;i<results.size();i++) {
 			final JsonObject j = results.get(i);
-			//Only published (status == 3)
-			if (j != null && j.getInteger("status", 0).equals(3)) {
+			//Only published (status == 3) or owner
+			if (j != null && (j.getInteger("status", 0).equals(3) || j.getString("owner", "").equals(userId))) {
 				final JsonObject jr = new JsonObject();
 				jr.putString(aHeader.get(0), j.getString("title"));
 				jr.putString(aHeader.get(1), j.getString("content"));
