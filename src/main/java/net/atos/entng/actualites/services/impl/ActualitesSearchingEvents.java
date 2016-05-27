@@ -53,6 +53,7 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 			returnFields.add("modified");
 			returnFields.add("thread_id");
 			returnFields.add("id");
+			returnFields.add("status");
 
 			final List<String> searchFields = new ArrayList<String>();
 			searchFields.add("title");
@@ -82,8 +83,9 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 
 		for (int i=0;i<results.size();i++) {
 			final JsonObject j = results.get(i);
-			final JsonObject jr = new JsonObject();
-			if (j != null) {
+			//Only published (status == 3)
+			if (j != null && j.getInteger("status", 0).equals(3)) {
+				final JsonObject jr = new JsonObject();
 				jr.putString(aHeader.get(0), j.getString("title"));
 				jr.putString(aHeader.get(1), j.getString("content"));
 				jr.putObject(aHeader.get(2), new JsonObject().putValue("$date",
