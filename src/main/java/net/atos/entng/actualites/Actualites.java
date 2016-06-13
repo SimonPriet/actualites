@@ -56,7 +56,10 @@ public class Actualites extends BaseServer {
 
 		// Subscribe to events published for transition
 		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false)));
-		setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE)));
+
+		if (config.getBoolean("searching-event", true)) {
+			setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE)));
+		}
 
 		addController(new DisplayController());
 
