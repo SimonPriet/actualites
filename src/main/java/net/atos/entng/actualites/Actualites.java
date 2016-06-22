@@ -36,6 +36,9 @@ import org.entcore.common.sql.SqlConfs;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Actualites extends BaseServer {
 	public final static String THREAD_RESOURCE_ID = "threadid";
 	public final static String THREAD_TABLE = "thread";
@@ -58,7 +61,10 @@ public class Actualites extends BaseServer {
 		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false)));
 
 		if (config.getBoolean("searching-event", true)) {
-			setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE)));
+			final List<String> searchFields = new ArrayList<String>();
+			searchFields.add("title");
+			searchFields.add("content");
+			setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE, searchFields)));
 		}
 
 		addController(new DisplayController());

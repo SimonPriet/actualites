@@ -55,10 +55,7 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 			returnFields.add("id");
 			returnFields.add("status");
 
-			final List<String> searchFields = new ArrayList<String>();
-			searchFields.add("title");
-			searchFields.add("content");
-			searchService.search(userId, groupIds.toList(), returnFields, searchWords.toList(), searchFields, page, limit, new Handler<Either<String, JsonArray>>() {
+			searchService.search(userId, groupIds.toList(), returnFields, searchWords.toList(), page, limit, new Handler<Either<String, JsonArray>>() {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
 					if (event.isRight()) {
