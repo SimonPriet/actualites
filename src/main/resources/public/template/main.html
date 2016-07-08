@@ -42,11 +42,13 @@
 
 	<section class="margin-four main-col">
 		<div class="twelve cell">
-
-			<microbox title="actualites.filter" close="ok">
-				<container ng-if="oneContribRight()" template="filters"></container>
-			</microbox>
-
+			<div class="option-row">
+				<div class="twelve cell">
+					<microbox title="actualites.filter" close="ok">
+						<container ng-if="oneContribRight()" template="filters"></container>
+					</microbox>
+				</div>
+			</div>
 			<div ng-if="display.emptyThread" class="row">
 				<h2><i18n>actualites.thread.empty</i18n></h2>
 			</div>
