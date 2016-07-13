@@ -427,11 +427,11 @@ object ActualitesScenario {
         jsonPath("$.status").find.is("1")
       ))
   // Contributor chooses recipients and submits his piece of news. He can't publish it
-  .exec(http("Info share read")
+  /*.exec(http("Info share read")
     .put("/actualites/thread/${threadId}/info/share/json/${studentContribInfoId}")
     .bodyPart(StringBodyPart("userId", "${teacherId}"))
     .bodyPart(StringBodyPart("actions", "net-atos-entng-actualites-controllers-InfoController|getInfo"))
-    .check(status.is(200)))
+    .check(status.is(200)))*/
   .exec(http("Info Submit")
     .put("/actualites/thread/${threadId}/info/${studentContribInfoId}/submit")
     .body(StringBody("""{"title" : "info updated", "owner": {"userId": "${studentId}"}}"""))
