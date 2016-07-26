@@ -68,7 +68,11 @@ function Info(data){
     this.collection(Comment);
     this.newComment = new Comment();
 	if(data){
-		this.preview = '<p>' + $('<div>' + data.content + '</div>').text().substring(0, 70) + '...' + '</p>';
+		this.preview = '<p>' + $('<div>' + data.content + '</div>').text().substring(0, 70);
+        if( this.preview.length > 70 ) {
+            this.preview = this.preview + '...'
+        }
+        this.preview = this.preview + '</p>';
 	}
 	else{
 		this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
