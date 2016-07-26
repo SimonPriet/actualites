@@ -347,13 +347,17 @@ Thread.prototype.saveModifications = function(){
 	});
 };
 
-Thread.prototype.save = function(){
-	if(this._id){
-		this.saveModifications();
-	}
-	else{
-		this.createThread();
-	}
+Thread.prototype.save = function() {
+    if (this._id) {
+        if (this.title && this.title.length > 0) {
+            this.saveModifications();
+        } else {
+            this.title = this.data.title;
+        }
+    }
+    else {
+        this.createThread();
+    }
 };
 
 Thread.prototype.remove = function(callback){
