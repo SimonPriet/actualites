@@ -108,6 +108,6 @@
     "user.teacher.deleted": "Ancien enseignant",
     "title.missing": "Veuillez renseigner le titre.",
 	"this.week": "Actualités de la semaine",
-	"before.this.week": "Actualités précédentes",
+	"before.this.week": "Autres actualités",
 	"this.week.empty": "Il n'y a pas de nouvelle actualité cette semaine"
 }
