@@ -205,11 +205,11 @@ public class CommentController extends ControllerHelper {
 				overview = overview.substring(0, OVERVIEW_LENGTH);
 			}
 			JsonObject params = new JsonObject()
-				.putString("profilUri", container.config().getString("host", "http://localhost:8090") +
+				.putString("profilUri", getScheme(request) + "://" + getHost(request) +
 						"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 				.putString("username", user.getUsername())
 				.putString("info", title)
-				.putString("actuUri",container.config().getString("host", "http://localhost:8090") +
+				.putString("actuUri",getScheme(request) + "://" + getHost(request) +
 						pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
 				.putString("overview", overview);
 			params.putString("resourceUri", params.getString("actuUri"));
