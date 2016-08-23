@@ -1,2 +1,3 @@
 create index on actualites.info (title);
-create index on actualites.info (content);
+-- use B-tree : content smaller than 8191 bytes
+-- create index on actualites.info (content);

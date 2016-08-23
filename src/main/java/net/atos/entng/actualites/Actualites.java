@@ -62,8 +62,7 @@ public class Actualites extends BaseServer {
 
 		if (config.getBoolean("searching-event", true)) {
 			final List<String> searchFields = new ArrayList<String>();
-			searchFields.add("title");
-			searchFields.add("content");
+			searchFields.add("text_searchable");
 			setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE, searchFields)));
 		}
 
