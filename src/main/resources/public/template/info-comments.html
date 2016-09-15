@@ -1,6 +1,6 @@
 <article class="row comment" ng-repeat="comment in info.comments.all">
 	<div class="lower-title">
-		<em>[[formatDate(comment.modified)]]</em>, par
+		<em>[[formatDate(comment.modified)]]</em>, <i18n>actualites.info.label.author</i18n>
 		<a href="/userbook/annuaire#/[[comment.owner]]"><span translate content="[[comment.username]]"></span></a>
 
 		<p>[[comment.comment]]</p>
