@@ -595,11 +595,9 @@ public class InfoController extends ControllerHelper {
 								if(info != null && info.containsField("status")){
 									if(info.getInteger("status") > 2){
 										JsonObject params = new JsonObject()
-											.putString("profilUri", getScheme(request) + "://" + getHost(request) +
-												"/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+											.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
 											.putString("username", user.getUsername())
-											.putString("resourceUri", getScheme(request) + "://" + getHost(request) +
-												pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+											.putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
 										String date = info.getString("publication_date");
 										if(date != null && !date.trim().isEmpty()){
@@ -751,12 +749,10 @@ public class InfoController extends ControllerHelper {
 	private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos owner, final String threadId, final String infoId, final String title, final String notificationName){
 		if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && owner != null) {
 			JsonObject params = new JsonObject()
-				.putString("profilUri", getScheme(request) + "://" + getHost(request) +
-                    "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
+				.putString("profilUri", "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
 				.putString("username", owner.getUsername())
 				.putString("info", title)
-				.putString("actuUri", getScheme(request) + "://" + getHost(request) +
-                    pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+				.putString("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
 			params.putString("resourceUri", params.getString("actuUri"));
 
 			notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
