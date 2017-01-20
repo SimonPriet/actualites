@@ -42,6 +42,7 @@
     "actualites.info.label.comments.many": "Afficher les commentaires",
     "actualites.info.label.comments.none": "Ajouter un commentaire",
     "actualites.info.label.comments.submit": "Commenter",
+    "actualites.info.label.comments.supprimer": "Supprimer",
     "actualites.info.label.expiration": "au",
     "actualites.info.label.initialDate": ", du",
     "actualites.info.label.publication": ", le",

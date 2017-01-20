@@ -26,11 +26,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import fr.wseduc.webutils.Utils;
 import net.atos.entng.actualites.Actualites;
+import net.atos.entng.actualites.filters.CommentFilter;
 import net.atos.entng.actualites.filters.InfoFilter;
 import net.atos.entng.actualites.services.InfoService;
+import net.atos.entng.actualites.services.ThreadService;
 import net.atos.entng.actualites.services.impl.InfoServiceSqlImpl;
 
+import net.atos.entng.actualites.services.impl.ThreadServiceSqlImpl;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
@@ -60,9 +64,11 @@ public class CommentController extends ControllerHelper {
 	private static final int OVERVIEW_LENGTH = 50;
 
 	protected final InfoService infoService;
+	protected final ThreadService threadService;
 
 	public CommentController(){
 		this.infoService = new InfoServiceSqlImpl();
+		this.threadService = new ThreadServiceSqlImpl();
 	}
 
 	@Put("/info/:"+Actualites.INFO_RESOURCE_ID+"/comment")
@@ -110,19 +116,19 @@ public class CommentController extends ControllerHelper {
 		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 			@Override
 			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_COMMENT_UPDATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						crudService.update(commentId, resource, user, notEmptyResponseHandler(request));
+						RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_COMMENT_UPDATE, new Handler<JsonObject>() {
+							@Override
+							public void handle(JsonObject resource) {
+								crudService.update(commentId, resource, user, notEmptyResponseHandler(request));
+							}
+						});
 					}
 				});
 			}
-		});
-	}
 
 	@Delete("/info/:"+Actualites.INFO_RESOURCE_ID+"/comment/:"+COMMENT_ID_PARAMETER)
 	@ApiDoc("Comment : delete a comment by comment id ")
-	@ResourceFilter(InfoFilter.class)
+	@ResourceFilter(CommentFilter.class)
 	@SecuredAction(value = "info.comment", type = ActionType.RESOURCE)
 	public void deleteComment(final HttpServerRequest request) {
 		final String commentId = request.params().get(COMMENT_ID_PARAMETER);

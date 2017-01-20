@@ -42,16 +42,15 @@
 				<editor ng-model="currentInfo.content"></editor>
 			</div>
 			<div class="row">
-
 				<div ng-if="currentInfo.thread !== undefined">
-					<button ng-click="saveDraft();" class="right-magnet">
-						<i18n>actualites.edition.infos.save</i18n>
-					</button>
 					<button ng-click="saveSubmitted();" class="right-magnet" ng-if="currentInfo.allow('submit')">
 						<i18n>actualites.edition.infos.submit</i18n>
 					</button>
 					<button ng-click="savePublished();" class="right-magnet" ng-if="currentInfo.allow('publish')">
 						<i18n>actualites.edition.infos.publish</i18n>
+					</button>
+					<button ng-click="saveDraft();" class="right-magnet">
+						<i18n>actualites.edition.infos.save.draft</i18n>
 					</button>
 				</div>
 				<button ng-click="cancelCreateInfo();" class="right-magnet cancel" type="button">

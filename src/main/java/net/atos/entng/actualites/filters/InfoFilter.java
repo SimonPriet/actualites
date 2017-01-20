@@ -87,12 +87,14 @@ public class InfoFilter implements ResourcesProvider {
 				}
 				values.add(user.getUserId());
 
-				query.append(" OR (ios.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
-					.append(" AND ios.action = ? AND i.status > 2)");
-				for(String value : groupsAndUserIds){
-					values.add(value);
+				if(!isDeleteComment(binding)) {
+					query.append(" OR (ios.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
+							.append(" AND ios.action = ? AND i.status > 2)");
+					for (String value : groupsAndUserIds) {
+						values.add(value);
+					}
+					values.add(sharedMethod);
 				}
-				values.add(sharedMethod);
 				query.append(") OR (");
 			}
 
@@ -150,6 +152,10 @@ public class InfoFilter implements ResourcesProvider {
 				);
 	}
 
+	private boolean isDeleteComment(final Binding binding) {
+		return "net.atos.entng.actualites.controllers.CommentController|deleteComment".equals(binding.getServiceMethod());
+	}
+
 	private boolean isInfoShare(final Binding binding) {
 		return ("net.atos.entng.actualites.controllers.InfoController|shareInfo".equals(binding.getServiceMethod()) ||
 				isInfoShareSubmitOrRemove(binding));
@@ -174,4 +180,6 @@ public class InfoFilter implements ResourcesProvider {
 				 "net.atos.entng.actualites.controllers.InfoController|updatePublished".equals(binding.getServiceMethod() )
 				);
 	}
+
+	private static final String mActionDeleteComment = "net-atos-entng-actualites-controllers-CommentController|deleteComment";
 }

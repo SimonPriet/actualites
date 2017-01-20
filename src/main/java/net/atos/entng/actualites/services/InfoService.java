@@ -19,14 +19,32 @@
 
 package net.atos.entng.actualites.services;
 
+import fr.wseduc.webutils.Either;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import fr.wseduc.webutils.Either;
-
 public interface InfoService {
+
+	/**
+	 * Create new info in database and create a new revision.
+	 * @param data new info
+	 * @param user user creating info
+	 * @param eventStatus revision event name
+	 * @param handler result handler
+	 */
+	public void create(JsonObject data, UserInfos user, String eventStatus, final Handler<Either<String, JsonObject>> handler);
+
+	/**
+	 * Update info in database and create a new revision.
+	 * @param id info id
+	 * @param data info values
+	 * @param user user updating info
+	 * @param eventStatus revision event name
+	 * @param handler result handler
+	 */
+	public void update(String id, JsonObject data, UserInfos user, String eventStatus, Handler<Either<String, JsonObject>> handler);
 
 	public void retrieve(String id, Handler<Either<String, JsonObject>> handler);
 	
@@ -41,5 +59,14 @@ public interface InfoService {
 	public void listForLinker(UserInfos user, Handler<Either<String, JsonArray>> handler);
 
 	public void getSharedWithIds(String infoId, Handler<Either<String, JsonArray>> handler);
+
+	/**
+	 * Get revisions filtered on infoId.
+	 * @param infoId info id.
+	 * @param handler result handler.
+	 */
+	public void getRevisions(Long infoId, Handler<Either<String, JsonArray>> handler);
+
+	public void getOwnerInfo(String infoId, Handler<Either<String, JsonObject>> handler);
 
 }

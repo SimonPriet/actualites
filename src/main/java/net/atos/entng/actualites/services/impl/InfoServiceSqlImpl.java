@@ -19,22 +19,115 @@
 
 package net.atos.entng.actualites.services.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.wseduc.webutils.http.Renders;
+import net.atos.entng.actualites.Actualites;
+import net.atos.entng.actualites.Actualites;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
+import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import fr.wseduc.webutils.Either;
 import net.atos.entng.actualites.services.InfoService;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
+
+import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
+import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 public class InfoServiceSqlImpl implements InfoService {
 
+	protected static final Logger log = LoggerFactory.getLogger(Renders.class);
 	private static final String THREAD_PUBLISH = "net-atos-entng-actualites-controllers-InfoController|publish";
+	private static final String RESOURCE_SHARED = "net-atos-entng-actualites-controllers-InfoController|getInfo";
+
+	/**
+	 * Format object to create a new revision
+	 * @param id info id
+	 * @param data object containing info
+	 * @return new object containing revision values
+	 */
+	private JsonObject mapRevision(Long id, JsonObject data) {
+		JsonObject o = data.copy();
+		o.removeField("id");
+		o.removeField("status");
+		o.removeField("thread_id");
+		if (o.containsField("expiration_date")) o.removeField("expiration_date");
+		if (o.containsField("publication_date")) o.removeField("publication_date");
+		if (o.containsField("is_headline")) o.removeField("is_headline");
+		o.putNumber("info_id", id);
+		return o;
+	}
+
+
+	@Override
+	public void create(final JsonObject data, final UserInfos user, final String eventStatus, final Handler<Either<String, JsonObject>> handler) {
+		String queryNewInfoId = "SELECT nextval('actualites.info_id_seq') as id";
+		Sql.getInstance().raw(queryNewInfoId, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+			@Override
+			public void handle(Either<String, JsonObject> event) {
+				if (event.isRight()) {
+					final Long infoId = event.right().getValue().getLong("id");
+					SqlStatementsBuilder s = new SqlStatementsBuilder();
+
+					String userQuery = "SELECT "+ Actualites.NEWS_SCHEMA + ".merge_users(?,?)";
+					s.prepared(userQuery, new JsonArray().add(user.getUserId()).add(user.getUsername()));
+
+					data.putString("owner", user.getUserId()).putNumber("id", infoId);
+					s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_TABLE, data, "id");
+
+					JsonObject revision = mapRevision(infoId, data);
+					revision.putString("event", eventStatus);
+					s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_REVISION_TABLE, revision, null);
+
+					Sql.getInstance().transaction(s.build(), validUniqueResultHandler(1, handler));
+				} else {
+					log.error("Failure to call nextval('"+ Actualites.NEWS_SCHEMA +".info_id_seq') sequence");
+				}
+			}
+		}));
+	}
+
+	@Override
+	public void update(String id, JsonObject data, UserInfos user, String eventStatus, Handler<Either<String, JsonObject>> handler) {
+		SqlStatementsBuilder s = new SqlStatementsBuilder();
+
+		String userQuery = "SELECT "+ Actualites.NEWS_SCHEMA + ".merge_users(?,?)";
+		s.prepared(userQuery, new JsonArray().add(user.getUserId()).add(user.getUsername()));
+
+		StringBuilder sb = new StringBuilder();
+		JsonArray values = new JsonArray();
+		for (String attr : data.getFieldNames()) {
+			sb.append(attr);
+			if (attr.contains("date")) {
+				sb.append("= to_timestamp(?, 'YYYY-MM-DD hh24:mi:ss'),");
+			} else {
+				sb.append(" = ?, ");
+			}
+			values.add(data.getValue(attr));
+		}
+		String query = "UPDATE " + Actualites.NEWS_SCHEMA + "." + Actualites.INFO_TABLE +
+						" SET " + sb.toString() + "modified = NOW() " +
+						"WHERE id = ? " +
+						"RETURNING id";
+
+		s.prepared(query, values.add(Integer.parseInt(id)));
+
+		JsonObject revision = mapRevision(Long.parseLong(id), data);
+		revision.putString("owner", user.getUserId());
+		revision.putString("event", eventStatus);
+		s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_REVISION_TABLE, revision, null);
+
+		Sql.getInstance().transaction(s.build(), SqlResult.validUniqueResultHandler(1, handler));
+	}
 
 	@Override
 	public void retrieve(String id, Handler<Either<String, JsonObject>> handler) {
@@ -210,7 +303,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title," +
+			query = "SELECT i.id as _id, i.title, u.username," +
 				" CASE WHEN i.publication_date > i.modified" +
 					" THEN i.publication_date" +
 					" ELSE i.modified" +
@@ -218,26 +311,20 @@ public class InfoServiceSqlImpl implements InfoService {
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +
 				" FROM actualites.info AS i" +
-				" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id" +
-				" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
 				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
-				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
-				" WHERE (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR i.owner = ?" +
-					" OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?) OR t.owner = ?)" +
+				" LEFT JOIN actualites.members AS m ON (ios.member_id = m.id AND m.group_id IS NOT NULL)" +
+				" WHERE ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND ios.action = ?) OR i.owner = ?)" +
 				" AND (i.status = 3" +
 					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date + interval '1 days' >= NOW())))" +
-				" GROUP BY i.id, u.username, t.id" +
+				" GROUP BY i.id, u.username" +
 				" ORDER BY date DESC" +
 				" LIMIT ?";
+
 			for(String value : groupsAndUserIds){
 				values.add(value);
 			}
-			values.add(user.getUserId());
-			for(String value : groupsAndUserIds){
-				values.add(value);
-			}
-			values.add(THREAD_PUBLISH);
+			values.add(RESOURCE_SHARED);
 			values.add(user.getUserId());
 			values.add(resultSize);
 			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
@@ -317,5 +404,28 @@ public class InfoServiceSqlImpl implements InfoService {
 			}
 		});
 	}
+
+	@Override
+	public void getOwnerInfo(String infoId, Handler<Either<String, JsonObject>> handler) {
+		if (infoId != null && !infoId.isEmpty()) {
+			String query = "SELECT info.owner FROM actualites." + Actualites.INFO_TABLE + " WHERE" +
+					" id = ?;";
+
+			Sql.getInstance().prepared(query, new JsonArray().addNumber(Long.parseLong(infoId)),
+					SqlResult.validUniqueResultHandler(handler));
+		}
+	}
+
+    @Override
+    public void getRevisions(Long infoId, Handler<Either<String, JsonArray>> handler) {
+        String query = "SELECT info_revision.id as _id, created, title, content, owner as " +
+                "user_id, event as eventName, username " +
+                "FROM "+ Actualites.NEWS_SCHEMA +".info_revision " +
+                "INNER JOIN "+ Actualites.NEWS_SCHEMA +".users on (info_revision.owner = users.id) " +
+                "WHERE info_id = ? " +
+                "ORDER BY created DESC;";
+        Sql.getInstance().prepared(query, new JsonArray().addNumber(infoId),
+                SqlResult.validResultHandler(handler));
+    }
 
 }

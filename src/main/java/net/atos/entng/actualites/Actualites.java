@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Actualites extends BaseServer {
+	public final static String NEWS_SCHEMA = "actualites";
+
 	public final static String THREAD_RESOURCE_ID = "threadid";
 	public final static String THREAD_TABLE = "thread";
 	public final static String THREAD_SHARE_TABLE = "thread_shares";
@@ -47,6 +49,7 @@ public class Actualites extends BaseServer {
 	public final static String INFO_RESOURCE_ID = "infoid";
 	public final static String INFO_TABLE = "info";
 	public final static String INFO_SHARE_TABLE = "info_shares";
+	public final static String INFO_REVISION_TABLE = "info_revision";
 
 	public final static String COMMENT_TABLE = "comment";
 

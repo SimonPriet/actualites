@@ -4,10 +4,13 @@
         <img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
     </div>
     <div class="margin-one">
-        <h2 style="margin: 0"><span translate content="[[getState(info)]]" class="warning-text"></span>[[info.title]]</h2>
-        <strong>
-            <i18n>actualites.info.label.author</i18n> <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>, &nbsp;[[(info.publication_date ? formatDate(info.publication_date).toLowerCase() : formatDateLocale(info.modified).toLowerCase())]]
-        </strong>
+        <h2 style="margin: 0">[[info.title]]</h2>
+        <em class="cell metadata">
+            <i18n>actualites.info.label.author</i18n> <a
+                href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>,
+            [[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
+            <span translate content="[[getState(info)]]"></span>
+        </em>
     </div>
 </div>
 

@@ -65,6 +65,9 @@ var actualitesBehaviours = {
 		},
 		deleteComment: {
 			right: 'net-atos-entng-actualites-controllers-CommentController|deleteComment'
+		},
+		getInfoTimeline: {
+			right: 'net-atos-entng-actualites-controllers-InfoController|getInfoTimeline'
 		}
 	},
 	workflow: {
@@ -75,16 +78,15 @@ var actualitesBehaviours = {
 Behaviours.register('actualites', {
 	behaviours: actualitesBehaviours,
 	resource: function(resource){
-		if(resource !== undefined){
-			if(!resource.myRights){
+		if (resource !== undefined){
+			if (!resource.myRights){
 				resource.myRights = {};
 			}
-			for(var behaviour in actualitesBehaviours.resources){
-				if(model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner){
-					if(resource.myRights[behaviour] !== undefined){
+			for (var behaviour in actualitesBehaviours.resources){
+				if (model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner){
+					if (resource.myRights[behaviour] !== undefined){
 						resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
-					}
-					else{
+					} else {
 						resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
 					}
 				}
@@ -95,8 +97,8 @@ Behaviours.register('actualites', {
 	workflow: function(){
 		var workflow = { };
 		var actualitesWorkflow = actualitesBehaviours.workflow;
-		for(var prop in actualitesWorkflow){
-			if(model.me.hasWorkflow(actualitesWorkflow[prop])){
+		for (var prop in actualitesWorkflow){
+			if (model.me.hasWorkflow(actualitesWorkflow[prop])){
 				workflow[prop] = true;
 			}
 		}
@@ -129,7 +131,7 @@ Behaviours.register('actualites', {
 				};
 			});
 			this.resources = _.compact(_.flatten(infosArray));
-			if(typeof callback === 'function'){
+			if (typeof callback === 'function'){
 				callback(this.resources);
 			}
 		}.bind(this));

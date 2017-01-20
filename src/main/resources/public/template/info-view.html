@@ -1,48 +1,51 @@
-<div class="preview-wrapper">
-	<em class="two cell metadata">
-        <i18n>actualites.info.label.author</i18n> <a href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>
-		<br />[[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
-	</em>
-
-	<article class="preview twelve cell"
-			 ng-class="{ expanded: info.expanded, important: info.is_headline, unpublished: (info.status === 1 || info.status === 2) }">
-
-		 <label ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')">
-			 <input type="checkbox" ng-model="info.selected" />
-			 <span></span>
-		 </label>
-
-		<div class="rigid-grid row">
-			<div ng-class="{ allowcheck: info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')}" class="one cell horizontal-spacing">
-				<img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
-				<img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
-			</div>
-
-			<div class="margin-three">
-				<h2 ng-click="info.expanded = !info.expanded">
-					<span translate content="[[getState(info)]]" class="warning-text"></span>[[info.title]]
-				</h2>
-				<div class="margin-three" ng-click="info.expanded = !info.expanded">
-					<div ng-show="!info.expanded">
-						<div class="twelve cell" bind-html="info.preview"></div>
-					</div>
-					<div ng-show="info.expanded">
-							<div class="twelve cell" bind-html="info.content"></div>
-					</div>
-				</div>
-			</div>
-
-		</div>
-		<div class="cell right-magnet" ng-if="info.allow('comment') || info.comments.length() > 0">
-			<a ng-click="info.displayComments = true; info.expanded = true;" ng-show="!info.displayComments">
-				<i18n>actualites.info.label.comments</i18n> ([[info.comments.all.length]])
-			</a>
-			<a ng-click="info.displayComments = false" ng-show="info.displayComments">
-				<i18n>actualites.info.label.comments.close</i18n>
-			</a>
-		</div>
-		<div class="row" ng-show="info.displayComments && info.expanded">
-			<container template="comments"></container>
-		</div>
-	</article>
+<div class="preview-wrapper cell twelve">
+    <article class="twelve cell preview"
+             ng-class="{ expanded: info.expanded, unpublished: (info.status === 1 || info.status === 2) }"
+             preview>
+        <div class="row">
+            <div class="one cell three-mobile">
+                <div ng-class="{ allowcheck: info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')}" class="horizontal-spacing">
+                    <img skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
+                    <img ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
+                </div>
+            </div>
+            <div class="cell eleven nine-mobile">
+                <h2 ng-click="info.expanded = !info.expanded"
+                    ng-class="{'warning-text': info.is_headline}">
+                    <i class="star" ng-if="info.is_headline"></i>
+                    [[info.title]]
+                </h2>
+                <div ng-click="info.expanded = !info.expanded; info.displayComments = !info.displayComments">
+                    <div ng-show="!info.expanded">
+                        <div class="twelve cell" bind-html="info.preview"></div>
+                    </div>
+                    <div ng-show="info.expanded">
+                        <div class="twelve cell" bind-html="info.content"></div>
+                    </div>
+                </div>
+                <div>
+                    <em class="cell metadata">
+                        <i18n>actualites.info.label.author</i18n> <a
+                            href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>,
+                        [[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
+                        <span translate content="[[getState(info)]]"></span>
+                    </em>
+                    <div class="cell right-magnet"
+                         ng-if="info.allow('comment') || info.comments.length() > 0">
+                        <a ng-click="info.displayComments = true; info.expanded = true;" ng-show="!info.displayComments">
+                            <i18n>actualites.info.label.comments</i18n> ([[info.comments.all.length]])
+                        </a>
+                        <a ng-click="info.displayComments = false" ng-show="info.displayComments">
+                            <i18n>actualites.info.label.comments.close</i18n>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" ng-show="info.displayComments && info.expanded">
+            <container template="comments"></container>
+        </div>
+        <check-tool ng-model="info.selected" ng-click="$event.stopPropagation()"
+                    ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')"></check-tool>
+    </article>
 </div>

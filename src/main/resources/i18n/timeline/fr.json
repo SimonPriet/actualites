@@ -17,5 +17,6 @@
     "user.personnel.deleted": "Ancien personnel",
     "user.relative.deleted": "Ancien parent",
     "user.student.deleted": "Ancien élève",
-    "user.teacher.deleted": "Ancien enseignant"
+    "user.teacher.deleted": "Ancien enseignant",
+    "timeline.actu.info.update" : "a mis à jour l'actualité "
 }
