@@ -268,20 +268,24 @@ function ActualitesController($scope, template, route, model, date, $location){
 	};
 
     $scope.getState = function(info){
-    	if(info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED){
-    		if(info.hasPublicationDate && moment().isBefore(getDateAsMoment(info.publication_date)) ){
-    			// label (A venir)
-    			return "actualites.edition.status.4" ;
-    		}
-    		if(info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date).add(1, 'days')) ){
-    			// label (Expiree)
-    			return "actualites.edition.status.5" ;
-    		}
-    		if(info.owner !== model.me.userId){
-    			return "actualites.edition.status.empty";
-    		}
-    	}
-    	return "actualites.edition.status." + info.status;
+        if (info) {
+            if (info.status === ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED) {
+                if (info.hasPublicationDate && moment().isBefore(getDateAsMoment(info.publication_date))) {
+                    // label (A venir)
+                    return "actualites.edition.status.4";
+                }
+                if (info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date).add(1, 'days'))) {
+                    // label (Expiree)
+                    return "actualites.edition.status.5";
+                }
+                if (info.owner !== model.me.userId) {
+                    return "actualites.edition.status.empty";
+                }
+            }
+            return "actualites.edition.status." + info.status;
+        } else {
+            return "";
+        }
     };
 
 	$scope.switchAll = function(){
@@ -399,12 +403,12 @@ function ActualitesController($scope, template, route, model, date, $location){
 
 	$scope.filterByThreads = function(unpublished){
 		return function(info){
-			return ((unpublished && info.status <= 2) || (!unpublished && info.status > 2))
+			return info && ((unpublished && info.status <= 2) || (!unpublished && info.status > 2))
 				&& ($scope.display.filters['show' + info.status || $scope.display.filters.all])
 				&& _.findWhere($scope.threads.selection(), { _id: info.thread_id })
 				&& info.allow('view');
 		};
-	}
+	};
 
     this.initialize();
 }
