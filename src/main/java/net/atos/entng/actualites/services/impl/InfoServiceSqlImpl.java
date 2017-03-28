@@ -91,6 +91,7 @@ public class InfoServiceSqlImpl implements InfoService {
 					Sql.getInstance().transaction(s.build(), validUniqueResultHandler(1, handler));
 				} else {
 					log.error("Failure to call nextval('"+ Actualites.NEWS_SCHEMA +".info_id_seq') sequence");
+					handler.handle(new Either.Left<String, JsonObject>("An error occured when creating new info"));
 				}
 			}
 		}));

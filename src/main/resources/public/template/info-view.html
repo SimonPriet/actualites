@@ -10,14 +10,18 @@
                 </div>
             </div>
             <div class="cell eleven nine-mobile">
-                <h2 ng-click="info.expanded = !info.expanded"
-                    ng-class="{'warning-text': info.is_headline}">
-                    <i class="star" ng-if="info.is_headline"></i>
+                <h2 ng-click="info.expanded = !info.expanded">
+                    <i class="star accent-color" ng-if="info.is_headline"></i>
                     [[info.title]]
                 </h2>
                 <div ng-click="info.expanded = !info.expanded; info.displayComments = !info.displayComments">
                     <div ng-show="!info.expanded">
-                        <div class="twelve cell" bind-html="info.preview"></div>
+                        <div class="cell twelve info-preview">
+                            <div class="twelve cell" bind-html="info.preview">
+                            </div>
+                            <div class="degrade twelve" ng-if="info.content.length > 500">
+                            </div>
+                        </div>
                     </div>
                     <div ng-show="info.expanded">
                         <div class="twelve cell" bind-html="info.content"></div>
@@ -28,7 +32,7 @@
                         <i18n>actualites.info.label.author</i18n> <a
                             href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>,
                         [[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
-                        <span translate content="[[getState(info)]]"></span>
+                        <span class="warning-text" translate content="[[getState(info)]]"></span>
                     </em>
                     <div class="cell right-magnet"
                          ng-if="info.allow('comment') || info.comments.length() > 0">

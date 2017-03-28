@@ -196,41 +196,41 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
-	@Post("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/pending")
-	@ApiDoc("Add a new Info with pending status")
-	@ResourceFilter(ThreadFilter.class)
-	@SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
-	public void createPending(final HttpServerRequest request) {
-		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-			@Override
-			public void handle(final UserInfos user) {
-				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
-					@Override
-					public void handle(JsonObject resource) {
-						resource.putNumber("status", status_list.get(2));
-						final String threadId = resource.getNumber("thread_id").toString();
-						final String title = resource.getString("title");
-						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
-							@Override
-							public void handle(Either<String, JsonObject> event) {
-								if (event.isRight()) {
-									JsonObject info = event.right().getValue();
-									String infoId = info.getNumber("id").toString();
-									notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
-									renderJson(request, event.right().getValue(), 200);
-								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
-									renderJson(request, error, 400);
-								}
-							}
-						};
-						infoService.create(resource, user, Events.CREATE_AND_PENDING.toString(),
-                                notEmptyResponseHandler(request));
-					}
-				});
-			}
-		});
-	}
+    @Post("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/pending")
+    @ApiDoc("Add a new Info with pending status")
+    @ResourceFilter(ThreadFilter.class)
+    @SecuredAction(value = "thread.contrib", type = ActionType.RESOURCE)
+    public void createPending(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
+                    @Override
+                    public void handle(JsonObject resource) {
+                        resource.putNumber("status", status_list.get(2));
+                        final String threadId = resource.getNumber("thread_id").toString();
+                        final String title = resource.getString("title");
+                        infoService.create(resource, user, Events.CREATE_AND_PENDING.toString(),
+                                new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            JsonObject info = event.right().getValue();
+                                            String infoId = info.getNumber("id").toString();
+                                            notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
+                                            renderJson(request, event.right().getValue(), 200);
+                                        } else {
+                                            JsonObject error = new JsonObject().putString("error", event.left().getValue());
+                                            renderJson(request, error, 400);
+                                        }
+                                    }
+                                }
+                        );
+                    }
+                });
+            }
+        });
+    }
 
 	@Post("/thread/:"+Actualites.THREAD_RESOURCE_ID+"/info/published")
 	@ApiDoc("Add a new Info published status")
@@ -586,7 +586,7 @@ public class InfoController extends ControllerHelper {
                                                     params.putNumber("timeline-publish-date", publication_date.getTime());
                                                 }
                                             } catch (ParseException e) {
-                                                e.printStackTrace();
+                                                log.error("An error occured when sharing an info : " + e.getMessage());
                                             }
                                         }
                                         shareJsonSubmit(request, "news.info-shared", false, params, "title");

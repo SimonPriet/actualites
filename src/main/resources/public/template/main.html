@@ -20,90 +20,97 @@
     </div>
 </lightbox>
 <div class="row rigid-grid">
-    <div class="four cell twelve-mobile">
-        <nav class="vertical mobile-navigation mobile-zero" id="info-side-nav" side-nav>
-            <ul>
-                <li ng-class="{selected : $location.path() === '/default'}">
-                    <a href="#/default">
-                        <i18n>actualites.threads.all</i18n>
-                    </a>
-                </li>
-                <li ng-repeat="thread in threads.all"
-                    ng-class="{selected : $location.path() === '/view/thread/' + thread._id
-                        || $location.path().indexOf('/view/thread/' + thread._id) !== -1}">
-                    <a href="#/view/thread/[[thread._id]]">
+    <div class="four cell side-col twelve-mobile">
+        <nav class="vertical half-stamps mobile-navigation" side-nav>
+            <div>
+                <a href="#/default">
+                    <article ng-click="switchSselectThread(thread)"
+                             ng-class="{ selected: $location.path() === '/default'
+                        || $location.path().indexOf('/default') !== -1 }">
+                        <div></div>
                         <div>
-                            <img skin-src="/img/illustrations/actualites-default.png"
-                                 ng-if="!thread.icon" class="two"/>
-                            <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon"
-                                 class="two"/>
-                            [[thread.title]]
+                            <h3><i18n>actualites.threads.all</i18n></h3>
                         </div>
-                    </a>
-                </li>
-            </ul>
+                    </article>
+                </a>
+            </div>
+            <div ng-repeat="thread in threads.all">
+                <a href="#/view/thread/[[thread._id]]">
+                    <article ng-click="switchSselectThread(thread)"
+                             ng-class="{ selected: $location.path() === '/view/thread/' + thread._id
+                        || $location.path().indexOf('/view/thread/' + thread._id) !== -1 }">
+                        <div>
+                            <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
+                            <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
+                        </div>
+                        <div>
+                            <h3>[[thread.title]]</h3>
+                        </div>
+                    </article>
+                </a>
+            </div>
             <a class="classic-link cell" workflow="actualites.admin" ng-click="threadsView()">
                 <i18n>thread.list.view</i18n>
             </a>
         </nav>
     </div>
-    <section class="margin-four">
+    <!--<section class="margin-four">-->
+    <section class="margin-four main-col">
         <div class="twelve cell">
             <container template="createInfo"></container>
         </div>
         <div class="twelve cell">
-            <nav class="subnavbar row">
-                <ul>
-                    <li ng-class="{selected : !hasParam('filter')}">
-                        <a href="[['#' + $location.path()]]" class="horizontal-spacing">
-                            <i18n>filters.all</i18n>
-                        </a>
-                    </li>
-                    <li ng-class="{selected : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED}"
-                        ng-if="oneRight('contrib')">
-                        <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED]]"
-                           class="horizontal-spacing">
-                            <i18n>filters.published</i18n>
-                        </a>
-                    </li>
-                    <li ng-class="{selected : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.HEADLINE,
-                           disabled : displayedInfos.headlines.length === 0 }">
-                        <a ng-if="displayedInfos.headlines.length > 0"
-                           href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.HEADLINE]]"
-                           class="horizontal-spacing">
-                            <i18n>filters.headline</i18n>
-                        </a>
-                        <span ng-if="displayedInfos.headlines.length === 0"><i18n>filters.headline</i18n></span>
-                    </li>
-                    <li ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.DRAFT,
+            <div class="twelve tabs vertical-spacing-twice heading-tabs">
+                <header ng-class="{selected : !hasParam('filter')}" class="horizontal-spacing-twice">
+                    <a href="[['#' + $location.path()]]" class="horizontal-spacing">
+                        <span><i18n>filters.all</i18n></span>
+                    </a>
+                </header>
+                <header ng-class="{selected : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED}"
+                    ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
+                    <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED]]"
+                       class="horizontal-spacing">
+                        <span><i18n>filters.published</i18n></span>
+                    </a>
+                </header>
+                <header ng-class="{selected : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.HEADLINE,
+                           disabled : displayedInfos.headlines.length === 0 }" class="horizontal-spacing-twice">
+                    <a ng-if="displayedInfos.headlines.length > 0"
+                       href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.HEADLINE]]"
+                       class="horizontal-spacing">
+                        <span><i18n>filters.headline</i18n></span>
+                    </a>
+                    <span ng-if="displayedInfos.headlines.length === 0"><i18n>filters.headline</i18n></span>
+                </header>
+                <header ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.DRAFT,
                         'disabled' : displayedInfos.drafts.length === 0}"
-                        ng-if="oneRight('contrib')">
-                        <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.DRAFT]]"
-                           ng-if="displayedInfos.drafts.length > 0"
-                           class="horizontal-spacing">
-                            <i18n>filters.drafts</i18n>
-                        </a>
-                        <span ng-if="displayedInfos.drafts.length === 0"><i18n>filters.drafts</i18n></span>
-                    </li>
-                    <li ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PENDING,
+                    ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
+                    <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.DRAFT]]"
+                       ng-if="displayedInfos.drafts.length > 0"
+                       class="horizontal-spacing">
+                        <span><i18n>filters.drafts</i18n></span>
+                    </a>
+                    <span ng-if="displayedInfos.drafts.length === 0"><i18n>filters.drafts</i18n></span>
+                </header>
+                <header ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PENDING,
                             'disabled': displayedInfos.pendings.length === 0}"
-                        ng-if="oneRight('submit')">
-                        <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PENDING]]"
-                           ng-if="displayedInfos.pendings.length > 0"
-                           class="horizontal-spacing">
+                    ng-if="oneRight('submit')" class="horizontal-spacing-twice">
+                    <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PENDING]]"
+                       ng-if="displayedInfos.pendings.length > 0"
+                       class="horizontal-spacing">
+                        <span>
                             <i18n>filters.submitted.waiting</i18n>
                             <i class="badge">[[displayedInfos.pendings.length]]</i>
-                        </a>
-                        <span ng-if="displayedInfos.pendings.length === 0"><i18n>filters.submitted.waiting</i18n></span>
-                    </li>
-                </ul>
-            </nav>
+                        </span>
+                    </a>
+                    <span ng-if="displayedInfos.pendings.length === 0"><i18n>filters.submitted.waiting</i18n></span>
+                </header>
+            </div>
         </div>
         <div class="twelve cell">
             <div ng-if="display.emptyThread" class="row">
                 <h2><i18n>actualites.thread.empty</i18n></h2>
             </div>
-
             <div ng-if="findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.DRAFT
                         || findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PENDING
                         || !hasParam('filter')">

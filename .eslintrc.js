@@ -78,8 +78,7 @@ module.exports = {
         }],
         "line-comment-position": "off",
         "linebreak-style": [
-            "error",
-            "windows"
+            "warn"
         ],
         "lines-around-comment": "error",
         "lines-around-directive": "error",
@@ -103,7 +102,8 @@ module.exports = {
         "no-caller": "error",
         "no-catch-shadow": "error",
         "no-confusing-arrow": "error",
-        "no-continue": "error",
+        "no-continue": "warn",
+        "no-fallthrough": "warn",
         "no-div-regex": "error",
         "no-duplicate-imports": "error",
         "no-else-return": "off",
@@ -166,7 +166,7 @@ module.exports = {
         "no-restricted-modules": "error",
         "no-restricted-properties": "error",
         "no-restricted-syntax": "error",
-        "no-return-assign": "error",
+        "no-return-assign": "warn",
         "no-return-await": "error",
         "no-script-url": "error",
         "no-self-compare": "error",

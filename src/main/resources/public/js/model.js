@@ -77,7 +77,7 @@ function Info(data){
     if (data){
         this.preview = '<p>' + $('<div>' + data.content + '</div>').text().substring(0, 500);
         if ( this.preview.length > 500 ) {
-            this.preview = this.preview + '... <strong><a>' + lang.translate('actualites.info.read.more') + '</a></strong>';
+            this.preview = this.preview + '... <strong class="read-more-link"><a>' + lang.translate('actualites.info.read.more') + '</a></strong>';
         }
         this.preview = this.preview + '</p>';
     } else {
@@ -195,23 +195,35 @@ Info.prototype.save = function(){
 
 Info.prototype.submit = function(){
     this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit', { title: this.title });
+    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/submit', { title: this.title })
+        .done(function () {
+            model.infos.sync();
+        });
 };
 
 Info.prototype.unsubmit = function(){
     this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', { title: this.title });
+    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', { title: this.title })
+        .done(function () {
+            model.infos.sync();
+        });
 };
 
 Info.prototype.publish = function(){
     this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title, owner: this.owner, username: this.username });
+    http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title, owner: this.owner, username: this.username })
+        .done(function () {
+            model.infos.sync();
+        });
 };
 
 Info.prototype.unpublish = function(canSkipPendingStatus){
     if (!canSkipPendingStatus) {
         this.status = ACTUALITES_CONFIGURATION.infoStatus.PENDING;
-        http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', { title: this.title, owner: this.owner, username: this.username });
+        http().putJson('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unpublish', { title: this.title, owner: this.owner, username: this.username })
+            .done(function () {
+                model.infos.sync();
+            });
     } else {
         this.unsubmit();
     }
@@ -452,6 +464,7 @@ model.build = function(){
             http().get('/actualites/threads').done(function(result){
                 this.load(result);
                 this.trigger('sync');
+                model.trigger('counter:sync');
             }.bind(this));
         },
         removeSelection: function (){
@@ -564,6 +577,7 @@ model.build = function(){
                 this.drafts = model.draft(this.all);
                 this.headlines = model.headline(this.all);
                 this.trigger('sync');
+                model.trigger('counter:sync');
             }.bind(this));
         },
         behaviours: 'actualites'

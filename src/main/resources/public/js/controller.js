@@ -34,6 +34,11 @@ function ActualitesController($scope, template, route, model, date, $location){
         $scope.displayedInfos = null;
         $scope.infoTimeline = null;
 
+        model.infos.on('sync', function () {
+            model.infos.deselectAll();
+            $scope.$apply();
+        });
+
         route({
             // Routes viewThread, viewInfo adn viewComment are used by notifications
             viewThread: function(params){
@@ -132,15 +137,23 @@ function ActualitesController($scope, template, route, model, date, $location){
                 template.open('main', 'main');
                 model.infos.one('sync', function(){
                     model.threads.mapInfos();
-                    model.infos.deselectAll();
                     $scope.$apply();
                 });
                 $scope.displayedInfos = model.infos;
+                model.infos.deselectAll();
             },
             admin: function(){
                 model.infos.unbind('sync');
                 model.threads.unbind('sync');
                 template.open('main', 'threads-view');
+                model.on('counter:sync', function () {
+                   if (model.threads.all.length > 0 && model.infos.all.length > 0) {
+                       model.threads.map(function (thread) {
+                          return thread.counterInfo = $scope.countInfoByThread(thread._id);
+                       });
+                       $scope.$apply();
+                   }
+                });
             },
             viewTimeline : function (param) {
                 var initTimeline = function () {
