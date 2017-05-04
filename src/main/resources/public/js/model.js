@@ -119,7 +119,7 @@ Info.prototype.toJSON = function(){
         if (!moment.isMoment(expDate)) {
             expDate = moment(expDate);
         }
-        expDate = expDate.toISOString();
+        expDate = expDate.format('YYYY-MM-DD[T]HH:mm:ss.SSS');
     }
 
     var exportThis = {
