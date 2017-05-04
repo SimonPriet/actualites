@@ -37,8 +37,7 @@
             <div ng-repeat="thread in threads.all">
                 <a href="#/view/thread/[[thread._id]]">
                     <article ng-click="switchSselectThread(thread)"
-                             ng-class="{ selected: $location.path() === '/view/thread/' + thread._id
-                        || $location.path().indexOf('/view/thread/' + thread._id) !== -1 }">
+                             ng-class="{ selected: $location.path() === '/view/thread/' + thread._id}">
                         <div>
                             <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
                             <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />

@@ -20,7 +20,7 @@
                         <img skin-src="[[thread.icon]]" class="absolute" />
                     </div>
                     <div>
-                        <h3>[[thread.title]]</h3>
+                        <h3>[[thread.display_title]]</h3>
                         <strong class="row"><i18n>thread.owner</i18n>[[thread.username]]</strong>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <div class="reduce-block-eight" ng-if="thread.counterInfo > 0">
                         <em>[[thread.counterInfo]]<i18n>actualites.thread.thread.counter</i18n></em>
                     </div>
-                    <div class="reduce-block-eight" ng-if="thread.counterInfo === 0">
+                    <div ng-if="thread.counterInfo === 0">
                         <em><i18n>actualites.thread.empty.info</i18n></em>
                     </div>
                 </div>

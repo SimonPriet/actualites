@@ -462,6 +462,11 @@ model.build = function(){
         behaviours: 'actualites',
         sync: function(){
             http().get('/actualites/threads').done(function(result){
+                _.map(result, function (thread) {
+                    return thread.display_title = thread.title.length > 40
+                        ? (thread.title.substring(0, 40) + '...')
+                        : thread.title;
+                });
                 this.load(result);
                 this.trigger('sync');
                 model.trigger('counter:sync');
