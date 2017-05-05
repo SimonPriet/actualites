@@ -331,6 +331,12 @@ function Thread(){
     });
 }
 
+Thread.prototype.setDisplayName = function () {
+    return this.display_title = this.title.length > 40
+        ? (this.title.substring(0, 40) + '...')
+        : this.title
+};
+
 Thread.prototype.load = function (data) {
     var resourceUrl = '/actualites/thread/' + this._id;
     if (data !== undefined) {
@@ -382,7 +388,8 @@ Thread.prototype.saveModifications = function(){
     this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
     http().putJson('/actualites/thread/' + this._id, this).done(function () {
         model.infos.sync();
-    });
+        this.setDisplayName();
+    }.bind(this));
 };
 
 Thread.prototype.save = function() {
@@ -462,12 +469,10 @@ model.build = function(){
         behaviours: 'actualites',
         sync: function(){
             http().get('/actualites/threads').done(function(result){
-                _.map(result, function (thread) {
-                    return thread.display_title = thread.title.length > 40
-                        ? (thread.title.substring(0, 40) + '...')
-                        : thread.title;
-                });
                 this.load(result);
+                this.map(function (thred) {
+                   return thred.setDisplayName();
+                });
                 this.trigger('sync');
                 model.trigger('counter:sync');
             }.bind(this));
