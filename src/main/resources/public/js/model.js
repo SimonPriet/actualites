@@ -5,7 +5,7 @@ var getDateAsMoment = function(date){
     if (moment.isMoment(date)) {
         momentDate = date;
     }
-    else if (date.$date) {
+    else if (typeof date !== 'string' && date.$date) {
         momentDate = moment(date.$date);
     } else if (typeof date === 'number'){
         momentDate = moment.unix(date);
@@ -570,10 +570,14 @@ model.build = function(){
                     if (info.publication_date) {
                         info.publication_date = info.publication_date.split('.')[0];
                         info.hasPublicationDate = true;
+                    } else {
+                        info.publication_date = moment();
                     }
                     if (info.expiration_date) {
                         info.expiration_date = info.expiration_date.split('.')[0];
                         info.hasExpirationDate = true;
+                    } else {
+                        info.expiration_date = moment();
                     }
                     info.created = info.created.split('.')[0];
                     info.modified = info.modified.split('.')[0];
