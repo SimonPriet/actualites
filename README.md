@@ -89,6 +89,7 @@ Les scripts sql se trouvent dans le dossier "src/main/resources/sql".
  * `thread` : Fil d'actualités
  * `info` : Actualité
  * `comment` : Commentaire d'actulités
+ 
 Une `info` appartient à un `thread` et un `thread` peut avoir plusieurs objects `info`.
 Un `comment` appartient à une `info` et une `info` peut avoir plusieurs objects `comment`.
 
