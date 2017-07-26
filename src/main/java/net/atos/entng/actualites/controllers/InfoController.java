@@ -575,7 +575,8 @@ public class InfoController extends ControllerHelper {
                                         JsonObject params = new JsonObject()
                                                 .putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
                                                 .putString("username", user.getUsername())
-                                                .putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+                                                .putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
+                                                .putBoolean("disableAntiFlood", true);
                                         DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
                                         String date = info.getString("publication_date");
                                         if(date != null && !date.trim().isEmpty()){
@@ -746,7 +747,6 @@ public class InfoController extends ControllerHelper {
                     .putString("info", title)
                     .putString("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
             params.putString("resourceUri", params.getString("actuUri"));
-
             notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
         }
     }
