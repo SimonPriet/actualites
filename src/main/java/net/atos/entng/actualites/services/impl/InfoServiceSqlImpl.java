@@ -304,7 +304,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, u.username," +
+			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title , " +
 				" CASE WHEN i.publication_date > i.modified" +
 					" THEN i.publication_date" +
 					" ELSE i.modified" +
@@ -312,13 +312,14 @@ public class InfoServiceSqlImpl implements InfoService {
 				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
 				", array_to_json(array_agg(group_id)) as groups" +
 				" FROM actualites.info AS i" +
+				" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id" +
 				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON (ios.member_id = m.id AND m.group_id IS NOT NULL)" +
 				" WHERE ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND ios.action = ?) OR i.owner = ?)" +
 				" AND (i.status = 3" +
 					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date + interval '1 days' >= NOW())))" +
-				" GROUP BY i.id, u.username" +
+				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY date DESC" +
 				" LIMIT ?";
 
