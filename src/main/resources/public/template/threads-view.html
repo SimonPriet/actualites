@@ -17,7 +17,8 @@
             <div class="card four height-two" ng-repeat="thread in threads.editable()">
                 <div class="row">
                     <div class="illustration">
-                        <img skin-src="[[thread.icon]]" class="absolute" />
+                        <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
+                        <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
                     </div>
                     <div>
                         <h3>[[thread.display_title]]</h3>
