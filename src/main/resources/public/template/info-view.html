@@ -31,7 +31,7 @@
                     <em class="cell metadata vertical-spacing">
                         <i18n>actualites.info.label.author</i18n> <a
                             href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>,
-                        [[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
+                        [[getInfoDate(info)]]
                         <span class="warning-text" translate content="[[getState(info)]]"></span>
                     </em>
                     <div class="cell right-magnet"

@@ -348,6 +348,14 @@ function ActualitesController($scope, template, route, model, date, $location){
         return moment(momentDate).calendar();
     };
 
+    $scope.getInfoDate = function(info){
+        if (info.publication_date !== undefined && info.publication_date !== null && typeof info.publication_date === 'string') {
+            return $scope.formatDate(info.publication_date);
+        } else {
+            return $scope.formatDateLocale(info.modified);
+        }
+    };
+
     $scope.formatDateLocale = function(date){
         if (moment(date) > moment().add(-1, 'days').startOf('day') && moment(date) < moment().endOf('day'))
             return moment(date).calendar();
