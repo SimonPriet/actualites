@@ -294,7 +294,7 @@ function ActualitesController($scope, template, route, model, date, $location){
             }
             if (info.hasExpirationDate && moment().isAfter(getDateAsMoment(info.expiration_date).add(1, 'days')) ){
                 // label (Expiree)
-                return 'actualites.edition.status.5' ;
+                return  'actualites.edition.status.5' ;
             }
             if (info.owner !== model.me.userId){
                 return 'actualites.edition.status.empty';
@@ -403,6 +403,9 @@ function ActualitesController($scope, template, route, model, date, $location){
                 default :
                     _b = (unpublished && info.status <= $scope.getStatusNumber(ACTUALITES_CONFIGURATION.infoFilter.PENDING))
                         || (!unpublished && info.status > $scope.getStatusNumber(ACTUALITES_CONFIGURATION.infoFilter.PENDING));
+            }
+            if ($scope.getState(info)== 'actualites.edition.status.5'){
+                _b = false;
             }
             return _b;
         };
