@@ -237,6 +237,9 @@ function ActualitesController($scope, template, route, model, date, $location){
 
     $scope.createInfo = function(){
         $scope.currentInfo = new Info();
+        if (!jQuery.isEmptyObject($scope.currentThread)) {
+            $scope.currentInfo.thread = $scope.currentThread;
+        }
         template.open('createInfo', 'info-create');
     };
 
@@ -535,6 +538,18 @@ function ActualitesController($scope, template, route, model, date, $location){
     $scope.goBackToTimeline = function () {
         $scope.infoTimeline.events.deselectAll();
         template.open('main', 'info-timeline');
+    };
+
+    /**
+     * When selecting a thread, change the currentThread and
+     * the currentInfo.thread to the one selected
+     * @param thread selected
+     */
+    $scope.switchSelectThread = function (thread) {
+        if (thread !== undefined) {
+            $scope.currentInfo.thread = thread;
+            $scope.currentThread = thread;
+        }
     };
 
     function findSequence(x, y){
