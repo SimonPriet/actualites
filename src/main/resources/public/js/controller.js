@@ -42,6 +42,8 @@ function ActualitesController($scope, template, route, model, date, $location){
         route({
             // Routes viewThread, viewInfo adn viewComment are used by notifications
             viewThread: function(params){
+                model.infos.unbind('sync');
+                model.threads.unbind('sync');
                 var initThreadView = function () {
                     var aThread = model.threads.findWhere({_id : parseInt(params.threadId)});
                     if (aThread !== undefined) {
@@ -54,10 +56,10 @@ function ActualitesController($scope, template, route, model, date, $location){
                     }
                     $scope.$apply();
                 };
-                model.infos.one('sync', function () {
+                model.infos.on('sync', function () {
                     model.threads.mapInfos();
                 });
-                model.threads.one('sync', function(){
+                model.threads.on('sync', function(){
                     initThreadView();
                 });
                 if (model.threads.all.length === 0) {
@@ -68,6 +70,8 @@ function ActualitesController($scope, template, route, model, date, $location){
                 }
             },
             viewInfo: function(params){
+                model.infos.unbind('sync');
+                model.threads.unbind('sync');
                 var initInfoSync = function () {
                     model.threads.mapInfos();
                     $scope.info = undefined;
@@ -116,10 +120,10 @@ function ActualitesController($scope, template, route, model, date, $location){
                         }
                     }
                 };
-                model.infos.one('sync', function () {
+                model.infos.on('sync', function () {
                     initInfoSync();
                 });
-                model.threads.one('sync', function(){
+                model.threads.on('sync', function(){
                     model.infos.sync();
                     initThreadSync();
                 });

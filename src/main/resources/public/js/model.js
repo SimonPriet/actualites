@@ -247,7 +247,6 @@ Info.prototype.restore = function(){
 
 Info.prototype.delete = function(){
     http().delete('/actualites/thread/' + this.thread_id + '/info/' + this._id).done(function () {
-        model.infos.unbind('sync');
         model.infos.sync();
     });
 };
