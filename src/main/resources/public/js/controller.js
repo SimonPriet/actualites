@@ -239,6 +239,11 @@ function ActualitesController($scope, template, route, model, date, $location){
         info.expanded = true;
     };
 
+    $scope.cancelEditInfo = function (info) {
+        info.edit = false;
+        info.expanded = false;
+    };
+
     $scope.createInfo = function(){
         $scope.currentInfo = new Info();
         if (!jQuery.isEmptyObject($scope.currentThread)) {
