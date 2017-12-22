@@ -1,11 +1,11 @@
 <div class="last-infos-widget widget">
-	<h1>
+	<h1 class="widget-left-margin">
 		<span ng-click="widget.openConfig()" tooltip="actualites.widget.config" class="last-infos-config-button"></span>
 		<i18n>actualites.widget.title</i18n>
 	</h1>
 	
-	<ul class="row">
-		<li ng-repeat="info in widget.infos" ng-class="{ 'border': $last === false }">
+	<ul class="row widget-left-margin">
+		<li class="widget-news" ng-repeat="info in widget.infos" ng-class="{ 'border': $last === false }">
 			<a ng-href="/actualites#/view/thread/[[info.thread_id]]/info/[[info._id]]"
 			tooltip="[[info.tooltip]]">
 				[[info.title]]
