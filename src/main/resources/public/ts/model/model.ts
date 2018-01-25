@@ -102,33 +102,64 @@ export const buildModel = function() {
 
     model.collection(Info, {
         unsubmit: function () {
-            this.selection().forEach(function(info){
-                info.unsubmit();
-            });
+            if ( this.selection().length > 1 ) {
+                this.selection().forEach(function(info){
+                    info.unsubmit();
+                });
+            } else {
+                this.selection()[0].forEach(function(info){
+                    info.unsubmit();
+                });
+            }
             //remove drafts from other users
             this.all = this.reject(function(info){
                 return info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT && info.owner !== model.me.userId;
             });
         },
         unpublish: function () {
-            this.selection().forEach(function(info){
-                info.unpublish();
-            });
+            if ( this.selection().length > 1 ) {
+                this.selection().forEach(function(info){
+                    info.unpublish();
+                });
+            } else {
+                this.selection()[0].forEach(function(info){
+                    info.unpublish();
+                });
+            }
+
         },
         publish: function () {
-            this.selection().forEach(function(info){
-                info.publish();
-            });
+            if ( this.selection().length > 1 ) {
+                this.selection().forEach(function(info){
+                    info.publish();
+                });
+            } else {
+                this.selection()[0].forEach(function(info){
+                    info.publish();
+                });
+            }
         },
         submit: function () {
-            this.selection().forEach(function(info){
-                info.submit();
-            });
+            if ( this.selection().length > 1 ) {
+                this.selection().forEach(function(info){
+                    info.submit();
+                });
+            } else {
+                this.selection()[0].forEach(function(info){
+                    info.submit();
+                });
+            }
         },
         remove: function () {
-            this.selection().forEach(function(info){
-                info.delete();
-            });
+            if ( this.selection().length > 1 ) {
+                this.selection().forEach(function(info){
+                    info.delete();
+                });
+            } else {
+                this.selection()[0].forEach(function(info){
+                    info.delete();
+                });
+            }
             this.removeSelection();
         },
         thisWeekInfos: [],

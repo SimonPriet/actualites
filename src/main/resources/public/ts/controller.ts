@@ -1,6 +1,6 @@
 import { ng, template, idiom as lang, moment, _, $, model } from 'entcore';
 import { ACTUALITES_CONFIGURATION } from './configuration';
-
+import { safeApply } from './functions/safeApply';
 import { Info, Thread, Comment, Utils } from './model';
 
 export const actualiteController = ng.controller('ActualitesController',
@@ -18,7 +18,7 @@ export const actualiteController = ng.controller('ActualitesController',
 
                 model.infos.on('sync', function () {
                     model.infos.deselectAll();
-                    $scope.$apply();
+                    safeApply($scope);
                 });
 
                 route({
@@ -34,7 +34,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 $scope.notFound = true;
                                 template.open('error', '404');
                             }
-                            $scope.$apply();
+                            safeApply($scope);
                         };
                         model.infos.one('sync', function () {
                             model.threads.mapInfos();
@@ -83,7 +83,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 $location.path('/default');
                             }
                             $location.replace();
-                            $scope.$apply();
+                            safeApply($scope);
                         };
                         var initThreadSync = function () {
                             if (params.threadId !== undefined) {
@@ -119,7 +119,7 @@ export const actualiteController = ng.controller('ActualitesController',
                         template.open('main', 'main');
                         model.infos.one('sync', function(){
                             model.threads.mapInfos();
-                            $scope.$apply();
+                            safeApply($scope);
                         });
                         $scope.displayedInfos = model.infos;
                         model.infos.deselectAll();
@@ -133,7 +133,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 model.threads.map(function (thread) {
                                     return thread.counterInfo = $scope.countInfoByThread(thread._id);
                                 });
-                                $scope.$apply();
+                                safeApply($scope);
                             }
                         });
                     },
@@ -148,7 +148,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 $scope.infoTimeline.events.deselectAll();
                             }
                             template.open('main', 'info-timeline');
-                            $scope.$apply();
+                            safeApply($scope);
                         };
                         if (model.infos.all.length === 0) {
                             model.infos.one('sync', function () {
@@ -208,14 +208,20 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.allowForSelection = function(action){
                 return _.filter(model.infos.selection(), function(info){
-                    return !info.allow(action);
+                    if(info.length === undefined){
+                        return !info.allow(action);
+                    } else {
+                        return !info[0].allow(action);
+                    }
                 }).length === 0;
             };
 
             $scope.editInfo = function(info){
                 model.infos.deselectAll();
-                info.edit = true;
-                info.expanded = true;
+                if ( info.length > 0 ) {
+                    info[0].edit = true;
+                    info[0].expanded = true;
+                }
             };
 
             $scope.cancelEditInfo = function (info: Info) {
@@ -261,7 +267,7 @@ export const actualiteController = ng.controller('ActualitesController',
                         info.selected = true;
                     }
                     $scope.display.showInfoSharePanel = true;
-                    $scope.$apply();
+                    safeApply($scope);
                 });
             };
 
