@@ -5,7 +5,6 @@
         "port" : 8022,
 		"sql" : true,
         "mongodb" : true,
-        "neo4j" : false,
         "app-name" : "Actualites",
         "app-address" : "/actualites",
         "app-icon" : "actualites-large",
