@@ -83,15 +83,16 @@ export class Thread extends Model {
         }
     }
 
-    saveModifications () {
+    async saveModifications () {
         this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
         http.put('/actualites/thread/' + this._id, this).then(function () {
             model.infos.sync();
             this.setDisplayName();
+            return true;
         }.bind(this));
     }
 
-    save () {
+    async save () {
         if (this._id) {
             if (this.title && this.title.length > 0) {
                 this.saveModifications();

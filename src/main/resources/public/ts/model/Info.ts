@@ -54,13 +54,16 @@ export class Info extends Model {
             this.publication_date = new Date();
         }
         (this as any).collection(Event, {
-            sync : function () {
-                http.get('/actualites/info/' + that._id + '/timeline').then(function (response) {
-                    var newEvents = _.filter(response.data, function (event) {
-                        return !that.events.findWhere({_id : event._id});
-                    });
-                    this.addRange(newEvents);
-                }.bind(this));
+            sync : async (): Promise<any> => {
+                return new Promise((resolve, reject) => {
+                    http.get('/actualites/info/' + that._id + '/timeline').then(function (response) {
+                        var newEvents = _.filter(response.data, function (event) {
+                            return !that.events.findWhere({_id : event._id});
+                        });
+                        that.events.load(newEvents);
+                        resolve();
+                    }.bind(this));
+                });
             }
         });
     }
@@ -101,16 +104,15 @@ export class Info extends Model {
         return exportThis;
     }
 
-    create (): boolean {
+    async create () {
         if (!this.title){
             notify.info('title.missing');
             return false;
         }
         this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-        http.post('/actualites/thread/' + this.thread._id + '/info', this.toJson()).then(function () {
-            model.infos.sync();
-        }.bind(this));
-        return true;
+        await http.post('/actualites/thread/' + this.thread._id + '/info', this.toJson());
+        model.infos.sync();
+
     }
 
     createPending (): boolean {
@@ -140,14 +142,13 @@ export class Info extends Model {
         return true;
     }
 
-    saveModifications () {
-        var resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
-        http.put(resourceUrl, this.toJson()).then(function () {
-            model.infos.sync();
-        });
+    async saveModifications () {
+        const resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
+        await http.put(resourceUrl, this.toJson());
+        model.infos.sync();
     }
 
-    save () {
+    async save () {
         if (this._id){
             this.saveModifications();
         } else {
@@ -163,20 +164,14 @@ export class Info extends Model {
             });
     }
 
-    unsubmit () {
+    async unsubmit () {
         this.status = ACTUALITES_CONFIGURATION.infoStatus.DRAFT;
-        http.put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', { title: this.title })
-            .then(function () {
-                model.infos.sync();
-            });
+        await http.put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/unsubmit', { title: this.title });
     }
 
-    publish () {
+    async publish () {
         this.status = ACTUALITES_CONFIGURATION.infoStatus.PUBLISHED;
-        http.put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title, owner: this.owner, username: this.username })
-            .then(function () {
-                model.infos.sync();
-            });
+        await http.put('/actualites/thread/' + this.thread._id + '/info/' + this._id + '/publish', { title: this.title, owner: this.owner, username: this.username });
     }
 
     unpublish (canSkipPendingStatus) {
@@ -209,11 +204,8 @@ export class Info extends Model {
     //     });
     // }
 
-    delete () {
-        http.delete('/actualites/thread/' + this.thread_id + '/info/' + this._id).then(function () {
-            model.infos.unbind('sync');
-            model.infos.sync();
-        });
+    async delete () {
+       await http.delete('/actualites/thread/' + this.thread_id + '/info/' + this._id);
     }
 
     comment (commentText) {

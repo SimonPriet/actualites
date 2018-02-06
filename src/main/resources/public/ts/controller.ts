@@ -138,13 +138,13 @@ export const actualiteController = ng.controller('ActualitesController',
                         });
                     },
                     viewTimeline : function (param) {
-                        var initTimeline = function () {
+                        var initTimeline = async function () {
                             $scope.infoTimeline = model.infos.findWhere({_id : parseInt(param.infoId)});
                             if ($scope.infoTimeline === undefined) {
                                 $scope.notFound = true;
                                 template.open('error', '404');
                             } else {
-                                $scope.infoTimeline.events.sync();
+                                await $scope.infoTimeline.events.sync();
                                 $scope.infoTimeline.events.deselectAll();
                             }
                             template.open('main', 'info-timeline');
@@ -208,20 +208,14 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.allowForSelection = function(action){
                 return _.filter(model.infos.selection(), function(info){
-                    if(info.length === undefined){
-                        return !info.allow(action);
-                    } else {
-                        return !info[0].allow(action);
-                    }
+                    return !info.allow(action);
                 }).length === 0;
             };
 
             $scope.editInfo = function(info){
                 model.infos.deselectAll();
-                if ( info.length > 0 ) {
-                    info[0].edit = true;
-                    info[0].expanded = true;
-                }
+                info.edit = true;
+                info.expanded = false;
             };
 
             $scope.cancelEditInfo = function (info: Info) {
@@ -246,17 +240,36 @@ export const actualiteController = ng.controller('ActualitesController',
                 $scope.display.showInfoSharePanel = false;
             };
 
-            $scope.saveDraft = function(){
-                if ($scope.currentInfo.save()){
-                    template.close('createInfo');
-                    $scope.currentInfo = new Info();
-                }
+            $scope.saveDraft = async function(){
+                await $scope.currentInfo.save();
+                template.close('createInfo');
+                $scope.currentInfo = new Info();
+                safeApply($scope);
+            };
+
+            $scope.removeCurrentInfo = async function(){
+                await $scope.infos.remove();
+                $scope.displayedInfos = model.infos;
+                safeApply($scope);
+            };
+
+            $scope.publishCurrentInfo = async function(){
+                await $scope.infos.publish();
+                $scope.displayedInfos = model.infos;
+                safeApply($scope);
+            };
+
+            $scope.unSubmitCurrentInfo = async function(){
+                await $scope.infos.unsubmit();
+                $scope.displayedInfos = model.infos;
+                safeApply($scope);
             };
 
             $scope.saveSubmitted = function(){
                 if ($scope.currentInfo.createPending()){
                     template.close('createInfo');
                     $scope.currentInfo = new Info();
+                    safeApply($scope);
                 }
             };
 
@@ -275,6 +288,7 @@ export const actualiteController = ng.controller('ActualitesController',
                 if ($scope.currentInfo.createPublished(displaySharePopUp)){
                     template.close('createInfo');
                     $scope.currentInfo = new Info();
+                    safeApply($scope);
                 }
             };
 
@@ -329,10 +343,11 @@ export const actualiteController = ng.controller('ActualitesController',
                 template.open('main', 'thread-edit');
             };
 
-            $scope.saveThread = function(){
-                $scope.currentThread.save();
+            $scope.saveThread = async function(){
+                await $scope.currentThread.save();
                 template.open('main', 'threads-view');
                 $scope.currentThread = undefined;
+                safeApply($scope);
             };
 
             $scope.cancelEditThread = function(){

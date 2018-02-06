@@ -102,72 +102,68 @@ export const buildModel = function() {
 
     model.collection(Info, {
         unsubmit: function () {
-            if ( this.selection().length > 1 ) {
+            return new Promise( (resolve,reject) => {
+                let infosTemp = [];
                 this.selection().forEach(function(info){
-                    info.unsubmit();
-                });
-            } else {
-                this.selection()[0].forEach(function(info){
-                    info.unsubmit();
-                });
-            }
-            //remove drafts from other users
-            this.all = this.reject(function(info){
-                return info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT && info.owner !== model.me.userId;
+                    info.unsubmit().then( async() => {
+                        infosTemp.push(true);
+                        if (infosTemp.length === this.selection().length){
+                            await model.infos.sync();
+                            //remove drafts from other users
+                            model.infos.all = this.reject(function(info){
+                                return info.status === ACTUALITES_CONFIGURATION.infoStatus.DRAFT && info.owner !== model.me.userId;
+                            });
+                            resolve();
+                        }
+                    })
+                }.bind(this));
             });
         },
         unpublish: function () {
-            if ( this.selection().length > 1 ) {
-                this.selection().forEach(function(info){
-                    info.unpublish();
-                });
-            } else {
-                this.selection()[0].forEach(function(info){
-                    info.unpublish();
-                });
-            }
-
+            this.selection().forEach(function(info){
+                info.unpublish();
+            });
         },
         publish: function () {
-            if ( this.selection().length > 1 ) {
+            return new Promise( (resolve,reject) => {
+                let infosTemp = [];
                 this.selection().forEach(function(info){
-                    info.publish();
-                });
-            } else {
-                this.selection()[0].forEach(function(info){
-                    info.publish();
-                });
-            }
+                    info.publish().then( async() => {
+                        infosTemp.push(true);
+                        if (infosTemp.length === this.selection().length){
+                            await model.infos.sync();
+                            resolve();
+                        }
+                    })
+                }.bind(this));
+            })
         },
         submit: function () {
-            if ( this.selection().length > 1 ) {
-                this.selection().forEach(function(info){
-                    info.submit();
-                });
-            } else {
-                this.selection()[0].forEach(function(info){
-                    info.submit();
-                });
-            }
+            this.selection().forEach(function(info){
+                info.submit();
+            });
         },
         remove: function () {
-            if ( this.selection().length > 1 ) {
+            return new Promise( (resolve,reject) => {
+                let infosTemp = [];
                 this.selection().forEach(function(info){
-                    info.delete();
-                });
-            } else {
-                this.selection()[0].forEach(function(info){
-                    info.delete();
-                });
-            }
-            this.removeSelection();
+                    info.delete().then( async() => {
+                        infosTemp.push(true);
+                        if (infosTemp.length === this.selection().length){
+                            await model.infos.sync();
+                            this.removeSelection();
+                            resolve();
+                        }
+                    })
+                }.bind(this));
+            })
         },
         thisWeekInfos: [],
         beforeThisWeekInfos: [],
         pendings : [],
         drafts : [],
-        sync: function(){
-            http.get('/actualites/infos').then(function(response){
+        sync: async function(){
+           await http.get('/actualites/infos').then(function(response){
                 let infos = response.data;
                 let that = this;
                 this.all = [];

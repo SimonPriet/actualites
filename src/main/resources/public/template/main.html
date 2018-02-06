@@ -170,7 +170,7 @@
     <h2><i18n>actualites.editions.infos.delete.lightbox.title</i18n></h2>
     <p><i18n>actualites.editions.infos.delete.lightbox.text</i18n></p>
     <div class="row">
-        <button ng-click="infos.remove(); display.showConfirmRemove = false;"
+        <button ng-click="removeCurrentInfo(); display.showConfirmRemove = false;"
                 class="right-magnet"><i18n>actualites.edition.infos.delete</i18n></button>
         <input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="display.showConfirmRemove = false" />
     </div>
@@ -193,10 +193,10 @@
         <button ng-if="infos.selection().length === 1 && allowForSelection('edit')" ng-click="editInfo(infos.selection()[0])">
             <i18n>edit</i18n>
         </button>
-        <button ng-click="infos.unsubmit()" ng-if="allowForSelection('unsubmit')"><i18n>unsubmit</i18n></button>
+        <button ng-click="unSubmitCurrentInfo()" ng-if="allowForSelection('unsubmit')"><i18n>unsubmit</i18n></button>
         <button ng-click="infos.unpublish()" ng-if="allowForSelection('unpublish')"><i18n>unpublish</i18n></button>
         <button ng-click="infos.submit()" ng-if="allowForSelection('submit')"><i18n>submit</i18n></button>
-        <button ng-click="infos.publish()" ng-if="allowForSelection('publish')"><i18n>publish</i18n></button>
+        <button ng-click="publishCurrentInfo()" ng-if="allowForSelection('publish')"><i18n>publish</i18n></button>
         <a href="#/info/[[infos.selection()[0]._id]]/timeline">
             <button ng-if="allowForSelection('edit') && infos.selection().length === 1"><i18n>journal</i18n></button>
         </a>
