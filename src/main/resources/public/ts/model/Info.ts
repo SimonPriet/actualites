@@ -21,6 +21,7 @@ export class Info extends Model {
     content: string;
     thread: Thread;
     is_headline: boolean;
+    old_is_headline: boolean;
     owner: string;
     username: string;
     thread_id: number;
