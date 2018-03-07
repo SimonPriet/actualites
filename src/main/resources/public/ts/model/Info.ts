@@ -11,17 +11,14 @@ export class Info extends Model {
     newComment: Comment;
     preview: string;
     publication_date: any;
-    old_publication_date: any;
     hasPublicationDate: boolean;
     events: Collection<Event>;
     expiration_date: any;
     hasExpirationDate: boolean;
-    old_expiration_date: any;
     title: string;
     content: string;
     thread: Thread;
     is_headline: boolean;
-    old_is_headline: boolean;
     owner: string;
     username: string;
     thread_id: number;

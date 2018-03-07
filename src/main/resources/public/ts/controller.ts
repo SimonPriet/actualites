@@ -214,25 +214,14 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.editInfo = function(info){
                 model.infos.deselectAll();
-                if(info.hasExpirationDate){
-                    info.old_expiration_date = info.expiration_date;
-                }
-                if(info.hasPublicationDate){
-                    info.old_publication_date = info.publication_date;
-                }
-                if(info.is_headline){
-                    info.old_is_headline = info.is_headline;
-                }
                 info.edit = true;
                 info.expanded = false;
             };
 
             $scope.cancelEditInfo = function (info: Info) {
-                info.expiration_date = info.old_expiration_date;
-                info.publication_date = info.old_publication_date;
-                info.is_headline = info.old_is_headline;
-                info.edit = false;
-                info.expanded = false;
+                model.infos.sync();
+                safeApply($scope);
+
             };
 
             $scope.createInfo = function(){
