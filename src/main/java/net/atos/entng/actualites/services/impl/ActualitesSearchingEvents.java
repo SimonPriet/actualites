@@ -70,13 +70,13 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 				}
 			});
 		} else {
-			handler.handle(new Right<String, JsonArray>(new JsonArray()));
+			handler.handle(new Right<String, JsonArray>(new fr.wseduc.webutils.collections.JsonArray()));
 		}
 	}
 
 	private JsonArray formatSearchResult(final JsonArray results, final JsonArray columnsHeader, final String userId) {
 		final List<String> aHeader = columnsHeader.getList();
-		final JsonArray traity = new JsonArray();
+		final JsonArray traity = new fr.wseduc.webutils.collections.JsonArray();
 
 		for (int i=0;i<results.size();i++) {
 			final JsonObject j = results.getJsonObject(i);
