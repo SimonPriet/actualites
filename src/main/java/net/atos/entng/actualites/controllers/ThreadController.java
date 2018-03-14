@@ -32,10 +32,10 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
@@ -160,11 +160,11 @@ public class ThreadController extends ControllerHelper {
 							final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
 							if(event.isRight()){
 								JsonObject result = event.right().getValue();
-								if(result.containsField("actions")){
-									JsonArray actions = result.getArray("actions");
+								if(result.containsKey("actions")){
+									JsonArray actions = result.getJsonArray("actions");
 									JsonArray newActions = new JsonArray();
 									for(Object action : actions){
-										if(((JsonObject) action).containsField("displayName")){
+										if(((JsonObject) action).containsKey("displayName")){
 											String displayName = ((JsonObject) action).getString("displayName");
 											if(displayName.contains(".")){
 												String resource = displayName.split("\\.")[0];
@@ -174,7 +174,7 @@ public class ThreadController extends ControllerHelper {
 											}
 										}
 									}
-									result.putArray("actions", newActions);
+									result.put("actions", newActions);
 								}
 								handler.handle(new Either.Right<String, JsonObject>(result));
 							} else {
@@ -205,9 +205,9 @@ public class ThreadController extends ControllerHelper {
 			            return;
 			        }
 					JsonObject params = new JsonObject()
-						.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
-						.putString("username", user.getUsername())
-						.putString("resourceUri", pathPrefix + "#/default");
+						.put("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+						.put("username", user.getUsername())
+						.put("resourceUri", pathPrefix + "#/default");
 
 					shareJsonSubmit(request, "news.thread-shared", false, params, "title");
 				} else {

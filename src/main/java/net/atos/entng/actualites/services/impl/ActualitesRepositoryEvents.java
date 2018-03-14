@@ -25,11 +25,11 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.RepositoryEvents;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import fr.wseduc.webutils.Either;
 
@@ -59,7 +59,7 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			}
             if (gIds.size() > 0) {
                 // Delete the groups. Cascade delete : delete from members, thread_shares and info_shares too
-                Sql.getInstance().prepared("DELETE FROM actualites.groups WHERE id IN " + Sql.listPrepared(gIds.toArray())
+                Sql.getInstance().prepared("DELETE FROM actualites.groups WHERE id IN " + Sql.listPrepared(gIds.getList())
                         , gIds, SqlResult.validRowsResultHandler(new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
@@ -88,11 +88,11 @@ public class ActualitesRepositoryEvents implements RepositoryEvents {
 			}
 			SqlStatementsBuilder statementsBuilder = new SqlStatementsBuilder();
 			// Remove all thread shares from thread_shares table
-			statementsBuilder.prepared("DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(uIds.toArray()), uIds);
+			statementsBuilder.prepared("DELETE FROM actualites.thread_shares WHERE member_id IN " + Sql.listPrepared(uIds.getList()), uIds);
 			// Remove all news shares from info_shares table
-			statementsBuilder.prepared("DELETE FROM actualites.info_shares WHERE member_id IN " + Sql.listPrepared(uIds.toArray()), uIds);
+			statementsBuilder.prepared("DELETE FROM actualites.info_shares WHERE member_id IN " + Sql.listPrepared(uIds.getList()), uIds);
 			// Delete users (Set deleted = true in users table)
-			statementsBuilder.prepared("UPDATE actualites.users SET deleted = true WHERE id IN " + Sql.listPrepared(uIds.toArray()), uIds);
+			statementsBuilder.prepared("UPDATE actualites.users SET deleted = true WHERE id IN " + Sql.listPrepared(uIds.getList()), uIds);
 			// Delete all threads where the owner is deleted and no manager rights shared on these resources
 			// Cascade delete : the news that belong to these threads will be deleted too
 			// thus, no need to delete news that do not have a manager because the thread owner is still there

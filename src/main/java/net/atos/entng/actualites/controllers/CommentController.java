@@ -39,10 +39,10 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
@@ -85,17 +85,17 @@ public class CommentController extends ControllerHelper {
 					public void handle(JsonObject resource) {
 						final String commentText = resource.getString("comment");
 						final String title = resource.getString("title");
-						resource.removeField("title");
+						resource.remove("title");
 						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
 							@Override
 							public void handle(Either<String, JsonObject> event) {
 								if (event.isRight()) {
 									JsonObject comment = event.right().getValue();
-									String commentId = comment.getNumber("id").toString();
+									String commentId = comment.getLong("id").toString();
 									notifyTimeline(request, user, infoId, commentId, title, commentText, NEWS_COMMENT_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									JsonObject error = new JsonObject().put("error", event.left().getValue());
 									renderJson(request, error, 400);
 								}
 							}
@@ -164,8 +164,8 @@ public class CommentController extends ControllerHelper {
 			final AtomicInteger remaining = new AtomicInteger(shared.size());
 			// Extract shared with
 			for(int i=0; i<shared.size(); i++){
-				jo = (JsonObject) shared.get(i);
-				if(jo.containsField("userId")){
+				jo = shared.getJsonObject(i);
+				if(jo.containsKey("userId")){
 					id = jo.getString("userId");
 					if(!ids.contains(id) && !(user.getUserId().equals(id))){
 						ids.add(id);
@@ -173,7 +173,7 @@ public class CommentController extends ControllerHelper {
 					remaining.getAndDecrement();
 				}
 				else{
-					if(jo.containsField("groupId")){
+					if(jo.containsKey("groupId")){
 						groupId = jo.getString("groupId");
 						if (groupId != null) {
 							UserUtils.findUsersInProfilsGroups(groupId, eb, user.getUserId(), false, new Handler<JsonArray>() {
@@ -211,12 +211,12 @@ public class CommentController extends ControllerHelper {
 				overview = overview.substring(0, OVERVIEW_LENGTH);
 			}
 			JsonObject params = new JsonObject()
-				.putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
-				.putString("username", user.getUsername())
-				.putString("info", title)
-				.putString("actuUri", pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
-				.putString("overview", overview);
-			params.putString("resourceUri", params.getString("actuUri"));
+				.put("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+				.put("username", user.getUsername())
+				.put("info", title)
+				.put("actuUri", pathPrefix + "#/view/info/" + infoId + "/comment/" + commentId)
+				.put("overview", overview);
+			params.put("resourceUri", params.getString("actuUri"));
 
 			notification.notifyTimeline(request, notificationName, user, ids, infoId, params);
 		}

@@ -25,9 +25,9 @@ import java.util.List;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import fr.wseduc.webutils.Either;
 import net.atos.entng.actualites.services.ThreadService;
@@ -107,8 +107,8 @@ public class ThreadServiceSqlImpl implements ThreadService {
 				" OR t.owner = ? " +
 				" GROUP BY t.id, u.username" +
 				" ORDER BY t.modified DESC";
-			values = new JsonArray(groupsAndUserIds).add(user.getUserId());
-			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
+			values = new JsonArray(gu).add(user.getUserId());
+			Sql.getInstance().prepared(query, values, SqlResult.parseShared(handler));
 		}
 	}
 
@@ -121,15 +121,15 @@ public class ThreadServiceSqlImpl implements ThreadService {
 				if (event.isRight()) {
 					try {
 						JsonObject thread = event.right().getValue();
-						if (thread.containsField("owner")) {
+						if (thread.containsKey("owner")) {
 							JsonObject owner = new JsonObject();
-							owner.putString("userId", thread.getString("owner"));
+							owner.put("userId", thread.getString("owner"));
 							sharedWithIds.add(owner);
 						}
-						if (thread.containsField("shared")) {
-							JsonArray shared = thread.getArray("shared");
+						if (thread.containsKey("shared")) {
+							JsonArray shared = thread.getJsonArray("shared");
 							for(Object jo : shared){
-								if(((JsonObject) jo).containsField("net-atos-entng-actualites-controllers-InfoController|publish")){
+								if(((JsonObject) jo).containsKey("net-atos-entng-actualites-controllers-InfoController|publish")){
 									sharedWithIds.add(jo);
 								}
 							}

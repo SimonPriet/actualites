@@ -46,10 +46,10 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
@@ -188,7 +188,7 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						resource.putNumber("status", status_list.get(1));
+						resource.put("status", status_list.get(1));
 						infoService.create(resource, user, Events.DRAFT.toString(),notEmptyResponseHandler(request));
 					}
 				});
@@ -207,8 +207,8 @@ public class InfoController extends ControllerHelper {
                 RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject resource) {
-                        resource.putNumber("status", status_list.get(2));
-                        final String threadId = resource.getNumber("thread_id").toString();
+                        resource.put("status", status_list.get(2));
+                        final String threadId = resource.getLong("thread_id").toString();
                         final String title = resource.getString("title");
                         infoService.create(resource, user, Events.CREATE_AND_PENDING.toString(),
                                 new Handler<Either<String, JsonObject>>() {
@@ -216,11 +216,11 @@ public class InfoController extends ControllerHelper {
                                     public void handle(Either<String, JsonObject> event) {
                                         if (event.isRight()) {
                                             JsonObject info = event.right().getValue();
-                                            String infoId = info.getNumber("id").toString();
+                                            String infoId = info.getLong("id").toString();
                                             notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
                                             renderJson(request, event.right().getValue(), 200);
                                         } else {
-                                            JsonObject error = new JsonObject().putString("error", event.left().getValue());
+                                            JsonObject error = new JsonObject().put("error", event.left().getValue());
                                             renderJson(request, error, 400);
                                         }
                                     }
@@ -243,7 +243,7 @@ public class InfoController extends ControllerHelper {
 				RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_CREATE, new Handler<JsonObject>() {
 					@Override
 					public void handle(JsonObject resource) {
-						resource.putNumber("status", status_list.get(3));
+						resource.put("status", status_list.get(3));
 						infoService.create(resource, user, Events.CREATE_AND_PUBLISH.toString(),notEmptyResponseHandler(request));
 					}
 				});
@@ -263,12 +263,12 @@ public class InfoController extends ControllerHelper {
                 RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject resource) {
-                        resource.putNumber("status", status_list.get(1));
-                        if(!resource.containsField("expiration_date")){
-                            resource.putString("expiration_date", null);
+                        resource.put("status", status_list.get(1));
+                        if(!resource.containsKey("expiration_date")){
+                            resource.putNull("expiration_date");
                         }
-                        if(!resource.containsField("publication_date")){
-                            resource.putString("publication_date", null);
+                        if(!resource.containsKey("publication_date")){
+                            resource.putNull("publication_date");
                         }
                         notifyOwner(request, user, resource, infoId, NEWS_UPDATE_EVENT_TYPE);
                         infoService.update(infoId, resource, user, Events.UPDATE.toString(), notEmptyResponseHandler(request));
@@ -290,12 +290,12 @@ public class InfoController extends ControllerHelper {
                 RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject resource) {
-                        resource.putNumber("status", status_list.get(2));
-                        if(!resource.containsField("expiration_date")){
-                            resource.putString("expiration_date", null);
+                        resource.put("status", status_list.get(2));
+                        if(!resource.containsKey("expiration_date")){
+                            resource.putNull("expiration_date");
                         }
-                        if(!resource.containsField("publication_date")){
-                            resource.putString("publication_date", null);
+                        if(!resource.containsKey("publication_date")){
+                            resource.putNull("publication_date");
                         }
                         notifyOwner(request, user, resource, infoId, NEWS_UPDATE_EVENT_TYPE);
                         infoService.update(infoId, resource, user, Events.PENDING.toString(), notEmptyResponseHandler(request));
@@ -317,12 +317,12 @@ public class InfoController extends ControllerHelper {
                 RequestUtils.bodyToJson(request, pathPrefix + SCHEMA_INFO_UPDATE, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject resource) {
-                        resource.putNumber("status", status_list.get(3));
-                        if(!resource.containsField("expiration_date")){
-                            resource.putString("expiration_date", null);
+                        resource.put("status", status_list.get(3));
+                        if(!resource.containsKey("expiration_date")){
+                            resource.putNull("expiration_date");
                         }
-                        if(!resource.containsField("publication_date")){
-                            resource.putString("publication_date", null);
+                        if(!resource.containsKey("publication_date")){
+                            resource.putNull("publication_date");
                         }
                         notifyOwner(request, user, resource, infoId, NEWS_UPDATE_EVENT_TYPE);
                         infoService.update(infoId, resource, user, Events.UPDATE.toString(),
@@ -369,13 +369,13 @@ public class InfoController extends ControllerHelper {
 									notifyTimeline(request, user, threadId, infoId, title, NEWS_SUBMIT_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									JsonObject error = new JsonObject().put("error", event.left().getValue());
 									renderJson(request, error, 400);
 								}
 							}
 						};
 						JsonObject resource = new JsonObject();
-						resource.putNumber("status", status_list.get(2));
+						resource.put("status", status_list.get(2));
 						infoService.update(infoId, resource, user, Events.SUBMIT.toString(),
                                 notEmptyResponseHandler(request));
 					}
@@ -405,13 +405,13 @@ public class InfoController extends ControllerHelper {
 									// notifyTimeline(request, user, threadId, infoId, title, NEWS_UNSUBMIT_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									JsonObject error = new JsonObject().put("error", event.left().getValue());
 									renderJson(request, error, 400);
 								}
 							}
 						};
 						JsonObject resource = new JsonObject();
-						resource.putNumber("status", status_list.get(1));
+						resource.put("status", status_list.get(1));
 						infoService.update(infoId, resource, user, Events.UNPUBLISH.toString(),
                                 notEmptyResponseHandler(request));
 					}
@@ -444,13 +444,13 @@ public class InfoController extends ControllerHelper {
 									notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									JsonObject error = new JsonObject().put("error", event.left().getValue());
 									renderJson(request, error, 400);
 								}
 							}
 						};
 						JsonObject resource = new JsonObject();
-						resource.putNumber("status", status_list.get(3));
+						resource.put("status", status_list.get(3));
 						infoService.update(infoId, resource, user, Events.PUBLISH.toString(), notEmptyResponseHandler(request));
 					}
 				});
@@ -482,13 +482,13 @@ public class InfoController extends ControllerHelper {
 									notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_UNPUBLISH_EVENT_TYPE);
 									renderJson(request, event.right().getValue(), 200);
 								} else {
-									JsonObject error = new JsonObject().putString("error", event.left().getValue());
+									JsonObject error = new JsonObject().put("error", event.left().getValue());
 									renderJson(request, error, 400);
 								}
 							}
 						};
 						JsonObject resource = new JsonObject();
-						resource.putNumber("status", status_list.get(2));
+						resource.put("status", status_list.get(2));
 						infoService.update(infoId, resource, user, Events.UNPUBLISH.toString(), notEmptyResponseHandler(request));
 			}
 		});
@@ -517,11 +517,11 @@ public class InfoController extends ControllerHelper {
                             final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
                             if(event.isRight()){
                                 JsonObject result = event.right().getValue();
-                                if(result.containsField("actions")){
-                                    JsonArray actions = result.getArray("actions");
+                                if(result.containsKey("actions")){
+                                    JsonArray actions = result.getJsonArray("actions");
                                     JsonArray newActions = new JsonArray();
                                     for(Object action : actions){
-                                        if(((JsonObject) action).containsField("displayName")){
+                                        if(((JsonObject) action).containsKey("displayName")){
                                             String displayName = ((JsonObject) action).getString("displayName");
                                             if(displayName.contains(".")){
                                                 String resource = displayName.split("\\.")[0];
@@ -531,7 +531,7 @@ public class InfoController extends ControllerHelper {
                                             }
                                         }
                                     }
-                                    result.putArray("actions", newActions);
+                                    result.put("actions", newActions);
                                 }
                                 handler.handle(new Either.Right<String, JsonObject>(result));
                             } else {
@@ -570,13 +570,13 @@ public class InfoController extends ControllerHelper {
                             request.resume();
                             if(event.right() != null){
                                 JsonObject info = event.right().getValue();
-                                if(info != null && info.containsField("status")){
+                                if(info != null && info.containsKey("status")){
                                     if(info.getInteger("status") > 2){
                                         JsonObject params = new JsonObject()
-                                                .putString("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
-                                                .putString("username", user.getUsername())
-                                                .putString("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
-                                                .putBoolean("disableAntiFlood", true);
+                                                .put("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+                                                .put("username", user.getUsername())
+                                                .put("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
+                                                .put("disableAntiFlood", true);
                                         DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
                                         String date = info.getString("publication_date");
                                         if(date != null && !date.trim().isEmpty()){
@@ -584,7 +584,7 @@ public class InfoController extends ControllerHelper {
                                                 Date publication_date = dfm.parse(date);
                                                 Date timeNow=new Date(System.currentTimeMillis());
                                                 if(publication_date.after(timeNow)){
-                                                    params.putNumber("timeline-publish-date", publication_date.getTime());
+                                                    params.put("timeline-publish-date", publication_date.getTime());
                                                 }
                                             } catch (ParseException e) {
                                                 log.error("An error occured when sharing an info : " + e.getMessage());
@@ -619,10 +619,10 @@ public class InfoController extends ControllerHelper {
             public void handle(Either<String, JsonObject> event) {
                 if (event.isRight()) {
                     String ownerId = event.right().getValue().getString("owner");
-                    if (!ownerId.equals(user.getUserId()) && resource.containsField("thread_id") && resource.containsField("title")) {
+                    if (!ownerId.equals(user.getUserId()) && resource.containsKey("thread_id") && resource.containsKey("title")) {
                         UserInfos owner = new UserInfos();
                         owner.setUserId(ownerId);
-                        notifyTimeline(request,  user, owner, resource.getNumber("thread_id").toString(), infoId, resource.getString("title"), eventType);
+                        notifyTimeline(request,  user, owner, resource.getLong("thread_id").toString(), infoId, resource.getString("title"), eventType);
                     }
                 } else {
                     log.error("Unable to create notification : GetOwnerInfo failed");
@@ -699,8 +699,8 @@ public class InfoController extends ControllerHelper {
             final AtomicInteger remaining = new AtomicInteger(shared.size());
             // Extract shared with
             for(int i=0; i<shared.size(); i++){
-                jo = (JsonObject) shared.get(i);
-                if(jo.containsField("userId")){
+                jo = shared.getJsonObject(i);
+                if(jo.containsKey("userId")){
                     id = jo.getString("userId");
                     if(!ids.contains(id) && !(user.getUserId().equals(id)) && !(owner.getUserId().equals(id))){
                         ids.add(id);
@@ -708,7 +708,7 @@ public class InfoController extends ControllerHelper {
                     remaining.getAndDecrement();
                 }
                 else{
-                    if(jo.containsField("groupId")){
+                    if(jo.containsKey("groupId")){
                         groupId = jo.getString("groupId");
                         if (groupId != null) {
                             UserUtils.findUsersInProfilsGroups(groupId, eb, user.getUserId(), false, new Handler<JsonArray>() {
@@ -742,11 +742,11 @@ public class InfoController extends ControllerHelper {
     private void sendNotify(final HttpServerRequest request, final List<String> ids, final UserInfos owner, final String threadId, final String infoId, final String title, final String notificationName){
         if (infoId != null && !infoId.isEmpty() && threadId != null && !threadId.isEmpty() && owner != null) {
             JsonObject params = new JsonObject()
-                    .putString("profilUri", "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
-                    .putString("username", owner.getUsername())
-                    .putString("info", title)
-                    .putString("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
-            params.putString("resourceUri", params.getString("actuUri"));
+                    .put("profilUri", "/userbook/annuaire#" + owner.getUserId() + "#" + (owner.getType() != null ? owner.getType() : ""))
+                    .put("username", owner.getUsername())
+                    .put("info", title)
+                    .put("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
+            params.put("resourceUri", params.getString("actuUri"));
             notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
         }
     }

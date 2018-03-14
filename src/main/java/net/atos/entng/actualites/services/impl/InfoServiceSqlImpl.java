@@ -30,15 +30,15 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import fr.wseduc.webutils.Either;
 import net.atos.entng.actualites.services.InfoService;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
@@ -57,13 +57,13 @@ public class InfoServiceSqlImpl implements InfoService {
 	 */
 	private JsonObject mapRevision(Long id, JsonObject data) {
 		JsonObject o = data.copy();
-		o.removeField("id");
-		o.removeField("status");
-		o.removeField("thread_id");
-		if (o.containsField("expiration_date")) o.removeField("expiration_date");
-		if (o.containsField("publication_date")) o.removeField("publication_date");
-		if (o.containsField("is_headline")) o.removeField("is_headline");
-		o.putNumber("info_id", id);
+		o.remove("id");
+		o.remove("status");
+		o.remove("thread_id");
+		if (o.containsKey("expiration_date")) o.remove("expiration_date");
+		if (o.containsKey("publication_date")) o.remove("publication_date");
+		if (o.containsKey("is_headline")) o.remove("is_headline");
+		o.put("info_id", id);
 		return o;
 	}
 
@@ -81,11 +81,11 @@ public class InfoServiceSqlImpl implements InfoService {
 					String userQuery = "SELECT "+ Actualites.NEWS_SCHEMA + ".merge_users(?,?)";
 					s.prepared(userQuery, new JsonArray().add(user.getUserId()).add(user.getUsername()));
 
-					data.putString("owner", user.getUserId()).putNumber("id", infoId);
+					data.put("owner", user.getUserId()).put("id", infoId);
 					s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_TABLE, data, "id");
 
 					JsonObject revision = mapRevision(infoId, data);
-					revision.putString("event", eventStatus);
+					revision.put("event", eventStatus);
 					s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_REVISION_TABLE, revision, null);
 
 					Sql.getInstance().transaction(s.build(), validUniqueResultHandler(1, handler));
@@ -106,7 +106,7 @@ public class InfoServiceSqlImpl implements InfoService {
 
 		StringBuilder sb = new StringBuilder();
 		JsonArray values = new JsonArray();
-		for (String attr : data.getFieldNames()) {
+		for (String attr : data.fieldNames()) {
 			sb.append(attr);
 			if (attr.contains("date")) {
 				sb.append("= to_timestamp(?, 'YYYY-MM-DD hh24:mi:ss'),");
@@ -123,8 +123,8 @@ public class InfoServiceSqlImpl implements InfoService {
 		s.prepared(query, values.add(Integer.parseInt(id)));
 
 		JsonObject revision = mapRevision(Long.parseLong(id), data);
-		revision.putString("owner", user.getUserId());
-		revision.putString("event", eventStatus);
+		revision.put("owner", user.getUserId());
+		revision.put("event", eventStatus);
 		s.insert(Actualites.NEWS_SCHEMA + "." + Actualites.INFO_REVISION_TABLE, revision, null);
 
 		Sql.getInstance().transaction(s.build(), SqlResult.validUniqueResultHandler(1, handler));
@@ -381,13 +381,13 @@ public class InfoServiceSqlImpl implements InfoService {
 				if (event.isRight()) {
 					try {
 						JsonObject info = event.right().getValue();
-						if (info.containsField("owner")) {
+						if (info.containsKey("owner")) {
 							JsonObject owner = new JsonObject();
-							owner.putString("userId", info.getString("owner"));
+							owner.put("userId", info.getString("owner"));
 							sharedWithIds.add(owner);
 						}
-						if (info.containsField("shared")) {
-							JsonArray shared = info.getArray("shared");
+						if (info.containsKey("shared")) {
+							JsonArray shared = info.getJsonArray("shared");
 							for(Object jo : shared){
 								sharedWithIds.add(jo);
 							}
@@ -414,7 +414,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			String query = "SELECT info.owner FROM actualites." + Actualites.INFO_TABLE + " WHERE" +
 					" id = ?;";
 
-			Sql.getInstance().prepared(query, new JsonArray().addNumber(Long.parseLong(infoId)),
+			Sql.getInstance().prepared(query, new JsonArray().add(Long.parseLong(infoId)),
 					SqlResult.validUniqueResultHandler(handler));
 		}
 	}
@@ -427,7 +427,7 @@ public class InfoServiceSqlImpl implements InfoService {
                 "INNER JOIN "+ Actualites.NEWS_SCHEMA +".users on (info_revision.owner = users.id) " +
                 "WHERE info_id = ? " +
                 "ORDER BY created DESC;";
-        Sql.getInstance().prepared(query, new JsonArray().addNumber(infoId),
+        Sql.getInstance().prepared(query, new JsonArray().add(infoId),
                 SqlResult.validResultHandler(handler));
     }
 

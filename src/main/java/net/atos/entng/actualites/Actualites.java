@@ -33,8 +33,8 @@ import org.entcore.common.service.impl.SqlSearchService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class Actualites extends BaseServer {
 	public final static String MANAGE_RIGHT_ACTION = "net-atos-entng-actualites-controllers-ThreadController|updateThread";
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		super.start();
 		final EventBus eb = getEventBus(vertx);
 
@@ -83,7 +83,7 @@ public class Actualites extends BaseServer {
 
 		// thread controller
 		ThreadController threadController = new ThreadController();
-		SqlCrudService threadSqlCrudService = new SqlCrudService(getSchema(), THREAD_TABLE, THREAD_SHARE_TABLE, new JsonArray().addString("*"), new JsonArray().add("*"), true);
+		SqlCrudService threadSqlCrudService = new SqlCrudService(getSchema(), THREAD_TABLE, THREAD_SHARE_TABLE, new JsonArray().add("*"), new JsonArray().add("*"), true);
 		threadController.setCrudService(threadSqlCrudService);
 		threadController.setShareService(new SqlShareService(getSchema(),THREAD_SHARE_TABLE, eb, securedActions, null));
 		addController(threadController);
@@ -97,7 +97,7 @@ public class Actualites extends BaseServer {
 
 		// info controller
 		InfoController infoController = new InfoController();
-		SqlCrudService infoSqlCrudService = new SqlCrudService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE, new JsonArray().addString("*"), new JsonArray().add("*"), true);
+		SqlCrudService infoSqlCrudService = new SqlCrudService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE, new JsonArray().add("*"), new JsonArray().add("*"), true);
 		infoController.setCrudService(infoSqlCrudService);
 		infoController.setShareService(new SqlShareService(getSchema(),INFO_SHARE_TABLE, eb, securedActions, null));
 		addController(infoController);

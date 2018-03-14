@@ -23,11 +23,11 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.Either.Right;
 import org.entcore.common.search.SearchingEvents;
 import org.entcore.common.service.SearchService;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 			returnFields.add("id");
 			returnFields.add("status");
 
-			searchService.search(userId, groupIds.toList(), returnFields, searchWords.toList(), page, limit, new Handler<Either<String, JsonArray>>() {
+			searchService.search(userId, groupIds.getList(), returnFields, searchWords.getList(), page, limit, new Handler<Either<String, JsonArray>>() {
 				@Override
 				public void handle(Either<String, JsonArray> event) {
 					if (event.isRight()) {
@@ -75,22 +75,22 @@ public class ActualitesSearchingEvents implements SearchingEvents {
 	}
 
 	private JsonArray formatSearchResult(final JsonArray results, final JsonArray columnsHeader, final String userId) {
-		final List<String> aHeader = columnsHeader.toList();
+		final List<String> aHeader = columnsHeader.getList();
 		final JsonArray traity = new JsonArray();
 
 		for (int i=0;i<results.size();i++) {
-			final JsonObject j = results.get(i);
+			final JsonObject j = results.getJsonObject(i);
 			//Only published (status == 3) or owner
 			if (j != null && (j.getInteger("status", 0).equals(3) || j.getString("owner", "").equals(userId))) {
 				final JsonObject jr = new JsonObject();
-				jr.putString(aHeader.get(0), j.getString("title"));
-				jr.putString(aHeader.get(1), j.getString("content"));
-				jr.putObject(aHeader.get(2), new JsonObject().putValue("$date",
+				jr.put(aHeader.get(0), j.getString("title"));
+				jr.put(aHeader.get(1), j.getString("content"));
+				jr.put(aHeader.get(2), new JsonObject().put("$date",
 						DatatypeConverter.parseDateTime(j.getString("modified")).getTime().getTime()));
-				jr.putString(aHeader.get(3), j.getString("username"));
-				jr.putString(aHeader.get(4), j.getString("owner"));
-				jr.putString(aHeader.get(5), "/actualites#/view/thread/"+
-						j.getNumber("thread_id",0) + "/info/"+j.getNumber("id",0));
+				jr.put(aHeader.get(3), j.getString("username"));
+				jr.put(aHeader.get(4), j.getString("owner"));
+				jr.put(aHeader.get(5), "/actualites#/view/thread/"+
+						j.getLong("thread_id",0l) + "/info/"+j.getLong("id",0l));
 				traity.add(jr);
 			}
 		}
