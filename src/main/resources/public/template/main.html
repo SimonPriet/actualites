@@ -176,7 +176,7 @@
     </div>
 </lightbox>
 
-<div ng-if="infos.selection().length === 1">
+<div ng-if="infos.selection().length > 0">
     <lightbox show="display.showInfoSharePanel" on-close="display.showInfoSharePanel = false">
         <div ng-class="{'read-only': allowForSelection('viewShare')}">
             <share-panel app-prefix="'actualites/thread/' + infos.selection()[0].thread_id + '/info'" resources="infos.selection()" ></share-panel>

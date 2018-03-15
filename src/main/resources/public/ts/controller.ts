@@ -248,6 +248,21 @@ export const actualiteController = ng.controller('ActualitesController',
                 safeApply($scope);
             };
 
+            const displaySharePanel = () => {
+                $scope.display.showInfoSharePanel = true;
+                safeApply($scope);
+            };
+
+            const displaySharePopUp = function (data) {
+                model.infos.one('sync', function () {
+                    var info = model.infos.findWhere({ _id : data.id });
+                    if (info !== undefined){
+                        info.selected = true;
+                    }
+                    displaySharePanel();
+                });
+            };
+
             $scope.removeCurrentInfo = async function(){
                 await $scope.infos.remove();
                 $scope.displayedInfos = model.infos;
@@ -255,9 +270,13 @@ export const actualiteController = ng.controller('ActualitesController',
             };
 
             $scope.publishCurrentInfo = async function(){
+                let ids = [];
+                model.infos.selection().map((info) => ids.push(info._id));
                 await $scope.infos.publish();
                 $scope.displayedInfos = model.infos;
-                safeApply($scope);
+                const infos = model.infos.filter((info) => ids.indexOf(info._id) !== -1);
+                infos.map((info) => info.selected = true);
+                displaySharePanel();
             };
 
             $scope.unSubmitCurrentInfo = async function(){
@@ -272,17 +291,6 @@ export const actualiteController = ng.controller('ActualitesController',
                     $scope.currentInfo = new Info();
                     safeApply($scope);
                 }
-            };
-
-            var displaySharePopUp = function (data) {
-                model.infos.one('sync', function () {
-                    var info = model.infos.findWhere({ _id : data.id });
-                    if (info !== undefined){
-                        info.selected = true;
-                    }
-                    $scope.display.showInfoSharePanel = true;
-                    safeApply($scope);
-                });
             };
 
             $scope.savePublished = function(){
