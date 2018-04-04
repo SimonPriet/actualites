@@ -747,6 +747,8 @@ public class InfoController extends ControllerHelper {
                     .put("info", title)
                     .put("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
             params.put("resourceUri", params.getString("actuUri"));
+            if(notificationName.equals("news.news-published"))
+                params.put("pushNotif", new JsonObject().put("title", "push.notif.actu.info.published").put("body", owner.getUsername()+ " : "+ title));
             notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
         }
     }
