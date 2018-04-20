@@ -576,7 +576,9 @@ public class InfoController extends ControllerHelper {
                                                 .put("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
                                                 .put("username", user.getUsername())
                                                 .put("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
-                                                .put("disableAntiFlood", true);
+                                                .put("disableAntiFlood", true)
+                                                .put("pushNotif", new JsonObject().put("title", "push.notif.actu.info.published").put("body", user.getUsername()+ " : "+ info.getString("title")));
+
                                         DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
                                         String date = info.getString("publication_date");
                                         if(date != null && !date.trim().isEmpty()){
