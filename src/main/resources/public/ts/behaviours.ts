@@ -115,7 +115,7 @@ Behaviours.register('actualites', {
     // Used by component "linker" to load news
     loadResources: function(callback){
         http.get('/actualites/linker/infos').then(function(infos) {
-            var infosArray = _.map(infos, function(info){
+            var infosArray = _.map(infos.data, function(info){
                 var threadIcon;
                 if (!info.thread_icon) {
                     threadIcon = '/img/icons/glyphicons_036_file.png';
