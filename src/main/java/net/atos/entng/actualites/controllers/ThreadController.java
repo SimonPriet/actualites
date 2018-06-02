@@ -224,4 +224,34 @@ public class ThreadController extends ControllerHelper {
 	public void shareThreadRemove(final HttpServerRequest request) {
 		removeShare(request, false);
 	}
+
+	@Put("/thread/share/resource/:id")
+	@ApiDoc("Share thread by id.")
+	@ResourceFilter(ThreadFilter.class)
+	@SecuredAction(value = "thread.manager", type = ActionType.RESOURCE)
+	public void shareResource(final HttpServerRequest request) {
+		UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+			@Override
+			public void handle(final UserInfos user) {
+				if (user != null) {
+					final String id = request.params().get("id");
+					if(id == null || id.trim().isEmpty()) {
+						badRequest(request, "invalid.id");
+						return;
+					}
+
+					JsonObject params = new JsonObject()
+							.put("profilUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType())
+							.put("username", user.getUsername())
+							.put("resourceUri", pathPrefix + "#/default");
+
+					shareResource(request, "news.thread-shared", false, params, "title");
+				} else {
+					unauthorized(request);
+				}
+			}
+		});
+	}
+
+
 }
