@@ -163,7 +163,8 @@ public class InfoFilter implements ResourcesProvider {
 
 	private boolean isInfoShareSubmitOrRemove(final Binding binding) {
 		return ("net.atos.entng.actualites.controllers.InfoController|shareInfoSubmit".equals(binding.getServiceMethod()) ||
-				 "net.atos.entng.actualites.controllers.InfoController|shareInfoRemove".equals(binding.getServiceMethod() )
+				 "net.atos.entng.actualites.controllers.InfoController|shareInfoRemove".equals(binding.getServiceMethod()) ||
+				"net.atos.entng.actualites.controllers.InfoController|shareResourceInfo".equals(binding.getServiceMethod())
 				);
 	};
 
