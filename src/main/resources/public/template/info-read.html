@@ -8,7 +8,7 @@
         <em class="cell metadata">
             <i18n>actualites.info.label.author</i18n> <a
                 href="/userbook/annuaire#/[[info.owner]]">[[info.username]]</a>,
-            [[(info.publication_date ? formatDate(info.publication_date) : formatDateLocale(info.modified))]]
+            [[getInfoDate(info)]]
             <span translate content="[[getState(info)]]"></span>
         </em>
     </div>
