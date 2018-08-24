@@ -45,14 +45,14 @@
                 ng-if="threads.selection().length < 2 && allowForSelection('editThread')" >
             <i18n> <i18n>edit</i18n></i18n>
         </button>
-        <resource-right name="deleteThread" resource="threads.selection()" class="cell">
-            <button ng-click="display.showConfirmRemove = true" >
-                <i18n>remove</i18n>
-            </button>
-        </resource-right>
         <resource-right name="share" resource="threads.selection()" class="cell">
             <button ng-click="display.showPanel = true">
                 <i18n>share</i18n>
+            </button>
+        </resource-right>
+        <resource-right name="deleteThread" resource="threads.selection()" class="cell">
+            <button ng-click="display.showConfirmRemove = true" >
+                <i18n>remove</i18n>
             </button>
         </resource-right>
     </div>
