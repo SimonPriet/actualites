@@ -48,11 +48,11 @@ export const buildModel = function() {
         return _.where(datas, {'is_headline' : true});
     };
 
-    this.syncAll = function(){
+    this.syncAll = async function(){
         this.threads.all = [];
         this.infos.all = [];
-        this.threads.sync();
-        this.infos.sync();
+        await this.threads.sync();
+        await this.infos.sync();
     };
 
     model.collection(Thread, {
@@ -67,16 +67,11 @@ export const buildModel = function() {
                 model.trigger('counter:sync');
             }.bind(this));
         },
-        removeSelection: function (){
+        removeSelection: async function (){
             let all = this.selection().length;
-            this.selection().forEach(function(thread){
-                thread.remove(function(){
-                    all --;
-                    if (all === 0){
-                        model.syncAll();
-                    }
-                });
-            });
+            for(let thread of this.selection()){
+                await thread.remove();
+            }
         },
         mapInfos : function () {
             this.each(function (thread) {

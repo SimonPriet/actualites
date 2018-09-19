@@ -7,7 +7,18 @@ export const actualiteController = ng.controller('ActualitesController',
     ['$scope', 'route', '$location',
         ($scope, route, $location) => {
 
+            model.infos.scope = $scope;
             template.open('info-read', 'info-read');
+
+            $scope.safeApply = function(){
+                safeApply($scope);
+            };
+
+            $scope.removeThreadSelection = async () => {
+                await $scope.threads.removeSelection();
+                await model.syncAll();
+                safeApply($scope);
+            };
 
             this.initialize = function(){
                 $scope.notFound = false;
@@ -23,7 +34,7 @@ export const actualiteController = ng.controller('ActualitesController',
 
                 route({
                     // Routes viewThread, viewInfo adn viewComment are used by notifications
-                    viewThread: function(params){
+                    viewThread: async function(params){
                         var initThreadView = function () {
                             var aThread = model.threads.findWhere({_id : parseInt(params.threadId)});
                             if (aThread !== undefined) {
@@ -43,13 +54,14 @@ export const actualiteController = ng.controller('ActualitesController',
                             initThreadView();
                         });
                         if (model.threads.all.length === 0) {
-                            model.threads.sync();
-                            model.infos.sync();
+                            await model.threads.sync();
+                            await model.infos.sync();
                         } else {
                             initThreadView();
                         }
+                        formatInfos();
                     },
-                    viewInfo: function(params){
+                    viewInfo: async function(params){
                         var initInfoSync = function () {
                             model.threads.mapInfos();
                             $scope.info = undefined;
@@ -83,7 +95,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 $location.path('/default');
                             }
                             $location.replace();
-                            safeApply($scope);
+                            formatInfos();
                         };
                         var initThreadSync = function () {
                             if (params.threadId !== undefined) {
@@ -97,20 +109,26 @@ export const actualiteController = ng.controller('ActualitesController',
                                     template.open('error', '404');
                                 }
                             }
+                            formatInfos();
                         };
                         model.infos.one('sync', function () {
                             initInfoSync();
+                            safeApply($scope);
                         });
-                        model.threads.one('sync', function(){
-                            model.infos.sync();
+                        model.threads.one('sync', async function(){
+                            await model.infos.sync();
+                            formatInfos();
                             initThreadSync();
+                            safeApply($scope);
                         });
                         if (model.threads.all.length === 0) {
-                            model.threads.sync();
+                            await model.threads.sync();
                         } else {
                             initThreadSync();
                             initInfoSync();
                         }
+                        formatInfos();
+                        safeApply($scope);
                     },
                     main: function(){
                         model.infos.unbind('sync');
@@ -121,7 +139,7 @@ export const actualiteController = ng.controller('ActualitesController',
                             model.threads.mapInfos();
                             safeApply($scope);
                         });
-                        $scope.displayedInfos = model.infos;
+                        formatInfos();
                         model.infos.deselectAll();
                     },
                     admin: function(){
@@ -218,8 +236,9 @@ export const actualiteController = ng.controller('ActualitesController',
                 info.expanded = false;
             };
 
-            $scope.cancelEditInfo = function (info: Info) {
-                model.infos.sync();
+            $scope.cancelEditInfo = async function (info: Info) {
+                await model.infos.sync();
+                updateDisplayedInfos();
                 safeApply($scope);
 
             };
@@ -265,7 +284,7 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.removeCurrentInfo = async function(){
                 await $scope.infos.remove();
-                $scope.displayedInfos = model.infos;
+                updateDisplayedInfos();
                 safeApply($scope);
             };
 
@@ -273,17 +292,33 @@ export const actualiteController = ng.controller('ActualitesController',
                 let ids = [];
                 model.infos.selection().map((info) => ids.push(info._id));
                 await $scope.infos.publish();
-                $scope.displayedInfos = model.infos;
+                updateDisplayedInfos();
                 const infos = model.infos.filter((info) => ids.indexOf(info._id) !== -1);
                 infos.map((info) => info.selected = true);
+                safeApply($scope);
                 displaySharePanel();
             };
 
             $scope.unSubmitCurrentInfo = async function(){
                 await $scope.infos.unsubmit();
-                $scope.displayedInfos = model.infos;
+                updateDisplayedInfos();
                 safeApply($scope);
             };
+
+            function updateDisplayedInfos(){
+                $scope.displayedInfos = model.infos;
+                safeApply($scope);
+            }
+
+            function formatInfos(){
+                model.infos.thisWeekInfos = model.thisWeek(model.infos.all);
+                model.infos.beforeThisWeekInfos = model.beforeThisWeek(model.infos.all);
+                model.infos.pendings = model.pending(model.infos.all);
+                model.infos.drafts = model.draft(model.infos.all);
+                model.infos.headlines = model.headline(model.infos.all);
+
+                updateDisplayedInfos();
+            }
 
             $scope.saveSubmitted = function(){
                 if ($scope.currentInfo.createPending()){
@@ -354,6 +389,7 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.saveThread = async function(){
                 await $scope.currentThread.save();
+                await model.syncAll();
                 template.open('main', 'threads-view');
                 $scope.currentThread = undefined;
                 safeApply($scope);
@@ -400,7 +436,14 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.filterByThreads = function(unpublished){
                 return function(info){
-                    var _b = false;
+                    var _b = true;
+
+                    if($scope.currentThread && Object.keys($scope.currentThread).length > 0) {
+                        _b = info.thread_id === $scope.currentThread._id;
+                    }
+
+                    if(!_b) return false;
+
                     switch ($scope.findParam('filter')) {
                         case ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED :
                             _b = info.status > $scope.getStatusNumber(ACTUALITES_CONFIGURATION.infoFilter.PENDING);
@@ -528,12 +571,14 @@ export const actualiteController = ng.controller('ActualitesController',
                 return color;
             };
 
-            $scope.restoreRevision = function (revision) {
+            $scope.restoreRevision = async function (revision) {
                 if (revision !== undefined) {
                     $scope.infoTimeline.title = revision.title;
                     $scope.infoTimeline.content = revision.content;
                     $scope.infoTimeline.save();
-                    model.infos.sync();
+                    await model.infos.sync();
+                    updateDisplayedInfos();
+                    safeApply($scope);
                 }
             };
 
@@ -561,11 +606,9 @@ export const actualiteController = ng.controller('ActualitesController',
              * the currentInfo.thread to the one selected
              * @param thread selected
              */
-            $scope.switchSelectThread = function (thread) {
-              if (thread !== undefined) {
-                  $scope.currentThread = thread;
-                  $scope.currentInfo.thread = thread;
-              }
+            $scope.switchSelectThread = function (thread?) {
+              $scope.currentThread = thread;
+              $scope.currentInfo.thread = thread;
             };
 
             function findSequence(x, y){

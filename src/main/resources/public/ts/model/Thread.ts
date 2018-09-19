@@ -60,12 +60,10 @@ export class Thread extends Model {
         }.bind(this));
     }
 
-    createThread () {
+    async createThread () {
         this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
-
-        http.post('/actualites/thread', this).then(function () {
-            model.syncAll();
-        }.bind(this));
+        let response = await http.post('/actualites/thread', this);
+        return response;
     }
 
     toJSON () {
@@ -85,23 +83,22 @@ export class Thread extends Model {
 
     async saveModifications () {
         this.mode = this.mode || ACTUALITES_CONFIGURATION.threadMode.SUBMIT;
-        http.put('/actualites/thread/' + this._id, this).then(function () {
-            model.infos.sync();
-            this.setDisplayName();
-            return true;
-        }.bind(this));
+        let response = await http.put('/actualites/thread/' + this._id, this);
+        await model.infos.sync();
+        this.setDisplayName();
+        return response;
     }
 
     async save () {
         if (this._id) {
             if (this.title && this.title.length > 0) {
-                this.saveModifications();
+                return await this.saveModifications();
             } else {
                 this.title = this.data.title;
             }
         }
         else {
-            this.createThread();
+            return await this.createThread();
         }
     }
 
