@@ -41,6 +41,9 @@
 			<div class="row">
 				<editor ng-model="currentInfo.content"></editor>
 			</div>
+			<div class="row" ng-if="createInfoError">
+				<div class="warning">[[createInfoError]]</div>
+			</div>
 			<div class="row">
 				<div ng-if="currentInfo.thread !== undefined">
 					<button ng-click="saveSubmitted();" class="right-magnet" ng-if="currentInfo.allow('submit')">

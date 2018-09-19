@@ -261,6 +261,9 @@ export const actualiteController = ng.controller('ActualitesController',
             };
 
             $scope.saveDraft = async function(){
+                if(!$scope.validateCreateInfoForm()){
+                    return;
+                }
                 await $scope.currentInfo.save();
                 template.close('createInfo');
                 $scope.currentInfo = new Info();
@@ -320,7 +323,24 @@ export const actualiteController = ng.controller('ActualitesController',
                 updateDisplayedInfos();
             }
 
+            $scope.validateCreateInfoForm = () => {
+                $scope.createInfoError = undefined;
+
+                if (!$scope.currentInfo.thread
+                    || !$scope.threads.writable().find(t => t._id === $scope.currentInfo.thread._id)) {
+                    $scope.createInfoError = lang.translate('info.error.create.need.thread');
+                } else if (!$scope.currentInfo.title) {
+                    $scope.createInfoError = lang.translate('info.error.create.need.title');
+                }
+                safeApply($scope);
+                // Return true if there is no error
+                return !$scope.createInfoError;
+            };
+
             $scope.saveSubmitted = function(){
+                if(!$scope.validateCreateInfoForm()){
+                    return;
+                }
                 if ($scope.currentInfo.createPending()){
                     template.close('createInfo');
                     $scope.currentInfo = new Info();
@@ -329,6 +349,9 @@ export const actualiteController = ng.controller('ActualitesController',
             };
 
             $scope.savePublished = function(){
+                if(!$scope.validateCreateInfoForm()){
+                    return;
+                }
                 if ($scope.currentInfo.createPublished(displaySharePopUp)){
                     template.close('createInfo');
                     $scope.currentInfo = new Info();

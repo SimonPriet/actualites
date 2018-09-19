@@ -129,6 +129,8 @@
     "group.school.Guest": "Invités de l'{0}.",
     "info.comment": "Commenter",
     "info.read": "Lire",
+    "info.error.create.need.thread": "Vous devez sélectionner le fil d'actualité",
+    "info.error.create.need.title": "Vous devez indiquer un titre",
     "thread.owner": "Propriétaire : ",
     "thread.contrib": "Contribuer",
     "thread.list.view": "Gérer les fils",
