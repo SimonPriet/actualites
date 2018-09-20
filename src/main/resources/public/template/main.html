@@ -145,8 +145,7 @@
                 </div>
 
                 <div ng-if="countByStatus(displayedInfos.beforeThisWeekInfos) > 0">
-                    <h4 class="row"
-                        ng-if="displayedInfos.beforeThisWeekInfos.length > 0">
+                    <h4 class="row" ng-if="(displayedInfos.beforeThisWeekInfos | filter:filterByThreads(false) | limitTo:display.limit).length > 0">
                         <i18n>before.this.week</i18n>
                     </h4>
                     <div ng-repeat="info in displayedInfos.beforeThisWeekInfos | filter:filterByThreads(false) | limitTo:display.limit">
