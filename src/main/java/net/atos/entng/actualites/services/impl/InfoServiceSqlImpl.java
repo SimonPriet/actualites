@@ -227,10 +227,11 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
-				" WHERE (i.expiration_date > LOCALTIMESTAMP OR i.expiration_date IS NULL OR i.owner = ?) AND (((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
+				" WHERE (i.expiration_date > LOCALTIMESTAMP OR i.expiration_date IS NULL OR i.owner = ?) AND (i.publication_date <= LOCALTIMESTAMP OR i.publication_date IS NULL OR i.owner = ?) AND (((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
 				" OR ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1)))" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY i.modified DESC";
+			values.add(user.getUserId());
 			values.add(user.getUserId());
 			values.add(user.getUserId());
 			for(String value : groupsAndUserIds){
