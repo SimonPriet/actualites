@@ -7,7 +7,7 @@ actualitesWidget.display = {
 actualitesWidget.updateInfos  = function(){
 	http().get('/actualites/infos/last/' + actualitesWidget.resultSize).done(function(infos){
 		var enrichedInfos = _.chain(infos).map(function(info){
-			info.relativeDate = moment(info.date).lang('fr').fromNow();
+			info.relativeDate = moment(info.date).fromNow();
 			info.tooltip = lang.translate('actualites.widget.thread') + ' : ' + info.thread_title +
 				' | ' + lang.translate('actualites.widget.author') + ' : ' + info.username;
 			return info;
