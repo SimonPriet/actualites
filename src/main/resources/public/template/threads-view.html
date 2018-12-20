@@ -15,8 +15,10 @@
     <div class="twelve cell">
         <div class="vertical cards-list eleven centered twelve-mobile rigid-grid">
             <div class="card four height-two" ng-repeat="thread in threads.editable()">
+
                 <div class="row">
-                    <div class="illustration">
+                    <div class="illustration" style="padding-bottom: 0;">
+
                         <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
                         <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
                     </div>
@@ -33,6 +35,7 @@
                         <em><i18n>actualites.thread.empty.info</i18n></em>
                     </div>
                 </div>
+
                 <check-tool ng-model="thread.selected" ng-click="$event.stopPropagation()"></check-tool>
             </div>
         </div>
