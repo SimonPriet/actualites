@@ -44,6 +44,7 @@ import net.atos.entng.actualites.services.impl.ThreadServiceSqlImpl;
 import net.atos.entng.actualites.utils.Events;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.notification.NotificationUtils;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import io.vertx.core.Handler;
@@ -578,6 +579,8 @@ public class InfoController extends ControllerHelper {
                                                 .put("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
                                                 .put("disableAntiFlood", true)
                                                 .put("pushNotif", new JsonObject().put("title", "push.notif.actu.info.published").put("body", user.getUsername()+ " : "+ info.getString("title")));
+										params.put("preview", NotificationUtils.htmlContentToPreview(
+												info.getString("content")));
 
                                         DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
                                         String date = info.getString("publication_date");
@@ -749,9 +752,20 @@ public class InfoController extends ControllerHelper {
                     .put("info", title)
                     .put("actuUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId);
             params.put("resourceUri", params.getString("actuUri"));
-            if(notificationName.equals("news.news-published"))
+            if("news.news-published".equals(notificationName)) {
                 params.put("pushNotif", new JsonObject().put("title", "push.notif.actu.info.published").put("body", owner.getUsername()+ " : "+ title));
-            notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
+				infoService.retrieve(infoId, actu -> {
+					JsonObject preview = null;
+					if (actu.isRight()) {
+						preview = NotificationUtils.htmlContentToPreview(
+								actu.right().getValue().getString("content"));
+					}
+					notification.notifyTimeline(request, notificationName, owner, ids, infoId,
+							null, params, false, preview);
+				});
+			} else {
+				notification.notifyTimeline(request, notificationName, owner, ids, infoId, params);
+			}
         }
     }
 
@@ -804,6 +818,8 @@ public class InfoController extends ControllerHelper {
 												.put("resourceUri", pathPrefix + "#/view/thread/" + threadId + "/info/" + infoId)
 												.put("disableAntiFlood", true)
 												.put("pushNotif", new JsonObject().put("title", "push.notif.actu.info.published").put("body", user.getUsername()+ " : "+ info.getString("title")));
+										params.put("preview", NotificationUtils.htmlContentToPreview(
+												info.getString("content")));
 
 										DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
 										String date = info.getString("publication_date");
