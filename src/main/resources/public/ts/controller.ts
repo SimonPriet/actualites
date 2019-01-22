@@ -1,7 +1,9 @@
-import { ng, template, idiom as lang, moment, _, $, model } from 'entcore';
+import { ng, template, idiom as lang, moment, _, $, model as typedModel } from 'entcore';
 import { ACTUALITES_CONFIGURATION } from './configuration';
 import { safeApply } from './functions/safeApply';
 import { Info, Thread, Comment, Utils } from './model';
+
+const model = typedModel as any;
 
 export const actualiteController = ng.controller('ActualitesController',
     ['$scope', 'route', '$location',

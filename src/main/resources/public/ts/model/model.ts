@@ -1,8 +1,10 @@
-import { model, moment, _ } from 'entcore';
+import { moment, _, model as typedModel } from 'entcore';
 import { Mix } from 'entcore-toolkit';
 import http from 'axios';
 import { ACTUALITES_CONFIGURATION } from '../configuration';
 import { Thread, Info, Event, Comment } from './index';
+
+const model = typedModel as any;
 
 export const buildModel = function() {
 

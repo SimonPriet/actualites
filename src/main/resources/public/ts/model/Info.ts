@@ -1,7 +1,9 @@
-import { Collection, $, idiom as lang, _, Model, moment, notify, model } from 'entcore';
+import { Collection, $, idiom as lang, _, Model, moment, notify, model as typedModel } from 'entcore';
 import http from 'axios';
 import { Thread, Utils, Comment } from './index';
 import { ACTUALITES_CONFIGURATION } from '../configuration';
+
+const model = typedModel as any;
 
 export class Info extends Model {
     _id: number;

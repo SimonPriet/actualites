@@ -1,8 +1,10 @@
-import { Collection, Model, model } from 'entcore';
+import { Collection, model as typedModel, Model } from 'entcore';
 import http from 'axios';
 import { ACTUALITES_CONFIGURATION } from '../configuration';
 
 import { Info } from './index';
+
+const model = typedModel as any;
 
 export class Thread extends Model {
     _id: number;
@@ -102,7 +104,7 @@ export class Thread extends Model {
         }
     }
 
-    remove (callback) {
+    remove (callback?) {
         http.delete('/actualites/thread/' + this._id).then(function(){
             if (typeof callback === 'function'){
                 callback();
