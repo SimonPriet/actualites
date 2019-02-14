@@ -21,6 +21,8 @@ package net.atos.entng.actualites.services.impl;
 
 import static net.atos.entng.actualites.Actualites.MANAGE_RIGHT_ACTION;
 
+import io.vertx.core.Vertx;
+import org.entcore.common.service.impl.SqlRepositoryEvents;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
@@ -33,19 +35,78 @@ import io.vertx.core.logging.LoggerFactory;
 
 import fr.wseduc.webutils.Either;
 
-public class ActualitesRepositoryEvents implements RepositoryEvents {
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 
 	private static final Logger log = LoggerFactory.getLogger(ActualitesRepositoryEvents.class);
 	private final boolean shareOldGroupsToUsers;
 
-	public ActualitesRepositoryEvents(boolean shareOldGroupsToUsers) {
+	public ActualitesRepositoryEvents(boolean shareOldGroupsToUsers, Vertx vertx) {
+		super(vertx);
 		this.shareOldGroupsToUsers = shareOldGroupsToUsers;
 	}
 
 	@Override
 	public void exportResources(String exportId, String userId, JsonArray groups, String exportPath, String locale, String host, final Handler<Boolean> handler) {
-		// TODO Implement exportResources
-		log.warn("[ActualitesRepositoryEvents] exportResources is not implemented");
+
+			final HashMap<String,JsonArray> queries = new HashMap<String, JsonArray>();
+
+			final String commentTable = "actualites.comment",
+					groupTable = "actualites.groups",
+					infoTable = "actualites.info",
+					infoRevisionTable = "actualites.info_revision",
+					infoSharesTable = "actualites.info_shares",
+					membersTable = "actualites.members",
+					threadTable = "actualites.thread",
+					threadSharesTable = "actualites.thread_shares",
+					usersTable = "actualites.users";
+
+			JsonArray params = new JsonArray().add(userId).add(userId).addAll(groups);
+
+			String queryInfo =
+					"SELECT DISTINCT info.* " +
+							"FROM " + infoTable + " " +
+							"LEFT JOIN " + infoSharesTable + " infoS ON info.id = infoS.resource_id " +
+							"LEFT JOIN " + membersTable + " mem ON infoS.member_id = mem.id " +
+							"WHERE info.owner = ? " +
+							"OR mem.user_id = ? " +
+							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "");
+			queries.put(infoTable,new SqlStatementsBuilder().prepared(queryInfo,params).build());
+
+			String queryInfoRevision =
+					"SELECT DISTINCT infoR.* " +
+							"FROM " + infoRevisionTable + " infoR " +
+							"WHERE infoR.info_id IN (" + queryInfo.replace("*","id") + ")";
+			queries.put(infoRevisionTable,new SqlStatementsBuilder().prepared(queryInfoRevision,params).build());
+
+
+			String queryThread =
+					"SELECT DISTINCT th.* " +
+							"FROM " + threadTable + " th " +
+							"LEFT JOIN "+ threadSharesTable + " thS ON th.id = thS.resource_id " +
+							"LEFT JOIN " + membersTable + " mem ON thS.member_id = mem.id " +
+							"WHERE th.owner = ? " +
+							"OR mem.user_id = ? " +
+							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "") + " " +
+							"OR th.id IN (" + queryInfo.replace("*","thread_id") + ")";
+			queries.put(threadTable,new SqlStatementsBuilder().prepared(queryThread,new JsonArray().addAll(params).addAll(params)).build());
+
+
+			AtomicBoolean exported = new AtomicBoolean(false);
+
+			createExportDirectory(exportPath, locale, new Handler<String>() {
+				@Override
+				public void handle(String path) {
+					if (path != null) {
+						exportTables(queries, new JsonArray(), path, exported, handler);
+					}
+					else {
+						handler.handle(exported.get());
+					}
+				}
+			});
 	}
 
 	@Override

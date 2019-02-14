@@ -61,7 +61,7 @@ public class Actualites extends BaseServer {
 		final EventBus eb = getEventBus(vertx);
 
 		// Subscribe to events published for transition
-		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false)));
+		setRepositoryEvents(new ActualitesRepositoryEvents(config.getBoolean("share-old-groups-to-users", false),vertx));
 
 		if (config.getBoolean("searching-event", true)) {
 			final List<String> searchFields = new ArrayList<String>();
