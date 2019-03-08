@@ -8,6 +8,7 @@
         "app-name" : "Actualites",
         "app-address" : "/actualites",
         "app-icon" : "actualites-large",
+        "app-type" : "END_USER",
         "host": "${host}",
         "ssl" : $ssl,
         "auto-redeploy": false,
