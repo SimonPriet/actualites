@@ -438,21 +438,18 @@ public class InfoController extends ControllerHelper {
 						final UserInfos owner = new UserInfos();
 						owner.setUserId(body.getString("owner"));
 						owner.setUsername(body.getString("username"));
-						Handler<Either<String, JsonObject>> handler = new Handler<Either<String, JsonObject>>() {
-							@Override
-							public void handle(Either<String, JsonObject> event) {
-								if (event.isRight()) {
-									notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
-									renderJson(request, event.right().getValue(), 200);
-								} else {
-									JsonObject error = new JsonObject().put("error", event.left().getValue());
-									renderJson(request, error, 400);
-								}
-							}
-						};
+						Handler<Either<String, JsonObject>> handler = event -> {
+                            if (event.isRight()) {
+                                notifyTimeline(request, user, owner, threadId, infoId, title, NEWS_PUBLISH_EVENT_TYPE);
+                                renderJson(request, event.right().getValue(), 200);
+                            } else {
+                                JsonObject error = new JsonObject().put("error", event.left().getValue());
+                                renderJson(request, error, 400);
+                            }
+                        };
 						JsonObject resource = new JsonObject();
 						resource.put("status", status_list.get(3));
-						infoService.update(infoId, resource, user, Events.PUBLISH.toString(), notEmptyResponseHandler(request));
+						infoService.update(infoId, resource, user, Events.PUBLISH.toString(), handler);
 					}
 				});
 			}
