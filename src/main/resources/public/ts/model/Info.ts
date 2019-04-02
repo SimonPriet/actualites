@@ -57,11 +57,10 @@ export class Info extends Model {
         }
         (this as any).collection(Event, {
             sync : async (): Promise<any> => {
+                that.events.all = [];
                 return new Promise((resolve, reject) => {
                     http.get('/actualites/info/' + that._id + '/timeline').then(function (response) {
-                        var newEvents = _.filter(response.data, function (event) {
-                            return !that.events.findWhere({_id : event._id});
-                        });
+                        var newEvents = response.data.filter( event => !that.events.findWhere({_id : event._id}));
                         that.events.load(newEvents);
                         resolve();
                     }.bind(this));
