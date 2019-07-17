@@ -1,5 +1,5 @@
     {
-      "name": "net.atos~actualites~1.6-SNAPSHOT",
+      "name": "net.atos~actualites~1.6.0",
       "config": {
         "main" : "net.atos.entng.actualites.Actualites",
         "port" : 8022,
