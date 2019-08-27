@@ -203,46 +203,56 @@ public class InfoServiceSqlImpl implements InfoService {
 	@Override
 	public void list(UserInfos user, Handler<Either<String, JsonArray>> handler) {
 		if (user != null) {
-			String query;
-			JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
 			List<String> groupsAndUserIds = new ArrayList<>();
 			groupsAndUserIds.add(user.getUserId());
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, i.content, i.status, i.publication_date, i.expiration_date, i.is_headline, i.thread_id, i.created, i.modified" +
-				", i.owner, u.username, t.title AS thread_title, t.icon AS thread_icon" +
-				", (SELECT json_agg(cr.*) FROM (" +
-					"SELECT c.id as _id, c.comment, c.owner, c.created, c.modified, au.username" +
-					" FROM actualites.comment AS c" +
-					" LEFT JOIN actualites.users AS au ON c.owner = au.id" +
-					" WHERE i.id = c.info_id" +
-					" ORDER BY c.modified ASC) cr)" +
-					" AS comments" +
-				", json_agg(row_to_json(row(ios.member_id, ios.action)::actualites.share_tuple)) as shared" +
-				", array_to_json(array_agg(group_id)) as groups" +
-				" FROM actualites.info AS i" +
-				" LEFT JOIN actualites.thread AS t ON i.thread_id = t.id" +
-				" LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id" +
-				" LEFT JOIN actualites.users AS u ON i.owner = u.id" +
-				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
-				" LEFT JOIN actualites.members AS m ON ((ts.member_id = m.id OR ios.member_id = m.id) AND m.group_id IS NOT NULL)" +
-				" WHERE (i.expiration_date > LOCALTIMESTAMP OR i.expiration_date IS NULL OR i.owner = ?) AND (i.publication_date <= LOCALTIMESTAMP OR i.publication_date IS NULL OR i.owner = ?) AND (((i.owner = ? OR (ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND i.status > 2))" +
-				" OR ((t.owner = ? OR (ts.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " AND ts.action = ?)) AND i.status > 1)))" +
-				" GROUP BY i.id, u.username, t.id" +
-				" ORDER BY i.modified DESC";
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			values.add(user.getUserId());
-			for(String value : groupsAndUserIds){
-				values.add(value);
-			}
-			values.add(user.getUserId());
-			for(String value : groupsAndUserIds){
-				values.add(value);
-			}
-			values.add(THREAD_PUBLISH);
-			Sql.getInstance().prepared(query.toString(), values, SqlResult.parseShared(handler));
+			String query = "WITH news AS (" +
+					"SELECT id " +
+					"FROM actualites.info " +
+					"WHERE info.owner = ? " +
+					"UNION " +
+					"SELECT id " +
+					"FROM actualites.info_shares " +
+					"INNER JOIN actualites.info ON (info.id = info_shares.resource_id) " +
+					"WHERE info_shares.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) +
+					" AND info.status > 2 " +
+					"AND (info.publication_date <= LOCALTIMESTAMP OR info.publication_date IS NULL) " +
+					"AND (info.expiration_date > LOCALTIMESTAMP OR info.expiration_date IS NULL) " +
+					"UNION " +
+					"SELECT info.id as id " +
+					"FROM actualites.thread_shares " +
+					"INNER JOIN actualites.thread ON (thread.id = thread_shares.resource_id) " +
+					"INNER JOIN actualites.info ON (info.thread_id = thread.id) " +
+					"WHERE thread.owner = ? " +
+					"OR (thread_shares.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) +
+					" AND thread_shares.action = '" + THREAD_PUBLISH + "') AND info.status > 1) " +
+					"SELECT info.id as _id, info.title, info.content, info.status, info.publication_date, info.expiration_date, info.is_headline, info.thread_id, info.created, info.modified, " +
+					"info.owner, users.username, thread.title AS thread_title, thread.icon AS thread_icon, ( " +
+					"SELECT json_agg(cr.*) " +
+					"FROM ( " +
+					"SELECT comment.id as _id, comment.comment, comment.owner, comment.created, comment.modified, users.username " +
+					"FROM actualites.comment INNER JOIN actualites.users ON comment.owner = users.id " +
+					"WHERE info.id = comment.info_id ORDER BY comment.modified ASC) cr) " +
+					"AS comments, json_agg(row_to_json(row(info_shares.member_id, info_shares.action)::actualites.share_tuple)) as shared, " +
+					"(SELECT CASE WHEN array_to_json(array_agg(group_id)) IS NULL THEN '[]'::json ELSE array_to_json(array_agg(group_id)) END " +
+					"FROM actualites.info_shares " +
+					"INNER JOIN news ON (news.id = info_shares.resource_id) " +
+					"INNER JOIN actualites.members ON (info_shares.member_id = members.group_id) " +
+					"WHERE news.id = info.id) as groups " +
+					"FROM actualites.info " +
+					"INNER JOIN news ON (info.id = news.id) " +
+					"INNER JOIN actualites.thread ON (info.thread_id = thread.id) " +
+					"INNER JOIN actualites.users ON (info.owner = users.id) " +
+					"LEFT JOIN actualites.info_shares ON (info.id = info_shares.resource_id) " +
+					"GROUP BY info.id, users.username, thread.id ORDER BY info.modified DESC;";
+			JsonArray values = new JsonArray()
+					.add(user.getUserId())
+					.addAll(new JsonArray(groupsAndUserIds))
+					.add(user.getUserId())
+					.addAll(new JsonArray(groupsAndUserIds));
+			Sql.getInstance().prepared(query, values, SqlResult.parseShared(handler));
 		}
 	}
 
