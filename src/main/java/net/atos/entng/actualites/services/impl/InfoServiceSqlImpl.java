@@ -325,8 +325,8 @@ public class InfoServiceSqlImpl implements InfoService {
 				" LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id" +
 				" LEFT JOIN actualites.members AS m ON (ios.member_id = m.id AND m.group_id IS NOT NULL)" +
 				" WHERE ((ios.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + "AND ios.action = ?) OR i.owner = ?)" +
-				" AND (i.status = 3" +
-					" AND ((i.publication_date IS NULL OR i.publication_date <= NOW()) AND (i.expiration_date IS NULL OR i.expiration_date + interval '1 days' >= NOW())))" +
+				" AND i.status = 3" +
+					" AND (i.publication_date <= LOCALTIMESTAMP OR i.publication_date IS NULL) AND (i.expiration_date > LOCALTIMESTAMP OR i.expiration_date IS NULL)" +
 				" GROUP BY i.id, u.username, t.id" +
 				" ORDER BY date DESC" +
 				" LIMIT ?";
