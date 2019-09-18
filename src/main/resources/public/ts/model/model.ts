@@ -185,8 +185,6 @@ export const buildModel = function() {
                     if (info.publication_date) {
                         info.publication_date = info.publication_date.split('.')[0];
                         info.hasPublicationDate = true;
-                    } else {
-                        info.publication_date = moment();
                     }
                     if (info.expiration_date) {
                         info.expiration_date = info.expiration_date.split('.')[0];
