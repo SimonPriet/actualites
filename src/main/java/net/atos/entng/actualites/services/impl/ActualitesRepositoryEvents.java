@@ -49,7 +49,7 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 	}
 
 	@Override
-	public void exportResources(String exportId, String userId, JsonArray groups, String exportPath, String locale, String host, final Handler<Boolean> handler) {
+	public void exportResources(JsonArray resourcesIds, String exportId, String userId, JsonArray groups, String exportPath, String locale, String host, final Handler<Boolean> handler) {
 
 			final HashMap<String,JsonArray> queries = new HashMap<String, JsonArray>();
 
@@ -64,22 +64,32 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 					usersTable = "actualites.users";
 
 			JsonArray params = new JsonArray().add(userId).add(userId).addAll(groups);
+			JsonArray resourcesIdsAndParams = params;
+			String resourcesList = "";
+
+			if(resourcesIds != null)
+			{
+				resourcesIdsAndParams = new JsonArray().addAll(resourcesIds).addAll(params);
+				resourcesList = Sql.listPrepared(resourcesIds);
+			}
 
 			String queryInfo =
 					"SELECT DISTINCT info.* " +
 							"FROM " + infoTable + " " +
 							"LEFT JOIN " + infoSharesTable + " infoS ON info.id = infoS.resource_id " +
 							"LEFT JOIN " + membersTable + " mem ON infoS.member_id = mem.id " +
-							"WHERE info.owner = ? " +
-							"OR mem.user_id = ? " +
-							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "");
-			queries.put(infoTable,new SqlStatementsBuilder().prepared(queryInfo,params).build());
+							"WHERE " +
+								(resourcesIds != null ? ("info.id IN " + resourcesList + " AND ") : "") +
+								"(info.owner = ? " +
+								"OR mem.user_id = ? " +
+							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "") + ")";
+			queries.put(infoTable,new SqlStatementsBuilder().prepared(queryInfo, resourcesIdsAndParams).build());
 
 			String queryInfoRevision =
 					"SELECT DISTINCT infoR.* " +
 							"FROM " + infoRevisionTable + " infoR " +
 							"WHERE infoR.info_id IN (" + queryInfo.replace("*","id") + ")";
-			queries.put(infoRevisionTable,new SqlStatementsBuilder().prepared(queryInfoRevision,params).build());
+			queries.put(infoRevisionTable,new SqlStatementsBuilder().prepared(queryInfoRevision, resourcesIdsAndParams).build());
 
 
 			String queryThread =
@@ -87,11 +97,12 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 							"FROM " + threadTable + " th " +
 							"LEFT JOIN "+ threadSharesTable + " thS ON th.id = thS.resource_id " +
 							"LEFT JOIN " + membersTable + " mem ON thS.member_id = mem.id " +
-							"WHERE th.owner = ? " +
+							"WHERE (th.owner = ? " +
 							"OR mem.user_id = ? " +
-							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "") + " " +
-							"OR th.id IN (" + queryInfo.replace("*","thread_id") + ")";
-			queries.put(threadTable,new SqlStatementsBuilder().prepared(queryThread,new JsonArray().addAll(params).addAll(params)).build());
+							((groups != null && !groups.isEmpty()) ? "OR mem.group_id IN " + Sql.listPrepared(groups.getList()) : "") + ") " +
+							(resourcesIds != null ? "AND " : "OR ") +
+							"th.id IN (" + queryInfo.replace("*","thread_id") + ")";
+			queries.put(threadTable,new SqlStatementsBuilder().prepared(queryThread,new JsonArray().addAll(params).addAll(resourcesIdsAndParams)).build());
 
 
 			AtomicBoolean exported = new AtomicBoolean(false);
