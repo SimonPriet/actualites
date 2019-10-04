@@ -80,15 +80,6 @@ export class Info extends Model {
             pubDate = pubDate.format();
         }
 
-        let expDate = null;
-        if (this.hasExpirationDate) {
-            expDate = this.expiration_date;
-            if (!moment.isMoment(expDate)) {
-                expDate = moment(expDate);
-            }
-            expDate = expDate.format('YYYY-MM-DD[T]HH:mm:ss.SSS');
-        }
-
         let exportThis: any = {
             title: this.title,
             content: this.content,
@@ -99,8 +90,11 @@ export class Info extends Model {
         if (pubDate){
             exportThis.publication_date = pubDate;
         }
-        if (expDate){
-            exportThis.expiration_date = expDate;
+
+        if (this.hasExpirationDate && this.expiration_date) {
+            let expDate = this.expiration_date;
+            if(typeof expDate === "string" && expDate.length === 10) expDate = Utils.getExploitableDate(expDate);
+            exportThis.expiration_date = moment(expDate).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
         }
         return exportThis;
     }
@@ -146,12 +140,11 @@ export class Info extends Model {
     async saveModifications () {
         const resourceUrl = '/' + ACTUALITES_CONFIGURATION.applicationName + '/thread/' + this.thread._id + '/info/' + this._id + '/' + ACTUALITES_CONFIGURATION.statusNameFromId(this.status);
         await http.put(resourceUrl, this.toJson());
-        model.infos.sync();
     }
 
     async save () {
         if (this._id){
-            this.saveModifications();
+            await this.saveModifications();
         } else {
             return this.create();
         }
@@ -206,7 +199,7 @@ export class Info extends Model {
     // }
 
     async delete () {
-       await http.delete('/actualites/thread/' + this.thread_id + '/info/' + this._id);
+        await http.delete('/actualites/thread/' + this.thread_id + '/info/' + this._id);
     }
 
     comment (commentText) {

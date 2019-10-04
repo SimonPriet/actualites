@@ -15,4 +15,20 @@ export class Utils {
         }
         return momentDate;
     }
+
+    static getExploitableDate (date:string):Date{
+        try{
+        const dateHash:string[] = date.split("/");
+        return moment(new Date(
+            parseInt(dateHash[2]),
+            parseInt(dateHash[1]),
+            parseInt(dateHash[0]),
+            0,
+            0,
+            0,
+        ));
+        } catch (error) {
+            throw error;
+        }
+    }
 }

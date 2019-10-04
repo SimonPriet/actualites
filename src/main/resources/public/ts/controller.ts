@@ -232,17 +232,18 @@ export const actualiteController = ng.controller('ActualitesController',
                 }).length === 0;
             };
 
-            $scope.editInfo = function(info){
+            $scope.editInfo = (info:Info):void => {
+                info.publication_date = new moment(info.publication_date).format('L');
+                info.expiration_date = new moment(info.expiration_date).format('L');
                 model.infos.deselectAll();
                 info.edit = true;
                 info.expanded = false;
             };
 
-            $scope.cancelEditInfo = async function (info: Info) {
+            $scope.cancelEditInfo = async function () {
                 await model.infos.sync();
                 updateDisplayedInfos();
                 safeApply($scope);
-
             };
 
             $scope.createInfo = function(){
@@ -862,6 +863,14 @@ export const actualiteController = ng.controller('ActualitesController',
                 if (info.edit) {
                     return 'max-height: auto !important';
                 }
+            };
+
+            $scope.saveInfo = async(infoSend:Info):Promise<void> =>{
+                if(!infoSend) return;
+                await infoSend.save();
+                await $scope.cancelEditInfo();
+                await model.infos.sync();
+                $scope.safeApply();
             };
 
             this.initialize();
