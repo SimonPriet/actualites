@@ -35,7 +35,8 @@ import io.vertx.core.logging.LoggerFactory;
 
 import fr.wseduc.webutils.Either;
 
-import java.util.HashMap;
+import java.io.File;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
@@ -118,6 +119,48 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 					}
 				}
 			});
+	}
+
+	@Override
+	public void importResources(String importId, String userId, String username, String importPath, String locale, Handler<JsonObject> handler) {
+
+		// We first need to recreate members and users rows
+		SqlStatementsBuilder builder = new SqlStatementsBuilder();
+		builder.prepared("INSERT INTO actualites.users (id, username) VALUES (?,?) ON CONFLICT DO NOTHING",
+				new JsonArray().add(userId).add(username));
+		builder.prepared("INSERT INTO actualites.members (id, user_id) VALUES (?,?) ON CONFLICT DO NOTHING",
+				new JsonArray().add(userId).add(userId));
+
+		sql.transaction(builder.build(), message -> {
+			if ("ok".equals(message.body().getString("status"))) {
+
+				List<String> tables = new ArrayList<>(Arrays.asList("thread", "info", "info_revision"));
+				Map<String,String> tablesWithId = new HashMap<>();
+				tablesWithId.put("thread", "DEFAULT");
+				tablesWithId.put("info", "DEFAULT");
+				tablesWithId.put("info_revision", "DEFAULT");
+
+				importTables(importPath, "actualites", tables, tablesWithId, userId, username, new SqlStatementsBuilder(), handler);
+			} else {
+				log.error(title	+ " : Failed to create users/members for import." + message.body().getString("message"));
+				handler.handle(new JsonObject().put("status", "error"));
+			}
+		});
+
+	}
+
+	@Override
+	public JsonArray transformResults(JsonArray fields, JsonArray results, String userId, String username, SqlStatementsBuilder builder, String table) {
+
+		final int index = fields.getList().indexOf("owner");
+		results.forEach(res -> {
+			((JsonArray)res).getList().set(index,userId);
+		});
+
+		final int indexId = fields.getList().indexOf("id");
+		Collections.sort(results.getList(), (a,b) -> new JsonArray((List)a).getInteger(indexId).compareTo(new JsonArray((List)b).getInteger(indexId)));
+
+		return results;
 	}
 
 	@Override

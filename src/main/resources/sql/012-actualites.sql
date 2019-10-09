@@ -1,0 +1,2 @@
+ALTER TABLE actualites.info_revision DROP CONSTRAINT info_pk;
+ALTER TABLE actualites.info_revision ADD CONSTRAINT info_pk FOREIGN KEY (info_id) REFERENCES actualites.info(id) ON UPDATE CASCADE ON DELETE CASCADE;
