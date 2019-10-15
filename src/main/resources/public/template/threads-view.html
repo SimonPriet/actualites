@@ -44,6 +44,10 @@
 
 <section class="toggle-buttons" ng-class="{ hide: threads.selection().length === 0 }">
     <div class="toggle">
+        <button ng-click="print(threads.selection()[0])"
+                ng-if="threads.selection().length == 1" >
+            <i18n> <i18n>print</i18n></i18n>
+        </button>
         <button ng-click="editSelectedThread()"
                 ng-if="threads.selection().length < 2 && allowForSelection('editThread')" >
             <i18n> <i18n>edit</i18n></i18n>
@@ -65,6 +69,27 @@
 <div ng-if="display.showPanel">
     <lightbox show="display.showPanel" on-close="display.showPanel = false;">
         <share-panel app-prefix="'actualites/thread'" resources="threads.selection()"></share-panel>
+    </lightbox>
+</div>
+
+<lightbox show="display.showInfoSharePanel" on-close="display.showInfoSharePanel = false; infos.selection()[0].selected = false;">
+    <div ng-class="{'read-only': allowForSelection('viewShare')}">
+        <share-panel app-prefix="'actualites/thread/' + infos.selection()[0].thread_id + '/info'" resources="infos.selection()" ></share-panel>
+    </div>
+</lightbox>
+
+<div ng-if="threads.selection().length == 1">
+    <lightbox show="display.showPrintComments" on-close="display.showPrintComments = false">
+        <h2><i18n>print.option</i18n></h2>
+        <p><i18n>print.include.comments</i18n></p>
+        <div class="row">
+            <button ng-click="print(threads.selection()[0],true)" class="right-magnet">
+                <i18n>yes</i18n>
+            </button>
+            <button type="button" ng-click="print(threads.selection()[0],false)" class="right-magnet cancel">
+                <i18n>no</i18n>
+            </button>
+        </div>
     </lightbox>
 </div>
 

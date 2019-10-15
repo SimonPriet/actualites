@@ -86,6 +86,7 @@
     "actualites.links.mine": "Mes actualités",
     "actualites.links.read": "Lire les actualités",
     "actualites.set.as.headline": "Mettre à la une",
+    "actualites.at.headline": "Actualité à la une",
     "actualites.thread.empty": "Aucune actualité",
     "actualites.threads.all": "Tous les fils",
     "actualites.threads.latest": "Dernières actualités",
@@ -102,6 +103,7 @@
     "filters.all": "Toutes",
     "filters.headline": "A la une",
     "filters.drafts": "Brouillons",
+    "actualites.draft": "Brouillon",
     "filters.published": "Publiées",
     "filters.submitted": "A valider",
     "filters.submitted.waiting": "En attente de validation",
@@ -149,5 +151,11 @@
     "title.missing": "Veuillez renseigner le titre.",
     "this.week": "Actualités de la semaine",
     "before.this.week": "Autres actualités",
-    "this.week.empty": "Il n'y a pas de nouvelle actualité cette semaine"
+    "this.week.empty": "Il n'y a pas de nouvelle actualité cette semaine",
+    "print": "Imprimer",
+    "print.option": "Option d'impression",
+    "print.include.comments": "Un ou plusieurs des actualités de ce fil d'actualité contiennent des commentaires. Voulez-vous les inclure dans l'impression ?",
+    "info.print.include.comments": "Cette actualité contient des commentaires. Voulez-vous les inclure dans l'impression ?",
+    "yes": "Oui",
+    "no": "Non"
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr" class="print">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Actualités</title>
+    <script src="/actualites/public/dist/entcore/ng-app.js" id="context"  type="text/javascript"></script>
+    <script src="/actualites/public/dist/application.js" type="text/javascript"></script>
+</head>
+<body ng-controller="ActualitesController">
+<portal-styles></portal-styles>
+<div class="centered container row">
+    <section class="main">
+        <div>
+            <div style="float: left; margin-top: 20px;">
+                <h1 class="title">Fil d'actualité : </h1>
+            </div>
+            <div class="six cell">
+                <nav class="vertical half-stamps" side-nav>
+                        <a style="cursor: default;">
+                            <article>
+                                <div>
+                                    <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
+                                    <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
+                                </div>
+                                <div>
+                                    <h2>[[thread.title]]</h2>
+                                </div>
+                            </article>
+                        </a>
+                </nav>
+            </div>
+        </div>
+        <div ng-repeat="info in thread.infos.all" class="row">
+            <article class="twelve cell" style="box-shadow: 0 1px 3px rgba(0,0,0,0.26);">
+                <div class="row">
+                    <div class="cell twelve">
+                        <h2 class="upper-title">
+                            <i class="star accent-color" ng-if="info.is_headline"></i>
+                            [[info.title]]
+                        </h2>
+                        <div>
+                            <div>
+                                <div class="twelve cell" ng-bind-html="replaceAudioVideo(info.content)"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <em class="cell metadata vertical-spacing">
+                                <i18n>actualites.info.label.author</i18n> [[info.username]],
+                                [[getInfoDate(info)]]
+                                <span class="warning-text" translate content="[[getState(info)]]"></span>
+                            </em>
+                        </div>
+                    </div>
+                    <div ng-if="showComments && info.comments.length > 0">
+                        <hr style="
+                        padding: 0px; border-style: inset; border-width: 1px">
+                        <h4 class="upper-title">Commentaires : </h4>
+                        <div ng-repeat="comment in info.comments">
+                            <article class="row comment">
+                                <div class="lower-title">
+                                    <em>[[formatDate(comment.modified)]]</em>, <i18n>actualites.info.label.author</i18n>
+                                    <span translate content="[[comment.username]]"></span>
+
+                                    <p>[[comment.comment]]</p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+        </div>
+    </section>
+</div>
+</body>
+</html>

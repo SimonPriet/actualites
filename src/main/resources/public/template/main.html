@@ -183,9 +183,24 @@
     </lightbox>
 </div>
 
+<div ng-if="infos.selection().length > 0">
+    <lightbox show="display.showPrintComments" on-close="display.showPrintComments = false">
+        <h2><i18n>print.option</i18n></h2>
+        <p><i18n>info.print.include.comments</i18n></p>
+        <div class="row">
+            <button ng-click="printInfo(undefined,true)" class="right-magnet">
+                <i18n>yes</i18n>
+            </button>
+            <button type="button" ng-click="printInfo(undefined,false)" class="right-magnet cancel">
+                <i18n>no</i18n>
+            </button>
+        </div>
+    </lightbox>
+</div>
 
 <div class="toggle-buttons" ng-class="{ hide: infos.selection().length === 0 }">
     <div class="row toggle">
+        <button ng-click="printInfo(infos.selection()[0],false)"><i18n>print</i18n></button>
         <div ng-if="infos.selection().length === 1 && (allowForSelection('share') || allowForSelection('viewShare')) && getState(displayedInfos._selection[0]) !== 'actualites.edition.status.5'" class="cell">
             <button ng-click="display.showInfoSharePanel = true"><i18n>share</i18n></button>
         </div>

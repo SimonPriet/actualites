@@ -253,5 +253,11 @@ public class ThreadController extends ControllerHelper {
 		});
 	}
 
+	@Get("/print/actualites")
+	@ApiDoc("Print thread by id")
+	public void print(HttpServerRequest request) {
+		renderView(request, new JsonObject().put("printThreadId", request.params().get("actualites")), "print.html", null);
+	}
+
 
 }

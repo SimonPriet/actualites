@@ -1,7 +1,9 @@
-import { ng, template, idiom as lang, moment, _, $, model as typedModel } from 'entcore';
+import {ng, template, idiom as lang, moment, _, $, model as typedModel, skin, Collection} from 'entcore';
 import { ACTUALITES_CONFIGURATION } from './configuration';
 import { safeApply } from './functions/safeApply';
 import { Info, Thread, Comment, Utils } from './model';
+import * as jQuery from 'jquery'
+import http from "axios";
 
 const model = typedModel as any;
 
@@ -36,9 +38,9 @@ export const actualiteController = ng.controller('ActualitesController',
 
                 route({
                     // Routes viewThread, viewInfo adn viewComment are used by notifications
-                    viewThread: async function(params){
+                    viewThread: async function (params) {
                         var initThreadView = function () {
-                            var aThread = model.threads.findWhere({_id : parseInt(params.threadId)});
+                            var aThread = model.threads.findWhere({_id: parseInt(params.threadId)});
                             if (aThread !== undefined) {
                                 $scope.notFound = false;
                                 $scope.displayedInfos = aThread.infos;
@@ -52,7 +54,7 @@ export const actualiteController = ng.controller('ActualitesController',
                         model.infos.one('sync', function () {
                             model.threads.mapInfos();
                         });
-                        model.threads.one('sync', function(){
+                        model.threads.one('sync', function () {
                             initThreadView();
                         });
                         if (model.threads.all.length === 0) {
@@ -63,31 +65,29 @@ export const actualiteController = ng.controller('ActualitesController',
                         }
                         formatInfos();
                     },
-                    viewInfo: async function(params){
+                    viewInfo: async function (params) {
                         var initInfoSync = function () {
                             model.threads.mapInfos();
                             $scope.info = undefined;
-                            $scope.info = model.infos.find(function(info){
+                            $scope.info = model.infos.find(function (info) {
                                 return info._id === parseInt(params.infoId);
                             });
                             if ($scope.info !== undefined) {
                                 if ($scope.info.allow('view')) {
                                     $scope.notFound = false;
                                     $scope.display.infoRead = true;
-                                }
-                                else {
+                                } else {
                                     $scope.display.infoRead = true;
                                     $scope.notFound = true;
                                     template.open('error', '401');
                                 }
-                            }
-                            else {
+                            } else {
                                 $scope.display.infoRead = true;
                                 $scope.notFound = true;
                                 template.open('error', '404');
                             }
                             if (params.threadId !== undefined) {
-                                var thread = model.threads.findWhere({id : params.threadId});
+                                var thread = model.threads.findWhere({id: params.threadId});
                                 if (thread !== undefined) {
                                     $location.path('/view/thread/' + params.threadId);
                                 } else {
@@ -101,7 +101,7 @@ export const actualiteController = ng.controller('ActualitesController',
                         };
                         var initThreadSync = function () {
                             if (params.threadId !== undefined) {
-                                var aThread = model.threads.findWhere({_id : parseInt(params.threadId)});
+                                var aThread = model.threads.findWhere({_id: parseInt(params.threadId)});
                                 if (aThread !== undefined) {
                                     $scope.notFound = false;
                                     $scope.displayedInfos = aThread.infos;
@@ -117,7 +117,7 @@ export const actualiteController = ng.controller('ActualitesController',
                             initInfoSync();
                             safeApply($scope);
                         });
-                        model.threads.one('sync', async function(){
+                        model.threads.one('sync', async function () {
                             await model.infos.sync();
                             formatInfos();
                             initThreadSync();
@@ -132,19 +132,19 @@ export const actualiteController = ng.controller('ActualitesController',
                         formatInfos();
                         safeApply($scope);
                     },
-                    main: function(){
+                    main: function () {
                         model.infos.unbind('sync');
                         model.threads.unbind('sync');
                         $scope.currentInfo = new Info();
                         template.open('main', 'main');
-                        model.infos.one('sync', function(){
+                        model.infos.one('sync', function () {
                             model.threads.mapInfos();
                             safeApply($scope);
                         });
                         formatInfos();
                         model.infos.deselectAll();
                     },
-                    admin: function(){
+                    admin: function () {
                         model.infos.unbind('sync');
                         model.threads.unbind('sync');
                         template.open('main', 'threads-view');
@@ -157,9 +157,9 @@ export const actualiteController = ng.controller('ActualitesController',
                             }
                         });
                     },
-                    viewTimeline : function (param) {
+                    viewTimeline: function (param) {
                         var initTimeline = async function () {
-                            $scope.infoTimeline = model.infos.findWhere({_id : parseInt(param.infoId)});
+                            $scope.infoTimeline = model.infos.findWhere({_id: parseInt(param.infoId)});
                             if ($scope.infoTimeline === undefined) {
                                 $scope.notFound = true;
                                 template.open('error', '404');
@@ -178,6 +178,82 @@ export const actualiteController = ng.controller('ActualitesController',
                         } else {
                             initTimeline();
                         }
+                    },
+                    print: function (params) {
+                        let data = {
+                            _id: params.threadId
+                        };
+                        let infoId;
+                        if (params.infoId) {
+                            infoId = parseInt(params.infoId,10);
+                        }
+                        $scope.thread = new Thread();
+                        if (params.comments === 'true')
+                            $scope.showComments = true;
+                        let resourceUrl = '/actualites/thread/' + data._id;
+                        $scope.getThread = http.get(resourceUrl);
+                        let infosRessourceUrl = "/actualites/thread/" + data._id + "/infos";
+                        $scope.getInfos = http.get(infosRessourceUrl);
+                        Promise.all([$scope.getThread,$scope.getInfos]).then(function (values) {
+                            let content = values[0].data;
+                            $scope.thread.updateData({
+                                title: content.title,
+                                icon: content.icon,
+                                order: content.order,
+                                mode: content.mode,
+                                loaded: true,
+                                modified: content.modified,
+                                owner: content.owner,
+                                ownerName: content.username,
+                                _id: content._id
+                            });
+                            $scope.thread.infos.all = values[1].data;
+                            if (infoId) {
+                                $scope.thread.infos.all = $scope.thread.infos.all.filter(p => p._id === infoId);
+                            }
+                            $scope.thread.infos.forEach( function (info) {
+                                if (info.comments){
+                                    $scope.commentsToInject = JSON.parse(info.comments);
+                                    info.comments = $scope.commentsToInject;
+                                }else{
+                                    info.comments = [];
+                                }
+                            });
+                            safeApply($scope);
+                            let countDown = $scope.thread.infos.length();
+                            let onFinish = function () {
+                                if (--countDown <= 0) {
+                                    setTimeout(() => {
+                                        const imgs = (jQuery as any).jQuery(document).find("img").toArray();
+                                        for (let img of imgs) {
+                                            (img as any).onerror = (() => {
+                                                (img as any).error = true;
+                                            })
+                                        }
+                                        const isComplete = (img) => {
+                                            return img.complete || (img.context && img.context.complete)
+                                        };
+                                        $scope.printed = false;
+                                        const it = setInterval(() => {
+                                            const pending = imgs.filter(img => !(img as any).error && !isComplete(img));
+                                            if (pending.length == 0) {
+                                                clearInterval(it);
+                                                if (!$scope.printed) {
+                                                    $scope.printed = true;
+                                                    window.print();
+                                                }
+                                            }
+                                        }, 200)
+                                    }, 1500)
+                                }
+                            };
+                            if (countDown === 0) {
+                                onFinish();
+                            }
+                            $scope.thread.infos.forEach(async function (info) {
+                                onFinish();
+                            })
+                        });
                     }
                 });
 
@@ -188,11 +264,14 @@ export const actualiteController = ng.controller('ActualitesController',
 
                 // Variables
                 $scope.infos = model.infos;
+                $scope.postToPrint = model.infos;
                 $scope.currentInfo = new Info();
                 $scope.display = {
                     emptyThread: false,
                     showCommentsPanel: false,
                     showComments: false,
+                    showPrintComments: false,
+                    printPost: false,
                     limit: 8
                 };
 
@@ -245,6 +324,56 @@ export const actualiteController = ng.controller('ActualitesController',
                 updateDisplayedInfos();
                 safeApply($scope);
             };
+
+            $scope.print = function (thread:Thread,printComments) {
+                if (!$scope.display.showPrintComments){
+                    let infosRessourceUrl = "/actualites/thread/" + thread._id + "/infos";
+                    http.get(infosRessourceUrl).then(function (response) {
+                        thread.infos.all = response.data;
+                        thread.infos.forEach( function (info) {
+                            if (info.comments){
+                                $scope.commentsToInject = JSON.parse(info.comments as any);
+                                info.comments = $scope.commentsToInject;
+                            }else{
+                                info.comments = ([] as any);
+                            }
+                        });
+                        if ((thread.infos.all as any).some(info => info.comments.length > 0)) {
+                            $scope.display.showPrintComments = true;
+                            $scope.display.printInfo = false;
+                            safeApply($scope);
+                        } else {
+                            $scope.display.showPrintComments = false;
+                            window.open(`/actualites/print/actualites#/print/${thread._id}?comments=false`, '_blank');
+                        }
+                    });
+                }else{
+                    $scope.display.showPrintComments = false;
+                    window.open(`/actualites/print/actualites#/print/${thread._id}?comments=${printComments}`, '_blank');
+                }
+            };
+
+            $scope.printInfo = function(info:Info, printComments) {
+                if (info) {
+                    $scope.infoToPrint = info;
+                }
+                if ($scope.infoToPrint.comments.all.length > 0 && !$scope.display.showPrintComments) {
+                    $scope.display.printInfo = true;
+                    $scope.display.showPrintComments = true;
+                }
+                else {
+                    $scope.display.showPrintComments = false;
+                    window.open(`/actualites/print/actualites#/print/${$scope.infoToPrint.thread._id}/info/${$scope.infoToPrint._id}?comments=${printComments}`, '_blank');
+                }
+            };
+
+            $scope.replaceAudioVideo = function (s: string) {
+                return s &&
+                    // Audio
+                    s.replace(/<div class=\"audio-wrapper.*?\/div>/g,"<img src='" + skin.basePath + "img/illustrations/audio-file.png' width='300' height='72'>")
+                    // Video
+                        .replace(/<iframe.*?src="(.+?)[\?|\"].*?\/iframe>/g,"<img src='" + skin.basePath + "img/icons/video-large.png' width='135' height='135'><br><a href=\"$1\">$1</a>");
+            }
 
             $scope.createInfo = function(){
                 $scope.currentInfo = new Info();

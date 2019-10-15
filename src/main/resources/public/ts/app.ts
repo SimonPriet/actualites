@@ -30,6 +30,12 @@ routes.define(function($routeProvider){
         .when('/admin', {
             action: 'admin'
         })
+        .when('/print/:threadId', {
+            action: 'print'
+        })
+        .when('/print/:threadId/info/:infoId', {
+            action: 'print'
+        })
         .otherwise({
             redirectTo: '/default'
         });
