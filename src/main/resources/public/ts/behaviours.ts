@@ -85,12 +85,27 @@ Behaviours.register('actualites', {
             if (!resource.myRights){
                 resource.myRights = {};
             }
-            for (var behaviour in actualitesBehaviours.resources){
-                if (model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner){
-                    if (resource.myRights[behaviour] !== undefined){
-                        resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
-                    } else {
-                        resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+            if (resource.thread_id) {
+                http.get('/actualites/thread/' + resource.thread_id).then(function (threadResponse) {
+                    var thread = threadResponse.data;
+                    for (var behaviour in actualitesBehaviours.resources) {
+                        if (model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner || model.me.userId === thread.owner) {
+                            if (resource.myRights[behaviour] !== undefined) {
+                                resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
+                            } else {
+                                resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+                            }
+                        }
+                    }
+                });
+            }else {
+                for (var behaviour in actualitesBehaviours.resources) {
+                    if (model.me.hasRight(resource, actualitesBehaviours.resources[behaviour]) || model.me.userId === resource.owner) {
+                        if (resource.myRights[behaviour] !== undefined) {
+                            resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
+                        } else {
+                            resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+                        }
                     }
                 }
             }

@@ -1,4 +1,15 @@
-import {ng, template, idiom as lang, moment, _, $, model as typedModel, skin, Collection} from 'entcore';
+import {
+    ng,
+    template,
+    idiom as lang,
+    moment,
+    _,
+    $,
+    model as typedModel,
+    skin,
+    Collection,
+    currentLanguage
+} from 'entcore';
 import { ACTUALITES_CONFIGURATION } from './configuration';
 import { safeApply } from './functions/safeApply';
 import { Info, Thread, Comment, Utils } from './model';
@@ -556,19 +567,23 @@ export const actualiteController = ng.controller('ActualitesController',
             };
 
             /* Util */
+            moment.locale(currentLanguage);
+
             $scope.formatDate = function(date){
                 var momentDate = Utils.getDateAsMoment(date);
-                return moment(momentDate).calendar();
+                var dateRightFormat = moment.utc(momentDate).local();
+                return dateRightFormat.calendar();
             };
 
             $scope.formatDateLocale = function(date){
-                if (moment(date) > moment().add(-1, 'days').startOf('day') && moment(date) < moment().endOf('day'))
-                    return moment(date).calendar();
+                var dateRightFormat = moment.utc(date).local();
+                if (dateRightFormat > moment().add(-1, 'days').startOf('day') && dateRightFormat < moment().endOf('day'))
+                    return dateRightFormat.calendar();
 
-                if (moment(date) > moment().add(-7, 'days').startOf('day') && moment(date) < moment().endOf('day'))
-                    return moment(date).fromNow(); //this week
+                if (dateRightFormat.local() > moment().add(-7, 'days').startOf('day') && dateRightFormat < moment().endOf('day'))
+                    return dateRightFormat.fromNow(); //this week
 
-                return moment(date).format('L');
+                return dateRightFormat.format('L');
             };
 
             $scope.hasParam = function (param) {
