@@ -47,6 +47,7 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 	public ActualitesRepositoryEvents(boolean shareOldGroupsToUsers, Vertx vertx) {
 		super(vertx);
 		this.shareOldGroupsToUsers = shareOldGroupsToUsers;
+		this.mainResourceName = "info";
 	}
 
 	@Override
