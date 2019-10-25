@@ -124,7 +124,7 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 
 	@Override
 	public void importResources(String importId, String userId, String userLogin, String username, String importPath, String locale,
-		Handler<JsonObject> handler)
+		boolean forceImportAsDuplication, Handler<JsonObject> handler)
 	{
 		// We first need to recreate members and users rows
 		SqlStatementsBuilder builder = new SqlStatementsBuilder();
@@ -142,7 +142,8 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 				tablesWithId.put("info", "DEFAULT");
 				tablesWithId.put("info_revision", "DEFAULT");
 
-				importTables(importPath, "actualites", tables, tablesWithId, userId, username, new SqlStatementsBuilder(), handler);
+				importTables(importPath, "actualites", tables, tablesWithId, userId, username, locale,
+					new SqlStatementsBuilder(), forceImportAsDuplication, handler);
 			} else {
 				log.error(title	+ " : Failed to create users/members for import." + message.body().getString("message"));
 				handler.handle(new JsonObject().put("status", "error"));
@@ -152,7 +153,8 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 	}
 
 	@Override
-	public JsonArray transformResults(JsonArray fields, JsonArray results, String userId, String username, SqlStatementsBuilder builder, String table) {
+	public JsonArray transformResults(JsonArray fields, JsonArray results, String userId, String username, SqlStatementsBuilder builder,
+		String table, boolean forceImportAsDuplication, String duplicationSuffix) {
 
 		final int index = fields.getList().indexOf("owner");
 		results.forEach(res -> {
