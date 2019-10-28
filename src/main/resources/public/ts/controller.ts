@@ -201,24 +201,45 @@ export const actualiteController = ng.controller('ActualitesController',
                         $scope.thread = new Thread();
                         if (params.comments === 'true')
                             $scope.showComments = true;
-                        let resourceUrl = '/actualites/thread/' + data._id;
-                        $scope.getThread = http.get(resourceUrl);
-                        let infosRessourceUrl = "/actualites/thread/" + data._id + "/infos";
-                        $scope.getInfos = http.get(infosRessourceUrl);
-                        Promise.all([$scope.getThread,$scope.getInfos]).then(function (values) {
+                        var request= [];
+                        if(params.allowAcces === 'true'){
+                            let resourceUrl = '/actualites/thread/' + data._id;
+                            $scope.getThread = http.get(resourceUrl);
+                            let infosRessourceUrl = "/actualites/thread/" + data._id + "/infos";
+                            $scope.getInfos = http.get(infosRessourceUrl);
+                            request.push($scope.getThread,$scope.getInfos);
+                        }else{
+                            let resourceUrl = '/actualites/infos';
+                            $scope.getInfos = http.get(resourceUrl);
+                            request.push($scope.getInfos);
+                        }
+                        Promise.all(request).then(function (values) {
                             let content = values[0].data;
-                            $scope.thread.updateData({
-                                title: content.title,
-                                icon: content.icon,
-                                order: content.order,
-                                mode: content.mode,
-                                loaded: true,
-                                modified: content.modified,
-                                owner: content.owner,
-                                ownerName: content.username,
-                                _id: content._id
-                            });
-                            $scope.thread.infos.all = values[1].data;
+                            if(params.allowAcces === 'true') {
+                                $scope.thread.updateData({
+                                    title: content.title,
+                                    icon: content.icon,
+                                    order: content.order,
+                                    mode: content.mode,
+                                    loaded: true,
+                                    modified: content.modified,
+                                    owner: content.owner,
+                                    ownerName: content.username,
+                                    _id: content._id
+                                });
+                                $scope.thread.infos.all = values[1].data;
+                            }else{
+                                content.forEach(function(info){
+                                    if(info.thread_id == parseInt(data._id,10)){
+                                        $scope.thread.updateData({
+                                            title:info.thread_title,
+                                            icon:info.thread_icon,
+                                            _id:info.thread_id
+                                            });
+                                    }
+                                });
+                                $scope.thread.infos.all = content;
+                            }
                             if (infoId) {
                                 $scope.thread.infos.all = $scope.thread.infos.all.filter(p => p._id === infoId);
                             }
@@ -230,6 +251,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                     info.comments = [];
                                 }
                             });
+
                             safeApply($scope);
                             let countDown = $scope.thread.infos.length();
                             let onFinish = function () {
@@ -285,6 +307,8 @@ export const actualiteController = ng.controller('ActualitesController',
                     printPost: false,
                     limit: 8
                 };
+                $scope.selectedToPrint=false;
+                $scope.allowAcces=false;
 
                 $scope.startDate = new Date();
                 $scope.appPrefix = 'actualites';
@@ -367,6 +391,7 @@ export const actualiteController = ng.controller('ActualitesController',
             $scope.printInfo = function(info:Info, printComments) {
                 if (info) {
                     $scope.infoToPrint = info;
+                    $scope.allowAcces = info.allow("edit");
                 }
                 if ($scope.infoToPrint.comments.all.length > 0 && !$scope.display.showPrintComments) {
                     $scope.display.printInfo = true;
@@ -374,8 +399,21 @@ export const actualiteController = ng.controller('ActualitesController',
                 }
                 else {
                     $scope.display.showPrintComments = false;
-                    window.open(`/actualites/print/actualites#/print/${$scope.infoToPrint.thread._id}/info/${$scope.infoToPrint._id}?comments=${printComments}`, '_blank');
+                    $scope.closePrintToolBar();
+                    window.open(`/actualites/print/actualites#/print/${$scope.infoToPrint.thread._id}/info/${$scope.infoToPrint._id}?comments=${printComments}&allowAcces=${$scope.allowAcces}`, '_blank');
                 }
+                $scope.safeApply();
+            };
+
+            $scope.openPrintToolBar = function(info:Info){
+                    $scope.selectedToPrint = true;
+                    $scope.infoToPrint = info;
+                    $scope.safeApply();
+            };
+
+            $scope.closePrintToolBar = function(){
+                $scope.selectedToPrint = false;
+                $scope.safeApply();
             };
 
             $scope.replaceAudioVideo = function (s: string) {
@@ -384,7 +422,7 @@ export const actualiteController = ng.controller('ActualitesController',
                     s.replace(/<div class=\"audio-wrapper.*?\/div>/g,"<img src='" + skin.basePath + "img/illustrations/audio-file.png' width='300' height='72'>")
                     // Video
                         .replace(/<iframe.*?src="(.+?)[\?|\"].*?\/iframe>/g,"<img src='" + skin.basePath + "img/icons/video-large.png' width='135' height='135'><br><a href=\"$1\">$1</a>");
-            }
+            };
 
             $scope.createInfo = function(){
                 $scope.currentInfo = new Info();

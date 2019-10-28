@@ -183,20 +183,18 @@
     </lightbox>
 </div>
 
-<div ng-if="infos.selection().length > 0">
-    <lightbox show="display.showPrintComments" on-close="display.showPrintComments = false">
-        <h2><i18n>print.option</i18n></h2>
-        <p><i18n>info.print.include.comments</i18n></p>
-        <div class="row">
-            <button ng-click="printInfo(undefined,true)" class="right-magnet">
-                <i18n>yes</i18n>
-            </button>
-            <button type="button" ng-click="printInfo(undefined,false)" class="right-magnet cancel">
-                <i18n>no</i18n>
-            </button>
-        </div>
-    </lightbox>
-</div>
+<lightbox show="display.showPrintComments" on-close="display.showPrintComments = false">
+    <h2><i18n>print.option</i18n></h2>
+    <p><i18n>info.print.include.comments</i18n></p>
+    <div class="row">
+        <button ng-click="printInfo(undefined,true)" class="right-magnet">
+            <i18n>yes</i18n>
+        </button>
+        <button type="button" ng-click="printInfo(undefined,false)" class="right-magnet cancel">
+            <i18n>no</i18n>
+        </button>
+    </div>
+</lightbox>
 
 <div class="toggle-buttons" ng-class="{ hide: infos.selection().length === 0 }">
     <div class="row toggle">
@@ -215,5 +213,11 @@
             <button ng-if="allowForSelection('edit') && infos.selection().length === 1"><i18n>journal</i18n></button>
         </a>
         <button ng-click="display.showConfirmRemove = true" ng-if="allowForSelection('remove')"><i18n>remove</i18n></button>
+    </div>
+</div>
+
+<div class="toggle-buttons" ng-class="{ hide: !selectedToPrint }">
+    <div class="row toggle">
+        <button ng-click="printInfo(infoToPrint,false)"><i18n>print</i18n></button>
     </div>
 </div>

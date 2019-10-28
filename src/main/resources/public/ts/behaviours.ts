@@ -109,6 +109,21 @@ Behaviours.register('actualites', {
                     }
                 }
             }
+            if(resource.shared.length > 0) {
+                resource.shared.forEach(shareInfos =>{
+                    for (var behaviour in actualitesBehaviours.resources) {
+                        for (var share in shareInfos) {
+                            if (share.includes(behaviour) && model.me.userId === shareInfos.userId && shareInfos[share]) {
+                                if (resource.myRights[behaviour] !== undefined) {
+                                    resource.myRights[behaviour] = resource.myRights[behaviour] && actualitesBehaviours.resources[behaviour];
+                                } else {
+                                    resource.myRights[behaviour] = actualitesBehaviours.resources[behaviour];
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
         return resource;
     },

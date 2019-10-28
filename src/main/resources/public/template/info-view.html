@@ -50,5 +50,7 @@
         </div>
         <check-tool ng-model="info.selected" ng-click="$event.stopPropagation()"
                     ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')"></check-tool>
+        <check-tool ng-model="selectedToPrint" ng-click="openPrintToolBar(info)" ng-blur="selectedToPrint = false"
+                    ng-if="!info.allow('edit') && !info.allow('viewShare') && !info.allow('unsubmit') && !info.allow('submit') && !info.allow('remove') && info.allow('comment')"></check-tool>
     </article>
 </div>
