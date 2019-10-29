@@ -124,7 +124,7 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 
 	@Override
 	public void importResources(String importId, String userId, String userLogin, String username, String importPath, String locale,
-		boolean forceImportAsDuplication, Handler<JsonObject> handler)
+		String host, boolean forceImportAsDuplication, Handler<JsonObject> handler)
 	{
 		// We first need to recreate members and users rows
 		SqlStatementsBuilder builder = new SqlStatementsBuilder();
