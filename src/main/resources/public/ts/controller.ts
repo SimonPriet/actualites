@@ -307,7 +307,6 @@ export const actualiteController = ng.controller('ActualitesController',
                     printPost: false,
                     limit: 8
                 };
-                $scope.selectedToPrint=false;
                 $scope.allowAcces=false;
 
                 $scope.startDate = new Date();
@@ -399,20 +398,8 @@ export const actualiteController = ng.controller('ActualitesController',
                 }
                 else {
                     $scope.display.showPrintComments = false;
-                    $scope.closePrintToolBar();
                     window.open(`/actualites/print/actualites#/print/${$scope.infoToPrint.thread._id}/info/${$scope.infoToPrint._id}?comments=${printComments}&allowAcces=${$scope.allowAcces}`, '_blank');
                 }
-                $scope.safeApply();
-            };
-
-            $scope.openPrintToolBar = function(info:Info){
-                    $scope.selectedToPrint = true;
-                    $scope.infoToPrint = info;
-                    $scope.safeApply();
-            };
-
-            $scope.closePrintToolBar = function(){
-                $scope.selectedToPrint = false;
                 $scope.safeApply();
             };
 

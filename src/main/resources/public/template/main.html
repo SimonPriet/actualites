@@ -66,7 +66,7 @@
                     </a>
                 </header>
                 <header ng-class="{selected : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED}"
-                    ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
+                        ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
                     <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PUBLISHED]]"
                        class="horizontal-spacing">
                         <span><i18n>filters.published</i18n></span>
@@ -83,7 +83,7 @@
                 </header>
                 <header ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.DRAFT,
                         'disabled' : displayedInfos.drafts.length === 0}"
-                    ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
+                        ng-if="oneRight('contrib')" class="horizontal-spacing-twice">
                     <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.DRAFT]]"
                        ng-if="displayedInfos.drafts.length > 0"
                        class="horizontal-spacing">
@@ -93,7 +93,7 @@
                 </header>
                 <header ng-class="{'selected' : findParam('filter') === ACTUALITES_CONFIGURATION.infoFilter.PENDING,
                             'disabled': displayedInfos.pendings.length === 0}"
-                    ng-if="oneRight('submit')" class="horizontal-spacing-twice">
+                        ng-if="oneRight('submit')" class="horizontal-spacing-twice">
                     <a href="[['#' + $location.path() + '?filter=' + ACTUALITES_CONFIGURATION.infoFilter.PENDING]]"
                        ng-if="displayedInfos.pendings.length > 0"
                        class="horizontal-spacing">
@@ -198,7 +198,7 @@
 
 <div class="toggle-buttons" ng-class="{ hide: infos.selection().length === 0 }">
     <div class="row toggle">
-        <button ng-click="printInfo(infos.selection()[0],false)"><i18n>print</i18n></button>
+        <button ng-click="printInfo(infos.selection()[0],false)" ng-if="infos.selection().length === 1"><i18n>print</i18n></button>
         <div ng-if="infos.selection().length === 1 && (allowForSelection('share') || allowForSelection('viewShare')) && getState(displayedInfos._selection[0]) !== 'actualites.edition.status.5'" class="cell">
             <button ng-click="display.showInfoSharePanel = true"><i18n>share</i18n></button>
         </div>
@@ -213,11 +213,5 @@
             <button ng-if="allowForSelection('edit') && infos.selection().length === 1"><i18n>journal</i18n></button>
         </a>
         <button ng-click="display.showConfirmRemove = true" ng-if="allowForSelection('remove')"><i18n>remove</i18n></button>
-    </div>
-</div>
-
-<div class="toggle-buttons" ng-class="{ hide: !selectedToPrint }">
-    <div class="row toggle">
-        <button ng-click="printInfo(infoToPrint,false)"><i18n>print</i18n></button>
     </div>
 </div>
