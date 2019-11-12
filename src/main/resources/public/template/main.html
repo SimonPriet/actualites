@@ -20,7 +20,7 @@
     </div>
 </lightbox>
 <div class="row rigid-grid">
-    <div class="four cell side-col twelve-mobile">
+    <div class="four cell side-col twelve-mobile" guard-root>
         <nav class="vertical half-stamps mobile-navigation" side-nav>
             <div>
                 <a href="#/default">
@@ -36,7 +36,7 @@
             </div>
             <div ng-repeat="thread in threads.all">
                 <a href="#/view/thread/[[thread._id]]">
-                    <article ng-click="switchSelectThread(thread)"
+                    <article reset-guard="switchSelectThread(thread)"
                              ng-class="{ selected: $location.path() === '/view/thread/' + thread._id}">
                         <div>
                             <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />

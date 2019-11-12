@@ -1,5 +1,5 @@
 <article class="row">
-	<form>
+	<form guard-root>
 		<div class="three cell">
 			<div class="row">
 				<label><i18n>actualites.create.thread</i18n></label>
@@ -36,23 +36,23 @@
 						ng-model="currentInfo.title"
 						type="text"
 						class="twelve cell"
-						i18n-placeholder="actualites.create.title" />
+						i18n-placeholder="actualites.create.title" input-guard/>
 			</div>
 			<div class="row">
-				<editor ng-model="currentInfo.content"></editor>
+				<editor ng-model="currentInfo.content" input-guard></editor>
 			</div>
 			<div class="row" ng-if="createInfoError">
 				<div class="warning">[[createInfoError]]</div>
 			</div>
 			<div class="row">
 				<div ng-if="currentInfo.thread !== undefined">
-					<button ng-click="saveSubmitted();" class="right-magnet" ng-if="currentInfo.allow('submit')">
+					<button reset-guard="saveSubmitted();" class="right-magnet" ng-if="currentInfo.allow('submit')">
 						<i18n>actualites.edition.infos.submit</i18n>
 					</button>
-					<button ng-click="savePublished();" class="right-magnet" ng-if="currentInfo.allow('publish')">
+					<button reset-guard="savePublished();" class="right-magnet" ng-if="currentInfo.allow('publish')">
 						<i18n>actualites.edition.infos.publish</i18n>
 					</button>
-					<button ng-click="saveDraft();" class="right-magnet">
+					<button reset-guard="saveDraft();" class="right-magnet">
 						<i18n>actualites.edition.infos.save.draft</i18n>
 					</button>
 				</div>

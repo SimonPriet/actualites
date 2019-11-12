@@ -1,7 +1,7 @@
 <article  class="twelve cell"
 		  ng-class="{ expanded: info.expanded, important: info.is_headline }"
-		  style="max-height:100000px !important;">
-	<form>
+		  style="max-height:100000px !important;" guard-root>
+	<form guard-root>
 		<div class="three cell">
 			<div class="row">
 				<label><i18n>actualites.create.thread</i18n></label>
@@ -34,13 +34,13 @@
 		</div>
 		<div class="nine cell">
 			<div class="row">
-				<input ng-model="info.title" type="text" class="twelve cell" i18n-placeholder="actualites.create.title" />
+				<input ng-model="info.title" type="text" class="twelve cell" i18n-placeholder="actualites.create.title" input-guard/>
 			</div>
 			<div class="row">
-				<editor ng-model="info.content"></editor>
+				<editor ng-model="info.content" input-guard></editor>
 			</div>
 			<div class="row">
-				<button ng-click="saveInfo(info);" class="right-magnet">
+				<button reset-guard="saveInfo(info);" class="right-magnet">
 					<i18n>actualites.edition.infos.save</i18n>
 				</button>
 				<button ng-click="cancelEditInfo()" class="right-magnet cancel">

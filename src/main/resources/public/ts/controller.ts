@@ -1,4 +1,4 @@
-import {ng, template, idiom as lang, moment, _, $, model as typedModel, skin, Collection} from 'entcore';
+import {ng, template, idiom as lang, moment, _, $, model as typedModel, skin, navigationGuardService} from 'entcore';
 import { ACTUALITES_CONFIGURATION } from './configuration';
 import { safeApply } from './functions/safeApply';
 import { Info, Thread, Comment, Utils } from './model';
@@ -392,14 +392,17 @@ export const actualiteController = ng.controller('ActualitesController',
                 $scope.display.showInfoSharePanel = false;
             };
 
-            $scope.saveDraft = async function(){
-                if(!$scope.validateCreateInfoForm()){
-                    return;
-                }
-                await $scope.currentInfo.save();
-                template.close('createInfo');
-                $scope.currentInfo = new Info();
-                safeApply($scope);
+            $scope.saveDraft = function(): Promise<void> {
+                return new Promise<void>(function(resolve, reject) {
+                    if (!$scope.validateCreateInfoForm()) {
+                        reject();
+                    }
+                    $scope.currentInfo.save();
+                    template.close('createInfo');
+                    $scope.currentInfo = new Info();
+                    safeApply($scope);
+                    resolve();
+                });
             };
 
             const displaySharePanel = () => {
@@ -469,26 +472,32 @@ export const actualiteController = ng.controller('ActualitesController',
                 return !$scope.createInfoError;
             };
 
-            $scope.saveSubmitted = function(){
-                if(!$scope.validateCreateInfoForm()){
-                    return;
-                }
-                if ($scope.currentInfo.createPending()){
-                    template.close('createInfo');
-                    $scope.currentInfo = new Info();
-                    safeApply($scope);
-                }
+            $scope.saveSubmitted = function():Promise<void> {
+                return new Promise<void>(function(resolve, reject) {
+                    if (!$scope.validateCreateInfoForm()) {
+                        reject();
+                    }
+                    if ($scope.currentInfo.createPending()) {
+                        resolve();
+                        template.close('createInfo');
+                        $scope.currentInfo = new Info();
+                        safeApply($scope);
+                    }
+                });
             };
 
-            $scope.savePublished = function(){
-                if(!$scope.validateCreateInfoForm()){
-                    return;
-                }
-                if ($scope.currentInfo.createPublished(displaySharePopUp)){
-                    template.close('createInfo');
-                    $scope.currentInfo = new Info();
-                    safeApply($scope);
-                }
+            $scope.savePublished = function():Promise<void> {
+                return new Promise<void>(function(resolve, reject) {
+                    if (!$scope.validateCreateInfoForm()) {
+                        reject();
+                    }
+                    if ($scope.currentInfo.createPublished(displaySharePopUp)) {
+                        resolve();
+                        template.close('createInfo');
+                        $scope.currentInfo = new Info();
+                        safeApply($scope);
+                    }
+                });
             };
 
             $scope.cancelCreateInfo = function(){
@@ -519,12 +528,15 @@ export const actualiteController = ng.controller('ActualitesController',
                 return (info.comments !== undefined && info.comments.length > 0);
             };
 
-            $scope.postInfoComment = function(info){
-                if ((!_.isString(info.newComment.comment)) || (info.newComment.comment.trim() === '')) {
-                    return;
-                }
-                info.comment(info.newComment.comment);
-                info.newComment = new Comment();
+            $scope.postInfoComment = function(info): Promise<void> {
+                return new Promise<void>(function(resolve, reject) {
+                    if ((!_.isString(info.newComment.comment)) || (info.newComment.comment.trim() === '')) {
+                        reject();
+                    }
+                    resolve();
+                    info.comment(info.newComment.comment);
+                    info.newComment = new Comment();
+                });
             };
 
             // Threads
@@ -762,8 +774,9 @@ export const actualiteController = ng.controller('ActualitesController',
              * @param thread selected
              */
             $scope.switchSelectThread = function (thread?) {
-              $scope.currentThread = thread;
-              $scope.currentInfo.thread = thread;
+                $scope.currentThread = thread;
+                if (thread in $scope.threads.writable())
+                    $scope.currentInfo.thread = thread;
             };
 
             function findSequence(x, y){
