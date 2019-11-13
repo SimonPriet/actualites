@@ -235,10 +235,10 @@ export const actualiteController = ng.controller('ActualitesController',
                                             title:info.thread_title,
                                             icon:info.thread_icon,
                                             _id:info.thread_id
-                                            });
+                                        });
+                                        $scope.thread.infos.all.push(info);
                                     }
                                 });
-                                $scope.thread.infos.all = content;
                             }
                             if (infoId) {
                                 $scope.thread.infos.all = $scope.thread.infos.all.filter(p => p._id === infoId);
