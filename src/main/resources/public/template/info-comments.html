@@ -10,9 +10,9 @@
 	</div>
 </article>
 
-<div ng-if="info.allow('comment')" class="row">
-	<textarea class="cell vertical-spacing" ng-model="info.newComment.comment"></textarea>
-	<button ng-click="postInfoComment(info)" class="right-magnet">
+<div guard-root ng-if="info.allow('comment')" class="row">
+	<textarea class="cell vertical-spacing" ng-model="info.newComment.comment" input-guard></textarea>
+	<button reset-guard="postInfoComment(info)" class="right-magnet">
 		<i18n>actualites.info.label.comments.submit</i18n>
 	</button>
 </div>

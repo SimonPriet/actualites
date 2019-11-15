@@ -1,5 +1,6 @@
 .idea
 actualites.iml
+src/main/resources/view
 src/main/resources/public/dist
 src/main/resources/public/temp
 src/main/resources/public/js
@@ -9,3 +10,4 @@ build/
 node_modules
 .gradle/
 src/main/resources/public/template/entcore/
+package-lock.json
