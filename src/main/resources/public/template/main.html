@@ -200,7 +200,7 @@
 
 <div class="toggle-buttons" ng-class="{ hide: infos.selection().length === 0 }">
     <div class="row toggle">
-        <button ng-click="printInfo(infos.selection()[0],false)"><i18n>print</i18n></button>
+        <button ng-click="printInfo(infos.selection()[0],false)" ng-if="infos.selection().length === 1"><i18n>print</i18n></button>
         <div ng-if="infos.selection().length === 1 && (allowForSelection('share') || allowForSelection('viewShare')) && getState(displayedInfos._selection[0]) !== 'actualites.edition.status.5'" class="cell">
             <button ng-click="display.showInfoSharePanel = true"><i18n>share</i18n></button>
         </div>

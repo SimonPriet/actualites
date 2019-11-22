@@ -11,22 +11,22 @@
 <div class="centered container row">
     <section class="main">
         <div>
-            <div style="float: left; margin-top: 20px;">
-                <h1 class="title">Fil d'actualité : </h1>
+            <div style="float: left;">
+                <h1 class="title" style="margin-top: 45px !important;">Fil d'actualité : </h1>
             </div>
             <div class="six cell">
                 <nav class="vertical half-stamps" side-nav>
-                        <a style="cursor: default;">
-                            <article>
-                                <div>
-                                    <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
-                                    <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
-                                </div>
-                                <div>
-                                    <h2>[[thread.title]]</h2>
-                                </div>
-                            </article>
-                        </a>
+                    <a style="cursor: default;">
+                        <article>
+                            <div>
+                                <img skin-src="/img/illustrations/actualites-default.png" ng-if="!thread.icon" />
+                                <img ng-src="[[thread.icon]]?thumbnail=120x120" ng-if="thread.icon" />
+                            </div>
+                            <div>
+                                <h2>[[thread.title]]</h2>
+                            </div>
+                        </article>
+                    </a>
                 </nav>
             </div>
         </div>
