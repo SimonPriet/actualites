@@ -98,7 +98,7 @@ export const actualiteController = ng.controller('ActualitesController',
                                 template.open('error', '404');
                             }
                             if (params.threadId !== undefined) {
-                                var thread = model.threads.findWhere({id: params.threadId});
+                                var thread = model.threads.findWhere({_id: parseInt(params.threadId)});
                                 if (thread !== undefined) {
                                     $location.path('/view/thread/' + params.threadId);
                                 } else {
@@ -124,18 +124,12 @@ export const actualiteController = ng.controller('ActualitesController',
                             }
                             formatInfos();
                         };
-                        model.infos.one('sync', function () {
-                            initInfoSync();
-                            safeApply($scope);
-                        });
-                        model.threads.one('sync', async function () {
-                            await model.infos.sync();
-                            formatInfos();
-                            initThreadSync();
-                            safeApply($scope);
-                        });
+                        
                         if (model.threads.all.length === 0) {
                             await model.threads.sync();
+                            await model.infos.sync();
+                            initThreadSync();
+                            initInfoSync();
                         } else {
                             initThreadSync();
                             initInfoSync();
@@ -555,12 +549,18 @@ export const actualiteController = ng.controller('ActualitesController',
                 return (info.comments !== undefined && info.comments.length > 0);
             };
 
-            $scope.postInfoComment = function(info){
+            $scope.postInfoComment = async function(info){
                 if ((!_.isString(info.newComment.comment)) || (info.newComment.comment.trim() === '')) {
                     return;
                 }
-                info.comment(info.newComment.comment);
+                await info.comment(info.newComment.comment);
                 info.newComment = new Comment();
+                safeApply($scope);
+            };
+
+            $scope.deleteInfoComment = async function(info, comment, index){
+                await info.deleteComment(comment, index);
+                safeApply($scope);
             };
 
             // Threads

@@ -202,9 +202,9 @@ export class Info extends Model {
         await http.delete('/actualites/thread/' + this.thread_id + '/info/' + this._id);
     }
 
-    comment (commentText) {
+    async comment (commentText) {
         var info = this;
-        http.put('/actualites/info/' + this._id + '/comment', { info_id: this._id, title: this.title, comment: commentText })
+        await http.put('/actualites/info/' + this._id + '/comment', { info_id: this._id, title: this.title, comment: commentText })
             .then(function (response) {
                 let comment = response.data;
                 info.comments.push(new Comment({
@@ -218,9 +218,9 @@ export class Info extends Model {
             });
     }
 
-    deleteComment (comment, index) {
+    async deleteComment (comment, index) {
         var info = this;
-        http.delete('/actualites/info/' + this._id + '/comment/' + comment._id).then(function () {
+        await http.delete('/actualites/info/' + this._id + '/comment/' + comment._id).then(function () {
             info.comments.splice(index, 1);
         });
     }

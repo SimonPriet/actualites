@@ -6,7 +6,7 @@
 		<p>[[comment.comment]]</p>
 	</div>
 	<div ng-if="comment._id" class="right-magnet cell">
-		<a ng-if="canDeleteComment(info, comment)" ng-click="info.deleteComment(comment, $index)"><i18n>actualites.info.label.comments.supprimer</i18n></a>
+		<a ng-if="canDeleteComment(info, comment)" ng-click="deleteInfoComment(info, comment, $index)"><i18n>actualites.info.label.comments.supprimer</i18n></a>
 	</div>
 </article>
 

@@ -109,7 +109,7 @@ Behaviours.register('actualites', {
                     }
                 }
             }
-            if(resource.shared.length > 0) {
+            if(resource.shared && resource.shared.length > 0) {
                 resource.shared.forEach(shareInfos =>{
                     for (var behaviour in actualitesBehaviours.resources) {
                         for (var share in shareInfos) {
