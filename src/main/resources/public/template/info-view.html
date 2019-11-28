@@ -50,9 +50,9 @@
         </div>
         <check-tool ng-model="info.selected" ng-click="$event.stopPropagation()"
                     ng-if="info.allow('edit') || info.allow('viewShare') || info.allow('unsubmit') || info.allow('submit') || info.allow('remove')"></check-tool>
-        <div ng-if="!info.allow('edit') && !info.allow('viewShare') && !info.allow('unsubmit') && !info.allow('submit') && !info.allow('remove') && info.allow('comment')"
+        <div ng-if="!info.allow('edit') && !info.allow('viewShare') && !info.allow('unsubmit') && !info.allow('submit') && !info.allow('remove')"
              class="check-tool" tooltip="print">
-            <i class="file-pdf" ng-click="printInfo(info)" style="transform: scale(0.75); padding: 5px;"></i>
+            <i class="file-pdf" ng-click="printInfo(info,false)" style="transform: scale(0.75); padding: 5px;"></i>
         </div>
     </article>
 </div>
