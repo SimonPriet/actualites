@@ -1,6 +1,6 @@
 <article  class="twelve cell"
 		  ng-class="{ expanded: info.expanded, important: info.is_headline }"
-		  style="max-height:100000px !important;" guard-root>
+		  style="max-height:100000px !important;">
 	<form guard-root>
 		<div class="three cell">
 			<div class="row">
@@ -43,7 +43,7 @@
 				<button reset-guard="saveInfo(info);" class="right-magnet">
 					<i18n>actualites.edition.infos.save</i18n>
 				</button>
-				<button ng-click="cancelEditInfo()" class="right-magnet cancel">
+				<button navigation-trigger="cancelEditInfo()" class="right-magnet cancel">
 					<i18n>actualites.edition.infos.cancel</i18n>
 				</button>
 			</div>
