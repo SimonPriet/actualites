@@ -143,7 +143,7 @@ public class InfoController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-                infoService.listForLinker(user, arrayResponseHandler(request));
+                infoService.list(user, arrayResponseHandler(request));
             }
         });
     }
