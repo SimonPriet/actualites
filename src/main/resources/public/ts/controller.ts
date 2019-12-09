@@ -596,19 +596,16 @@ export const actualiteController = ng.controller('ActualitesController',
 
             $scope.formatDate = function(date){
                 var momentDate = Utils.getDateAsMoment(date);
-                var dateRightFormat = moment.utc(momentDate).local();
-                return dateRightFormat.calendar();
+                return moment(momentDate).calendar();
             };
 
             $scope.formatDateLocale = function(date){
-                var dateRightFormat = moment.utc(date).local();
-                if (dateRightFormat > moment().add(-1, 'days').startOf('day') && dateRightFormat < moment().endOf('day'))
-                    return dateRightFormat.calendar();
+                if (moment(date) > moment().add(-1, 'days').startOf('day') && moment(date) < moment().endOf('day'))
+                    return moment(date).calendar();
+                if (moment(date) > moment().add(-7, 'days').startOf('day') && moment(date) < moment().endOf('day'))
+                    return moment(date).fromNow(); //this week
 
-                if (dateRightFormat.local() > moment().add(-7, 'days').startOf('day') && dateRightFormat < moment().endOf('day'))
-                    return dateRightFormat.fromNow(); //this week
-
-                return dateRightFormat.format('L');
+                return moment(date).format('L');
             };
 
             $scope.hasParam = function (param) {
