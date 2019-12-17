@@ -113,7 +113,7 @@ public class ActualitesRepositoryEvents extends SqlRepositoryEvents {
 				@Override
 				public void handle(String path) {
 					if (path != null) {
-						exportTables(queries, new JsonArray(), path, exported, handler);
+						exportTables(queries, new JsonArray(), null, path, exported, handler);
 					}
 					else {
 						handler.handle(exported.get());
