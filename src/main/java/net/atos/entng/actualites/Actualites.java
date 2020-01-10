@@ -23,6 +23,7 @@ import net.atos.entng.actualites.controllers.CommentController;
 import net.atos.entng.actualites.controllers.InfoController;
 import net.atos.entng.actualites.controllers.ThreadController;
 import net.atos.entng.actualites.controllers.DisplayController;
+import net.atos.entng.actualites.services.ConfigService;
 import net.atos.entng.actualites.services.impl.ActualitesRepositoryEvents;
 
 import net.atos.entng.actualites.services.impl.ActualitesSearchingEvents;
@@ -55,6 +56,8 @@ public class Actualites extends BaseServer {
 
 	public final static String MANAGE_RIGHT_ACTION = "net-atos-entng-actualites-controllers-ThreadController|updateThread";
 
+	public final static String SHARE_CONF_KEY = "share";
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -68,6 +71,9 @@ public class Actualites extends BaseServer {
 			searchFields.add("text_searchable");
 			setSearchingEvents(new ActualitesSearchingEvents(new SqlSearchService(getSchema(), INFO_TABLE, INFO_SHARE_TABLE, searchFields)));
 		}
+
+		ConfigService configService = ConfigService.getInstance();
+		configService.setShareConfig(config.getJsonObject(SHARE_CONF_KEY));
 
 		addController(new DisplayController());
 

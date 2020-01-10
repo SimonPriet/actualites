@@ -75,6 +75,9 @@ const actualitesBehaviours = {
     },
     workflow: {
         admin: 'net.atos.entng.actualites.controllers.ThreadController|createThread'
+    },
+    share: {
+        overrideDefaultActions: ['info.read', 'info.comment']
     }
 };
 
@@ -122,6 +125,9 @@ Behaviours.register('actualites', {
         }
 
         return workflow;
+    },
+    share: function() {
+        return actualitesBehaviours.share;
     },
     resourceRights: function(){
         return ['read', 'contrib', 'publish', 'manager', 'comment'];

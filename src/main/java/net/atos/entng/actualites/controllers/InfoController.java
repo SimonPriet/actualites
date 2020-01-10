@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.atos.entng.actualites.Actualites;
 import net.atos.entng.actualites.filters.InfoFilter;
 import net.atos.entng.actualites.filters.ThreadFilter;
+import net.atos.entng.actualites.services.ConfigService;
 import net.atos.entng.actualites.services.InfoService;
 import net.atos.entng.actualites.services.ThreadService;
 import net.atos.entng.actualites.services.impl.InfoServiceSqlImpl;
@@ -846,4 +847,15 @@ public class InfoController extends ControllerHelper {
 		});
 	}
 
+    @Get("/config/share")
+    @ApiDoc("Get the sharing configuration (for example: default actions to check in share panel.")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getConfigShare(final HttpServerRequest request) {
+        JsonObject shareConfig = ConfigService.getInstance().getShareConfig();
+        if (shareConfig != null) {
+            renderJson(request, ConfigService.getInstance().getShareConfig(), 200);
+        } else {
+            notFound(request, "No platform sharing configuration found");
+        }
+    }
 }
