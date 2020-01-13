@@ -1,5 +1,4 @@
 import { moment, _, model as typedModel } from 'entcore';
-import { Mix } from 'entcore-toolkit';
 import http from 'axios';
 import { ACTUALITES_CONFIGURATION } from '../configuration';
 import { Thread, Info, Event, Comment } from './index';
@@ -160,7 +159,11 @@ export const buildModel = function() {
         pendings : [],
         drafts : [],
         sync: async function(){
-           await http.get('/actualites/infos').then(function(response){
+            //optimisation => avoid multiple load
+            if(this.promiseSync){
+                return this.promiseSync;
+            }
+           this.promiseSync = http.get('/actualites/infos').then(function(response){
                 let infos = response.data;
                 let that = this;
                 this.all = [];
@@ -208,6 +211,8 @@ export const buildModel = function() {
                 this.trigger('sync');
                 model.trigger('counter:sync');
             }.bind(this));
+            await this.promiseSync;
+            setTimeout(() => this.promiseSync = null, 250);
         },
         behaviours: 'actualites'
     });
