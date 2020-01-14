@@ -49,7 +49,7 @@ buildNode () {
     exit -1
   fi
 
-  if [ "$BRANCH_NAME" = 'master' ]; then
+  if [ "$BRANCH_NAME" = 'v1.7.3' ]; then
       echo "[buildNode] Use entcore version from package.json ($BRANCH_NAME)"
       case `uname -s` in
         MINGW*)
