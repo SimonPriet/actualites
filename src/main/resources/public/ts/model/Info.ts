@@ -71,15 +71,6 @@ export class Info extends Model {
 
     toJson () {
         let pubDate = null;
-        if (this.hasPublicationDate) {
-            pubDate = this.publication_date;
-            if (!moment.isMoment(pubDate)) {
-                pubDate = moment(pubDate);
-            }
-            if (!pubDate.isSame(moment(), 'd')) pubDate.hour(1);
-            pubDate = pubDate.format();
-        }
-
         let exportThis: any = {
             title: this.title,
             content: this.content,
@@ -87,13 +78,20 @@ export class Info extends Model {
             is_headline: this.is_headline,
             thread_id: this.thread._id
         };
-        if (pubDate){
-            exportThis.publication_date = pubDate;
+        if (this.hasPublicationDate) {
+            pubDate = this.publication_date;
+            if(this.publication_date !== "Invalid date"){
+                pubDate = (Utils.isDateFormateCompatible(pubDate))
+                    ? Utils.getExploitableDate(pubDate)
+                    : moment(pubDate);
+                if (!pubDate.isSame(moment(), 'd')) pubDate.hour(1);
+                exportThis.publication_date = pubDate.format('YYYY-MM-DD[T]HH:mm:ss.SSS');
+            }
         }
 
         if (this.hasExpirationDate && this.expiration_date) {
             let expDate = this.expiration_date;
-            if(typeof expDate === "string" && expDate.length === 10) expDate = Utils.getExploitableDate(expDate);
+            if(Utils.isDateFormateCompatible(expDate)) expDate = Utils.getExploitableDate(expDate);
             exportThis.expiration_date = moment(expDate).format('YYYY-MM-DD[T]HH:mm:ss.SSS');
         }
         return exportThis;

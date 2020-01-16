@@ -21,7 +21,7 @@ export class Utils {
         const dateHash:string[] = date.split("/");
         return moment(new Date(
             parseInt(dateHash[2]),
-            parseInt(dateHash[1]),
+            parseInt((parseInt(dateHash[1]) -1).toString(10)),
             parseInt(dateHash[0]),
             0,
             0,
@@ -30,5 +30,8 @@ export class Utils {
         } catch (error) {
             throw error;
         }
+    }
+    static isDateFormateCompatible(date:any):Boolean{
+        return (typeof date === "string" && date.length === 10 && date.includes("/"));
     }
 }
