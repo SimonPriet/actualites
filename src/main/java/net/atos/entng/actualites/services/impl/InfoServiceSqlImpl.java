@@ -200,7 +200,7 @@ public class InfoServiceSqlImpl implements InfoService {
 		}
 	}
 
-	private String listSubquery(String where, Integer status){
+	private String listSubquery(String where, Integer status, Boolean publicationFilter){
 		final StringBuilder subQuery = new StringBuilder();
 		subQuery.append("SELECT i.id, i.title, i.thread_id, i.owner, ");
 		subQuery.append("u.username, t.title AS thread_title, t.icon AS thread_icon, ");
@@ -211,9 +211,11 @@ public class InfoServiceSqlImpl implements InfoService {
 		subQuery.append("LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id ");
 		subQuery.append("LEFT JOIN actualites.users AS u ON i.owner = u.id ");
 		subQuery.append("LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id ");
-		subQuery.append("WHERE (i.publication_date IS NULL OR i.publication_date <= LOCALTIMESTAMP) ");
-		subQuery.append("AND (i.expiration_date IS NULL OR i.expiration_date > LOCALTIMESTAMP) ");
-		subQuery.append("AND "+where+" ");
+		subQuery.append("WHERE "+where+" ");
+		if(publicationFilter){
+			subQuery.append(" AND (i.publication_date IS NULL OR i.publication_date <= LOCALTIMESTAMP) ");
+			subQuery.append(" AND (i.expiration_date IS NULL OR i.expiration_date > LOCALTIMESTAMP) ");
+		}
 		if(status != null){
 			subQuery.append("AND i.status > " + status + " ");
 		}
@@ -238,13 +240,13 @@ public class InfoServiceSqlImpl implements InfoService {
 			query.append(") AS comments, ");
 			query.append("tmp.content, tmp.status, tmp.publication_date, tmp.expiration_date, tmp.is_headline,tmp.created, tmp.modified ");
 			query.append("FROM ( ");
-			query.append(listSubquery("i.owner = ? ",null));
+			query.append(listSubquery("i.owner = ? ",null, false));
 			query.append(" UNION ");
-			query.append(listSubquery("ios.member_id IN " + Sql.listPrepared(groupsAndUserIds),2));
+			query.append(listSubquery("ios.member_id IN " + Sql.listPrepared(groupsAndUserIds),2, true));
 			query.append(" UNION ");
-			query.append(listSubquery("t.owner = ? ", 1));
+			query.append(listSubquery("t.owner = ? ", 1, false));
 			query.append(" UNION ");
-			query.append(listSubquery("ts.action = ? AND ts.member_id IN " + Sql.listPrepared(groupsAndUserIds),1));
+			query.append(listSubquery("ts.action = ? AND ts.member_id IN " + Sql.listPrepared(groupsAndUserIds),1,false));
 			query.append(" ) as tmp ");
 			query.append("LEFT JOIN actualites.members AS m ON ((tsmember_id = m.id OR iosmember_id = m.id) AND m.group_id IS NOT NULL) ");
 			query.append("GROUP BY tmp.id, tmp.title, tmp.thread_id,tmp.owner, tmp.username,tmp.thread_title, tmp.thread_icon, ");
@@ -346,7 +348,7 @@ public class InfoServiceSqlImpl implements InfoService {
 		}
 	}
 
-	private String listForLinkerSubquery(String where){
+	private String listForLinkerSubquery(String where, Integer status, Boolean publicationFilter){
 		final StringBuilder subQuery = new StringBuilder();
 		subQuery.append("SELECT i.id, i.title, i.thread_id, i.owner, ");
 		subQuery.append("u.username, t.title AS thread_title, t.icon AS thread_icon, ");
@@ -356,10 +358,14 @@ public class InfoServiceSqlImpl implements InfoService {
 		subQuery.append("LEFT JOIN actualites.thread_shares AS ts ON t.id = ts.resource_id ");
 		subQuery.append("LEFT JOIN actualites.users AS u ON i.owner = u.id ");
 		subQuery.append("LEFT JOIN actualites.info_shares AS ios ON i.id = ios.resource_id ");
-		subQuery.append("WHERE i.status > 2 ");
-		subQuery.append("AND (i.publication_date IS NULL OR i.publication_date <= LOCALTIMESTAMP) ");
-		subQuery.append("AND (i.expiration_date IS NULL OR i.expiration_date > LOCALTIMESTAMP) ");
-		subQuery.append("AND "+where+" ");
+		subQuery.append("WHERE "+where+" ");
+		if(publicationFilter){
+			subQuery.append(" AND (i.publication_date IS NULL OR i.publication_date <= LOCALTIMESTAMP) ");
+			subQuery.append(" AND (i.expiration_date IS NULL OR i.expiration_date > LOCALTIMESTAMP) ");
+		}
+		if(status != null){
+			subQuery.append("AND i.status > " + status + " ");
+		}
 		return subQuery.toString();
 	}
 
@@ -377,13 +383,13 @@ public class InfoServiceSqlImpl implements InfoService {
 			query.append("json_agg(row_to_json(ROW (tmp.iosmember_id, tmp.iosaction)::actualites.share_tuple)) AS shared, ");
 			query.append("array_to_json(array_agg(group_id)) AS GROUPS ");
 			query.append("FROM ( ");
-			query.append(listForLinkerSubquery("i.owner = ? "));
+			query.append(listForLinkerSubquery("i.owner = ? ", null, false));
 			query.append(" UNION ");
-			query.append(listForLinkerSubquery("ios.member_id IN " + Sql.listPrepared(groupsAndUserIds)));
+			query.append(listForLinkerSubquery("ios.member_id IN " + Sql.listPrepared(groupsAndUserIds), 2, true));
 			query.append(" UNION ");
-			query.append(listForLinkerSubquery("t.owner = ? "));
+			query.append(listForLinkerSubquery("t.owner = ? ",1,false));
 			query.append(" UNION ");
-			query.append(listForLinkerSubquery("ts.action = ? AND ts.member_id IN " + Sql.listPrepared(groupsAndUserIds)));
+			query.append(listForLinkerSubquery("ts.action = ? AND ts.member_id IN " + Sql.listPrepared(groupsAndUserIds),1,false));
 			query.append(" ) as tmp ");
 			query.append("LEFT JOIN actualites.members AS m ON ((tsmember_id = m.id OR iosmember_id = m.id) AND m.group_id IS NOT NULL) ");
 			query.append("GROUP BY tmp.id, tmp.title, tmp.thread_id,tmp.owner, tmp.username,tmp.thread_title, tmp.thread_icon ");
