@@ -186,8 +186,6 @@ export const buildModel = function() {
                         info.publication_date = info.publication_date.split('.')[0];
                         info.hasPublicationDate = true;
                     }
-                    const regexCleanFunctionInTag = /(ng-(.*?).\"(.*?)\")/g;
-                    if(info.content) info.content = info.content.replace(regexCleanFunctionInTag," ");
                     if (info.expiration_date) {
                         info.expiration_date = info.expiration_date.split('.')[0];
                         info.hasExpirationDate = true;
