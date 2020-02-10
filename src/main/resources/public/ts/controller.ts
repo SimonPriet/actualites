@@ -168,7 +168,6 @@ export const actualiteController = ng.controller('ActualitesController',
                             model.infos.one('sync', function () {
                                 model.threads.mapInfos();
                                 initTimeline();
-                                safeApply($scope);
                             });
                         } else {
                             initTimeline();
