@@ -2,7 +2,7 @@
 	<h1><i18n>actualites.widget.title</i18n></h1>
 	<div class="new">
 		<a class="cell-ellipsis" ng-repeat="info in widget.infos" ng-href="/actualites#/view/thread/[[info.thread_id]]/info/[[info._id]]" >
-			<img class="new--icon" skin-src="/img/illustrations/actualites-default.png" ng-if="!info.thread.icon" />
+			<img class="new--icon" skin-src="/img/illustrations/news-default.svg" ng-if="!info.thread.icon" />
 			<img class="new--icon" ng-src="[[info.thread.icon]]?thumbnail=120x120" ng-if="info.thread.icon" />
 			<span class="new--title" tooltip="[[info.tooltip]]">[[info.title]]</span>
 			<span class="new--info cell-ellipsis">[[info.relativeDate]] - [[info.username]]</span>
