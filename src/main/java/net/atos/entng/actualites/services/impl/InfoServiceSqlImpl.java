@@ -312,7 +312,7 @@ public class InfoServiceSqlImpl implements InfoService {
 			if (user.getGroupsIds() != null) {
 				groupsAndUserIds.addAll(user.getGroupsIds());
 			}
-			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title , " +
+			query = "SELECT i.id as _id, i.title, u.username, t.id AS thread_id, t.title AS thread_title , t.icon AS thread_icon, " +
 				" CASE WHEN i.publication_date > i.modified" +
 					" THEN i.publication_date" +
 					" ELSE i.modified" +
