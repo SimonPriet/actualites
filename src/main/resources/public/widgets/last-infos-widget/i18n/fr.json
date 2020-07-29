@@ -1,8 +1,8 @@
 {
     "last-infos-widget": "Actualités",
     "actualites.widget.author": "Auteur",
-    "actualites.widget.bad.request.invalid.size": "Le paramètre resultSize est invalide, il doit être compris entre 1 et 20",
-    "actualites.widget.bad.request.size.must.be.an.integer": "Le paramètre resultSize doit être un entier",
+    "actualites.widget.bad.request.invalid.size": "Nombre d'actualités invalide : veillez choisir un nombre compris entre 1 et 20.",
+    "actualites.widget.bad.request.size.must.be.an.integer": "Nombre d'actualités invalide : veillez utiliser un nombre.",
     "actualites.widget.config": "Configurer",
     "actualites.widget.config.cancel": "Annuler",
     "actualites.widget.config.nbr": "Nombre d'actualités à afficher",
